@@ -4,8 +4,46 @@
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
+@source '../**/*.jsx';
 
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    background: #f5f2ea;
+    color: #18181b;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.input {
+    min-height: 2.75rem;
+    width: 100%;
+    border: 1px solid #d6d3d1;
+    background: #fff;
+    padding: 0 0.75rem;
+    color: #18181b;
+    outline: none;
+}
+
+.input:focus {
+    border-color: #0f766e;
+    box-shadow: 0 0 0 3px rgb(15 118 110 / 14%);
 }

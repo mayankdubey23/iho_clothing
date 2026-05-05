@@ -12,6 +12,16 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
+        $validated = $request->validate([
+            'category' => ['nullable', 'string', 'max:255'],
+            'size' => ['nullable', 'string', 'max:50'],
+            'color' => ['nullable', 'string', 'max:100'],
+            'search' => ['nullable', 'string', 'max:255'],
+            'min_price' => ['nullable', 'numeric', 'min:0'],
+            'max_price' => ['nullable', 'numeric', 'min:0'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
+        ]);
+
         $perPage = max(1, min($request->integer('per_page', 12), 50));
 
         $products = Product::query()
@@ -21,8 +31,27 @@ class ProductController extends Controller
                 'images' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('sort_order'),
             ])
             ->where('is_active', true)
-            ->when($request->filled('category'), function ($query) use ($request) {
-                $query->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('slug', $request->string('category')->toString()));
+            ->when($validated['category'] ?? null, function ($query, $category) {
+                $query->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('slug', $category));
+            })
+            ->when($validated['size'] ?? null, function ($query, $size) {
+                $query->whereHas('skus', fn ($skuQuery) => $skuQuery->where('size', $size));
+            })
+            ->when($validated['color'] ?? null, function ($query, $color) {
+                $query->whereHas('skus', fn ($skuQuery) => $skuQuery->where('color', $color));
+            })
+            ->when($validated['search'] ?? null, function ($query, $search) {
+                $query->where(function ($searchQuery) use ($search) {
+                    $searchQuery
+                        ->where('name', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->when($validated['min_price'] ?? null, function ($query, $minPrice) {
+                $query->where('base_price', '>=', $minPrice);
+            })
+            ->when($validated['max_price'] ?? null, function ($query, $maxPrice) {
+                $query->where('base_price', '<=', $maxPrice);
             })
             ->latest()
             ->paginate($perPage);

@@ -6,11 +6,31 @@ use Illuminate\Database\Seeder;
 use App\Models\Category;
 use App\Models\FranchisePlan;
 use App\Models\Product;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        User::updateOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'IHO Admin',
+                'password' => Hash::make('password123'),
+                'role' => 'admin',
+            ],
+        );
+
+        User::updateOrCreate(
+            ['email' => 'customer@example.com'],
+            [
+                'name' => 'IHO Customer',
+                'password' => Hash::make('password123'),
+                'role' => 'customer',
+            ],
+        );
+
         $tshirtsCategory = Category::updateOrCreate(
             ['slug' => 'premium-tshirts'],
             ['name' => 'Premium T-Shirts', 'is_active' => true],
