@@ -14,7 +14,7 @@ export default function Home() {
         className="max-w-3xl"
       >
         <h1 className="text-5xl md:text-7xl font-extrabold text-[var(--color-brand-blue)] tracking-tight mb-6">
-          Elevate Your Performance.
+          Elevate Your  Best Performance.
         </h1>
         <p className="text-lg md:text-xl text-gray-600 mb-10 leading-relaxed">
           Premium sports wear designed for athletes. Explore our exclusive collection or join our growing network as a franchise partner.
