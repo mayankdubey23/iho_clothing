@@ -10,15 +10,27 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-    $products = Product::with(['category', 'skus', 'images'])->where('is_active', 1)->get();
-        
+        $perPage = max(1, min($request->integer('per_page', 12), 50));
+
+        $products = Product::query()
+            ->with([
+                'category',
+                'skus.inventory',
+                'images' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('sort_order'),
+            ])
+            ->where('is_active', true)
+            ->when($request->filled('category'), function ($query) use ($request) {
+                $query->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('slug', $request->string('category')->toString()));
+            })
+            ->latest()
+            ->paginate($perPage);
+
         return response()->json([
             'success' => true,
-            'data' => $products
+            'data' => $products,
         ]);
-    
     }
 
     /**
@@ -42,7 +54,18 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
+        abort_unless($product->is_active, 404);
+
+        $product->load([
+            'category',
+            'skus.inventory',
+            'images' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('sort_order'),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $product,
+        ]);
     }
 
     /**

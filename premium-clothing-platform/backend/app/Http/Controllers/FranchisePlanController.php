@@ -12,7 +12,14 @@ class FranchisePlanController extends Controller
      */
     public function index()
     {
-        //
+        $plans = FranchisePlan::query()
+            ->orderBy('price')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $plans,
+        ]);
     }
 
     /**
@@ -36,7 +43,10 @@ class FranchisePlanController extends Controller
      */
     public function show(FranchisePlan $franchisePlan)
     {
-        //
+        return response()->json([
+            'success' => true,
+            'data' => $franchisePlan,
+        ]);
     }
 
     /**

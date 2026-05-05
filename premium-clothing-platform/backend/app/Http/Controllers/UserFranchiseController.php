@@ -12,7 +12,16 @@ class UserFranchiseController extends Controller
      */
     public function index()
     {
-        //
+        $franchises = UserFranchise::query()
+            ->with(['franchisePlan'])
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $franchises,
+        ]);
     }
 
     /**
@@ -28,7 +37,22 @@ class UserFranchiseController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'franchise_plan_id' => ['required', 'exists:franchise_plans,id'],
+            'business_name' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $franchise = UserFranchise::create([
+            ...$validated,
+            'user_id' => $request->user()->id,
+            'status' => 'pending',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Franchise application submitted successfully.',
+            'data' => $franchise->load('franchisePlan'),
+        ], 201);
     }
 
     /**
@@ -36,7 +60,12 @@ class UserFranchiseController extends Controller
      */
     public function show(UserFranchise $userFranchise)
     {
-        //
+        abort_unless($userFranchise->user_id === auth()->id(), 403);
+
+        return response()->json([
+            'success' => true,
+            'data' => $userFranchise->load('franchisePlan'),
+        ]);
     }
 
     /**

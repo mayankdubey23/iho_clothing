@@ -8,6 +8,14 @@ class Product extends Model
 {
     protected $guarded = [];
 
+    protected function casts(): array
+    {
+        return [
+            'base_price' => 'decimal:2',
+            'franchise_price' => 'decimal:2',
+            'is_active' => 'boolean',
+        ];
+    }
 
     public function category()
     {
@@ -23,4 +31,4 @@ class Product extends Model
     {
         return $this->hasMany(ProductImage::class);
     }
-} 
+}
