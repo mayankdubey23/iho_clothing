@@ -14,10 +14,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::updateOrCreate(
-            ['email' => 'admin@example.com'],
+            ['email' => 'admin@yourdomain.com'],
             [
-                'name' => 'IHO Admin',
-                'password' => Hash::make('password123'),
+                'name' => 'Admin User',
+                'password' => Hash::make('admin123'),
                 'role' => 'admin',
             ],
         );
@@ -39,6 +39,21 @@ class DatabaseSeeder extends Seeder
         $bottomsCategory = Category::updateOrCreate(
             ['slug' => 'performance-bottoms'],
             ['name' => 'Performance Bottoms', 'is_active' => true],
+        );
+
+        $compressionCategory = Category::updateOrCreate(
+            ['slug' => 'compression-sets'],
+            ['name' => 'Compression Sets', 'is_active' => true],
+        );
+
+        $teamwearCategory = Category::updateOrCreate(
+            ['slug' => 'teamwear-jerseys'],
+            ['name' => 'Teamwear Jerseys', 'is_active' => true],
+        );
+
+        $accessoriesCategory = Category::updateOrCreate(
+            ['slug' => 'training-accessories'],
+            ['name' => 'Training Accessories', 'is_active' => true],
         );
 
         $product1 = Product::updateOrCreate(
@@ -102,6 +117,99 @@ class DatabaseSeeder extends Seeder
 
         $product2->images()->updateOrCreate(
             ['image_path' => 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=800&q=80'],
+            ['is_primary' => true, 'sort_order' => 1],
+        );
+
+        $product3 = Product::updateOrCreate(
+            ['slug' => 'seamless-compression-training-set'],
+            [
+                'category_id' => $compressionCategory->id,
+                'name' => 'Seamless Compression Training Set',
+                'description' => 'Body-supportive top and tights set with flexible recovery comfort for gym, running, and high-intensity sessions.',
+                'base_price' => 2499.00,
+                'franchise_price' => 1799.00,
+                'is_active' => true,
+            ],
+        );
+
+        collect([
+            ['sku_code' => 'COMP-ONYX-S', 'size' => 'S', 'color' => 'Onyx', 'stock_quantity' => 18],
+            ['sku_code' => 'COMP-ONYX-M', 'size' => 'M', 'color' => 'Onyx', 'stock_quantity' => 26],
+            ['sku_code' => 'COMP-SAGE-L', 'size' => 'L', 'color' => 'Sage', 'stock_quantity' => 14],
+        ])->each(function ($sku) use ($product3) {
+            $createdSku = $product3->skus()->updateOrCreate(
+                ['sku_code' => $sku['sku_code']],
+                ['size' => $sku['size'], 'color' => $sku['color']],
+            );
+
+            $createdSku->inventory()->updateOrCreate(
+                ['sku_id' => $createdSku->id],
+                ['stock_quantity' => $sku['stock_quantity'], 'low_stock_threshold' => 8],
+            );
+        });
+
+        $product3->images()->updateOrCreate(
+            ['image_path' => 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=80'],
+            ['is_primary' => true, 'sort_order' => 1],
+        );
+
+        $product4 = Product::updateOrCreate(
+            ['slug' => 'academy-match-day-jersey'],
+            [
+                'category_id' => $teamwearCategory->id,
+                'name' => 'Academy Match Day Jersey',
+                'description' => 'Lightweight club jersey for teams, academies, and event merchandise with sharp retail presentation.',
+                'base_price' => 1599.00,
+                'franchise_price' => 1099.00,
+                'is_active' => true,
+            ],
+        );
+
+        collect([
+            ['sku_code' => 'JERSEY-RED-M', 'size' => 'M', 'color' => 'Red', 'stock_quantity' => 34],
+            ['sku_code' => 'JERSEY-RED-L', 'size' => 'L', 'color' => 'Red', 'stock_quantity' => 28],
+            ['sku_code' => 'JERSEY-BLUE-XL', 'size' => 'XL', 'color' => 'Blue', 'stock_quantity' => 20],
+        ])->each(function ($sku) use ($product4) {
+            $createdSku = $product4->skus()->updateOrCreate(
+                ['sku_code' => $sku['sku_code']],
+                ['size' => $sku['size'], 'color' => $sku['color']],
+            );
+
+            $createdSku->inventory()->updateOrCreate(
+                ['sku_id' => $createdSku->id],
+                ['stock_quantity' => $sku['stock_quantity'], 'low_stock_threshold' => 10],
+            );
+        });
+
+        $product4->images()->updateOrCreate(
+            ['image_path' => 'https://images.unsplash.com/photo-1521412644187-c49fa049e84d?w=800&q=80'],
+            ['is_primary' => true, 'sort_order' => 1],
+        );
+
+        $product5 = Product::updateOrCreate(
+            ['slug' => 'grip-training-duffel-kit'],
+            [
+                'category_id' => $accessoriesCategory->id,
+                'name' => 'Grip Training Duffel Kit',
+                'description' => 'Carry-ready sports accessory kit for franchise shelves, team orders, and bundled gymwear drops.',
+                'base_price' => 1899.00,
+                'franchise_price' => 1299.00,
+                'is_active' => true,
+            ],
+        );
+
+        $product5Sku = $product5->skus()->updateOrCreate(
+            ['sku_code' => 'DUFFEL-BLK-STD'],
+            ['size' => 'STD', 'color' => 'Black'],
+        );
+
+        $product5Sku->inventory()->updateOrCreate(
+            ['sku_id' => $product5Sku->id],
+            ['stock_quantity' => 40, 'low_stock_threshold' => 12],
+        );
+
+        $product5->images()->updateOrCreate(
+            ['image_path' => 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80'],
             ['is_primary' => true, 'sort_order' => 1],
         );
 

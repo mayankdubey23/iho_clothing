@@ -55,6 +55,35 @@ Route::get('/', function (Request $request) {
     ]);
 });
 
+Route::get('/sports-wear', function () {
+    $sportsCategorySlugs = [
+        'premium-tshirts',
+        'performance-bottoms',
+        'compression-sets',
+        'teamwear-jerseys',
+        'training-accessories',
+    ];
+
+    return Inertia::render('SportsWear', [
+        'products' => Product::query()
+            ->with([
+                'category',
+                'skus.inventory',
+                'images' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('sort_order'),
+            ])
+            ->where('is_active', true)
+            ->whereHas('category', fn ($query) => $query->whereIn('slug', $sportsCategorySlugs))
+            ->latest()
+            ->get(),
+        'categories' => Category::query()
+            ->where('is_active', true)
+            ->whereIn('slug', $sportsCategorySlugs)
+            ->orderBy('name')
+            ->get(),
+        'plans' => FranchisePlan::query()->orderBy('price')->get(),
+    ]);
+});
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', fn () => Inertia::render('Auth/Login'))->name('login');
     Route::get('/register', fn () => Inertia::render('Auth/Register'));

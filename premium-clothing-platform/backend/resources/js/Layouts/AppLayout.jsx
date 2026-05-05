@@ -1,5 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { BriefcaseBusiness, LayoutDashboard, LogOut, Menu, Package, ShoppingBag, User } from 'lucide-react';
+import { ChevronDown, Dumbbell, LayoutDashboard, LogOut, Menu, Package, ShoppingBag, User } from 'lucide-react';
 import { useState } from 'react';
 
 export const money = new Intl.NumberFormat('en-IN', {
@@ -23,15 +23,25 @@ export default function AppLayout({ children, active = 'home', admin = false }) 
 
   const nav = admin
     ? [
-        ['/admin', 'Dashboard'],
-        ['/admin/products', 'Products'],
-        ['/admin/categories', 'Categories'],
-        ['/admin/franchises', 'Franchises'],
+        { href: '/admin', label: 'Dashboard', key: 'dashboard' },
+        { href: '/admin/products', label: 'Products', key: 'products' },
+        { href: '/admin/categories', label: 'Categories', key: 'categories' },
+        { href: '/admin/franchises', label: 'Franchises', key: 'franchises' },
       ]
     : [
-        ['/', 'Storefront'],
-        ['/#catalog', 'Catalog'],
-        ['/franchise-apply', 'Franchise'],
+        { href: '/', label: 'Storefront', key: 'storefront' },
+        { href: '/#catalog', label: 'Catalog', key: 'catalog' },
+        {
+          href: '/sports-wear',
+          label: 'Sports Wear',
+          key: 'sports',
+          options: [
+            ['/sports-wear#training', 'Training fits'],
+            ['/sports-wear#teamwear', 'Teamwear'],
+            ['/sports-wear#franchise-packs', 'Franchise packs'],
+          ],
+        },
+        { href: '/franchise-apply', label: 'Franchise', key: 'franchise' },
       ];
 
   function logout() {
@@ -51,14 +61,28 @@ export default function AppLayout({ children, active = 'home', admin = false }) 
           </Link>
 
           <nav className="hidden items-center gap-1 rounded-none border border-stone-300 bg-stone-200/70 p-1 md:flex">
-            {nav.map(([href, label]) => (
-              <Link
-                key={href}
-                href={href}
-                className={`px-4 py-2 text-sm font-bold ${active === label.toLowerCase() ? 'bg-white shadow-sm' : 'text-zinc-500'}`}
-              >
-                {label}
-              </Link>
+            {nav.map((item) => (
+              <div key={item.href} className="group relative">
+                <Link
+                  href={item.href}
+                  className={`inline-flex min-h-10 items-center gap-2 px-4 text-sm font-bold ${
+                    active === item.key ? 'bg-white shadow-sm' : 'text-zinc-500'
+                  }`}
+                >
+                  {item.key === 'sports' && <Dumbbell size={16} />}
+                  {item.label}
+                  {item.options && <ChevronDown size={15} />}
+                </Link>
+                {item.options && (
+                  <div className="invisible absolute left-0 top-full z-40 min-w-56 border border-stone-300 bg-white p-2 opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100">
+                    {item.options.map(([href, label]) => (
+                      <Link key={href} href={href} className="block px-3 py-2 text-sm font-bold text-zinc-600 hover:bg-stone-100 hover:text-zinc-900">
+                        {label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </nav>
 
@@ -96,8 +120,17 @@ export default function AppLayout({ children, active = 'home', admin = false }) 
 
         {open && (
           <div className="grid gap-2 border-t border-stone-300 bg-stone-50 px-4 py-3 md:hidden">
-            {nav.map(([href, label]) => (
-              <Link key={href} href={href} className="py-2 font-bold text-zinc-700">{label}</Link>
+            {nav.map((item) => (
+              <div key={item.href} className="grid gap-1">
+                <Link href={item.href} className="py-2 font-bold text-zinc-700">{item.label}</Link>
+                {item.options && (
+                  <div className="grid gap-1 border-l border-stone-300 pl-3">
+                    {item.options.map(([href, label]) => (
+                      <Link key={href} href={href} className="py-1 text-sm font-bold text-zinc-500">{label}</Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
             {user ? (
               <>

@@ -47,3 +47,87 @@ button {
     border-color: #0f766e;
     box-shadow: 0 0 0 3px rgb(15 118 110 / 14%);
 }
+
+.hero-media {
+    transform-origin: center;
+    animation: hero-ken-burns 18s ease-in-out infinite alternate;
+}
+
+.lift-card {
+    transition:
+        transform 220ms ease,
+        box-shadow 220ms ease,
+        border-color 220ms ease;
+}
+
+.lift-card:hover {
+    transform: translateY(-6px);
+    border-color: rgb(15 118 110 / 42%);
+    box-shadow: 0 18px 40px rgb(24 24 27 / 12%);
+}
+
+.image-zoom {
+    overflow: hidden;
+}
+
+.image-zoom img {
+    transition: transform 700ms ease;
+}
+
+.lift-card:hover .image-zoom img {
+    transform: scale(1.06);
+}
+
+.button-glow {
+    position: relative;
+    overflow: hidden;
+}
+
+.button-glow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-130%) skewX(-18deg);
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 28%), transparent);
+    transition: transform 650ms ease;
+}
+
+.button-glow:hover::after {
+    transform: translateX(130%) skewX(-18deg);
+}
+
+.float-icon {
+    animation: float-icon 3.8s ease-in-out infinite;
+}
+
+@keyframes hero-ken-burns {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.08);
+    }
+}
+
+@keyframes float-icon {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
