@@ -6,7 +6,8 @@ use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\UserFranchise;
-use App\Models\Order; // Naya Order Model add kiya hai
+use App\Models\Order;
+use App\Models\Sku;
 use App\Http\Controllers\OrderController; // Smart Checkout Controller
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -270,6 +271,107 @@ Route::middleware('auth')->prefix('admin')->group(function () {
         ]));
 
         return back()->with('success', 'Category created successfully.');
+    });
+
+    // ✏️ UPDATE PRODUCT
+    Route::patch('/products/{product}', function (Request $request, Product $product) {
+        abort_unless(Auth::user()->role === 'super_admin', 403);
+
+        $product->update($request->validate([
+            'name'            => ['required', 'string', 'max:255'],
+            'slug'            => ['required', 'string', 'max:255', 'unique:products,slug,' . $product->id],
+            'category_id'     => ['required', 'exists:categories,id'],
+            'base_price'      => ['required', 'numeric', 'min:0'],
+            'franchise_price' => ['required', 'numeric', 'min:0'],
+            'description'     => ['nullable', 'string'],
+            'is_active'       => ['boolean'],
+        ]));
+
+        return back()->with('success', 'Product updated successfully.');
+    });
+
+    // 📦 ADD SKU + INVENTORY TO PRODUCT
+    Route::post('/products/{product}/skus', function (Request $request, Product $product) {
+        abort_unless(Auth::user()->role === 'super_admin', 403);
+
+        $validated = $request->validate([
+            'name'           => ['required', 'string', 'max:255'],
+            'size'           => ['nullable', 'string', 'max:50'],
+            'color'          => ['nullable', 'string', 'max:50'],
+            'stock_quantity' => ['required', 'integer', 'min:0'],
+        ]);
+
+        $sku = $product->skus()->create([
+            'name'  => $validated['name'],
+            'size'  => $validated['size']  ?? null,
+            'color' => $validated['color'] ?? null,
+        ]);
+
+        $sku->inventory()->create(['stock_quantity' => $validated['stock_quantity']]);
+
+        return back()->with('success', 'SKU added and stock set successfully.');
+    });
+
+    // 🔄 UPDATE SKU STOCK (legacy — kept for compat)
+    Route::patch('/skus/{sku}/stock', function (Request $request, Sku $sku) {
+        abort_unless(Auth::user()->role === 'super_admin', 403);
+        $validated = $request->validate(['stock_quantity' => ['required', 'integer', 'min:0']]);
+        $sku->inventory ? $sku->inventory->update($validated) : $sku->inventory()->create($validated);
+        return back()->with('success', 'Stock updated successfully.');
+    });
+
+    // ✏️ FULL SKU UPDATE (name + size + color + stock)
+    Route::patch('/skus/{sku}', function (Request $request, Sku $sku) {
+        abort_unless(Auth::user()->role === 'super_admin', 403);
+
+        $validated = $request->validate([
+            'name'           => ['required', 'string', 'max:255'],
+            'size'           => ['nullable', 'string', 'max:50'],
+            'color'          => ['nullable', 'string', 'max:50'],
+            'stock_quantity' => ['required', 'integer', 'min:0'],
+        ]);
+
+        $sku->update([
+            'name'  => $validated['name'],
+            'size'  => $validated['size']  ?? null,
+            'color' => $validated['color'] ?? null,
+        ]);
+
+        if ($sku->inventory) {
+            $sku->inventory->update(['stock_quantity' => $validated['stock_quantity']]);
+        } else {
+            $sku->inventory()->create(['stock_quantity' => $validated['stock_quantity']]);
+        }
+
+        return back()->with('success', 'SKU updated successfully.');
+    });
+
+    // 🗑️ DELETE SKU
+    Route::delete('/skus/{sku}', function (Sku $sku) {
+        abort_unless(Auth::user()->role === 'super_admin', 403);
+        $sku->inventory()->delete();
+        $sku->delete();
+        return back()->with('success', 'SKU deleted successfully.');
+    });
+
+    // 🗑️ DELETE CATEGORY
+    Route::delete('/categories/{category}', function (Category $category) {
+        abort_unless(Auth::user()->role === 'super_admin', 403);
+        $category->delete();
+        return back()->with('success', 'Category deleted successfully.');
+    });
+
+    // ✏️ UPDATE CATEGORY
+    Route::patch('/categories/{category}', function (Request $request, Category $category) {
+        abort_unless(Auth::user()->role === 'super_admin', 403);
+
+        $category->update($request->validate([
+            'name'      => ['required', 'string', 'max:255', 'unique:categories,name,' . $category->id],
+            'slug'      => ['required', 'string', 'max:255', 'unique:categories,slug,' . $category->id],
+            'is_active' => ['boolean'],
+        ]));
+
+        return back()->with('success', 'Category updated successfully.');
     });
 
     // 🏢 FRANCHISES MANAGEMENT (Only Super Admin can see applications)

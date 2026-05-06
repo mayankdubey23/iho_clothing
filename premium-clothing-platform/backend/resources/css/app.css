@@ -7,77 +7,119 @@
 @source '../**/*.jsx';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display: 'Playfair Display', ui-serif, Georgia, 'Times New Roman', serif;
 }
 
-html {
-    scroll-behavior: smooth;
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        min-width: 320px;
+        min-height: 100vh;
+        background: #f9f7f4;
+        color: #1c1917;
+        font-family: var(--font-sans);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+        font: inherit;
+    }
+
+    button {
+        cursor: pointer;
+    }
 }
 
-body {
-    min-width: 320px;
-    min-height: 100vh;
-    background: #f5f2ea;
-    color: #18181b;
+@layer components {
+    .input {
+        min-height: 2.75rem;
+        width: 100%;
+        border: 1px solid #d6d3d1;
+        background: #fff;
+        padding: 0 0.875rem;
+        color: #1c1917;
+        outline: none;
+        border-radius: 0.5rem;
+        transition:
+            border-color 200ms ease,
+            box-shadow 200ms ease;
+    }
+
+    .input:focus {
+        border-color: #0f766e;
+        box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.2rem 0.65rem;
+        border-radius: 9999px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .badge-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .badge-active {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .glass {
+        backdrop-filter: blur(20px) saturate(180%);
+        background: rgba(249, 247, 244, 0.9);
+    }
 }
 
-button,
-input,
-select,
-textarea {
-    font: inherit;
-}
-
-button {
-    cursor: pointer;
-}
-
-.input {
-    min-height: 2.75rem;
-    width: 100%;
-    border: 1px solid #d6d3d1;
-    background: #fff;
-    padding: 0 0.75rem;
-    color: #18181b;
-    outline: none;
-}
-
-.input:focus {
-    border-color: #0f766e;
-    box-shadow: 0 0 0 3px rgb(15 118 110 / 14%);
-}
-
+/* ─── Hero Animation ─── */
 .hero-media {
     transform-origin: center;
-    animation: hero-ken-burns 18s ease-in-out infinite alternate;
+    animation: hero-ken-burns 22s ease-in-out infinite alternate;
 }
 
+/* ─── Lift Card ─── */
 .lift-card {
     transition:
-        transform 220ms ease,
-        box-shadow 220ms ease,
-        border-color 220ms ease;
+        transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 260ms ease;
 }
 
 .lift-card:hover {
     transform: translateY(-6px);
-    border-color: rgb(15 118 110 / 42%);
-    box-shadow: 0 18px 40px rgb(24 24 27 / 12%);
+    border-color: rgba(15, 118, 110, 0.35);
+    box-shadow:
+        0 20px 44px rgba(28, 25, 23, 0.10),
+        0 4px 12px rgba(28, 25, 23, 0.06);
 }
 
+/* ─── Image Zoom ─── */
 .image-zoom {
     overflow: hidden;
 }
 
 .image-zoom img {
-    transition: transform 700ms ease;
+    transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .lift-card:hover .image-zoom img {
-    transform: scale(1.06);
+    transform: scale(1.07);
 }
 
+/* ─── Button Glow Shimmer ─── */
 .button-glow {
     position: relative;
     overflow: hidden;
@@ -88,43 +130,57 @@ button {
     position: absolute;
     inset: 0;
     transform: translateX(-130%) skewX(-18deg);
-    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 28%), transparent);
-    transition: transform 650ms ease;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+    transition: transform 700ms ease;
 }
 
 .button-glow:hover::after {
     transform: translateX(130%) skewX(-18deg);
 }
 
+/* ─── Float Icon ─── */
 .float-icon {
-    animation: float-icon 3.8s ease-in-out infinite;
+    animation: float-icon 4s ease-in-out infinite;
 }
 
-@keyframes hero-ken-burns {
-    from {
-        transform: scale(1);
-    }
+/* ─── Marquee ─── */
+.marquee-track {
+    animation: marquee 30s linear infinite;
+    display: flex;
+    gap: 0;
+}
 
-    to {
-        transform: scale(1.08);
-    }
+/* ─── Shimmer Skeleton ─── */
+.shimmer {
+    background: linear-gradient(90deg, #f3f2ef 25%, #eae9e4 50%, #f3f2ef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* ─── Keyframes ─── */
+@keyframes hero-ken-burns {
+    from { transform: scale(1); }
+    to { transform: scale(1.08); }
 }
 
 @keyframes float-icon {
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-6px);
-    }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-7px); }
 }
 
+@keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* ─── Reduced Motion ─── */
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    *, *::before, *::after {
         scroll-behavior: auto !important;
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
