@@ -1,81 +1,113 @@
-import { useForm } from '@inertiajs/react';
-import AppLayout, { Field, SectionHeading, imageFor, money, stockFor } from '../../Layouts/AppLayout';
+import React, { useState } from 'react';
+import { Head, useForm } from '@inertiajs/react';
+import { Plus, X, Image as ImageIcon } from 'lucide-react';
+import AdminLayout from '../../Layouts/AdminLayout';
 
 export default function Products({ products, categories }) {
-  const { data, setData, post, processing, errors, reset } = useForm({
-    name: '',
-    slug: '',
-    category_id: categories[0]?.id || '',
-    base_price: '',
-    franchise_price: '',
-    description: '',
-    is_active: true,
-  });
-
-  function submit(event) {
-    event.preventDefault();
-    post('/admin/products', {
-      onSuccess: () => reset('name', 'slug', 'base_price', 'franchise_price', 'description'),
+    const [showModal, setShowModal] = useState(false);
+    const { data, setData, post, processing, reset } = useForm({
+        name: '', slug: '', category_id: categories[0]?.id || '',
+        base_price: '', franchise_price: '', description: '', is_active: true
     });
-  }
 
-  return (
-    <AppLayout active="products" admin>
-      <main className="mx-auto grid max-w-7xl gap-8 px-4 py-8 lg:grid-cols-[380px_minmax(0,1fr)] lg:px-8">
-        <form onSubmit={submit} className="h-fit border border-stone-300 bg-white p-6 shadow-sm lg:sticky lg:top-24">
-          <SectionHeading eyebrow="Admin" title="Add product" />
-          <div className="grid gap-4">
-            <Field label="Name" error={errors.name}>
-              <input className="input" value={data.name} onChange={(event) => setData('name', event.target.value)} required />
-            </Field>
-            <Field label="Slug" error={errors.slug}>
-              <input className="input" value={data.slug} onChange={(event) => setData('slug', event.target.value)} required />
-            </Field>
-            <Field label="Category" error={errors.category_id}>
-              <select className="input" value={data.category_id} onChange={(event) => setData('category_id', event.target.value)} required>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>{category.name}</option>
-                ))}
-              </select>
-            </Field>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Retail price" error={errors.base_price}>
-                <input className="input" type="number" min="0" value={data.base_price} onChange={(event) => setData('base_price', event.target.value)} required />
-              </Field>
-              <Field label="Franchise price" error={errors.franchise_price}>
-                <input className="input" type="number" min="0" value={data.franchise_price} onChange={(event) => setData('franchise_price', event.target.value)} required />
-              </Field>
-            </div>
-            <Field label="Description" error={errors.description}>
-              <textarea className="input min-h-28 py-3" value={data.description} onChange={(event) => setData('description', event.target.value)} />
-            </Field>
-            <button disabled={processing} className="min-h-11 bg-zinc-900 px-4 font-black text-white disabled:bg-stone-400">Save product</button>
-          </div>
-        </form>
+    const submitProduct = (e) => {
+        e.preventDefault();
+        post('/admin/products', {
+            onSuccess: () => { setShowModal(false); reset(); alert("Product Added Successfully!"); }
+        });
+    };
 
-        <section>
-          <SectionHeading eyebrow="Catalog" title="Products" aside={`${products.total} total`} />
-          <div className="grid gap-4">
-            {products.data.map((product) => (
-              <article key={product.id} className="grid gap-4 border border-stone-300 bg-white p-4 shadow-sm md:grid-cols-[120px_1fr_auto]">
-                <div className="h-28 bg-stone-200">
-                  {imageFor(product) && <img className="h-full w-full object-cover" src={imageFor(product)} alt={product.name} />}
-                </div>
+    return (
+        <AdminLayout active="products">
+            <Head title="Products | Admin" />
+            
+            <div className="flex justify-between items-end mb-10">
                 <div>
-                  <p className="text-xs font-black uppercase text-teal-700">{product.category?.name || 'Uncategorized'}</p>
-                  <h3 className="text-xl font-black">{product.name}</h3>
-                  <p className="mt-1 line-clamp-2 text-sm text-zinc-500">{product.description}</p>
-                  <p className="mt-2 text-sm font-bold text-zinc-600">{stockFor(product)} stock units</p>
+                    <h1 className="text-3xl font-black text-slate-900">Product Catalog</h1>
+                    <p className="text-slate-500 mt-1">Manage all retail and franchise inventory.</p>
                 </div>
-                <div className="text-left md:text-right">
-                  <strong className="block text-xl">{money.format(Number(product.base_price))}</strong>
-                  <small className="font-black text-orange-700">{money.format(Number(product.franchise_price))} franchise</small>
+                <button onClick={() => setShowModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-bold shadow-md shadow-blue-500/30 flex items-center gap-2 transition">
+                    <Plus size={20} /> Add Product
+                </button>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <table className="w-full text-left">
+                    <thead className="bg-slate-50 text-slate-500 text-sm border-b border-slate-200">
+                        <tr>
+                            <th className="px-6 py-4 font-bold">Product Name</th>
+                            <th className="px-6 py-4 font-bold">Category</th>
+                            <th className="px-6 py-4 font-bold">Retail Price</th>
+                            <th className="px-6 py-4 font-bold">Franchise Price</th>
+                            <th className="px-6 py-4 font-bold text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                        {products.data.map(product => (
+                            <tr key={product.id} className="hover:bg-slate-50 transition">
+                                <td className="px-6 py-4 flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
+                                        <ImageIcon size={20} />
+                                    </div>
+                                    <span className="font-bold text-slate-900">{product.name}</span>
+                                </td>
+                                <td className="px-6 py-4 font-semibold text-slate-600">{product.category?.name}</td>
+                                <td className="px-6 py-4 font-black text-slate-900">₹{product.base_price}</td>
+                                <td className="px-6 py-4 font-black text-orange-600">₹{product.franchise_price}</td>
+                                <td className="px-6 py-4 text-center">
+                                    <span className="bg-emerald-100 text-emerald-800 text-xs px-3 py-1 rounded-full font-bold">Active</span>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Modal */}
+            {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+                        <div className="bg-slate-900 text-white p-5 flex justify-between items-center">
+                            <h3 className="font-bold text-lg">Create New Product</h3>
+                            <button onClick={() => setShowModal(false)} className="hover:text-slate-300"><X size={24} /></button>
+                        </div>
+                        <form onSubmit={submitProduct} className="p-8">
+                            <div className="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 mb-2">Product Name</label>
+                                    <input required className="w-full border-slate-300 border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={data.name} onChange={e => setData('name', e.target.value)} />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 mb-2">URL Slug</label>
+                                    <input required className="w-full border-slate-300 border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={data.slug} onChange={e => setData('slug', e.target.value)} placeholder="tshirt-black" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 mb-2">Category</label>
+                                    <select className="w-full border-slate-300 border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={data.category_id} onChange={e => setData('category_id', e.target.value)}>
+                                        {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 mb-2">Retail Price (₹)</label>
+                                    <input required type="number" className="w-full border-slate-300 border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={data.base_price} onChange={e => setData('base_price', e.target.value)} />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 mb-2">Franchise Price (₹)</label>
+                                    <input required type="number" className="w-full border-slate-300 border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={data.franchise_price} onChange={e => setData('franchise_price', e.target.value)} />
+                                </div>
+                            </div>
+                            <div className="mt-6">
+                                <label className="block text-sm font-bold text-slate-700 mb-2">Description</label>
+                                <textarea required className="w-full border-slate-300 border p-3 rounded-lg h-24 focus:ring-2 focus:ring-blue-500 outline-none" value={data.description} onChange={e => setData('description', e.target.value)}></textarea>
+                            </div>
+                            <div className="mt-8 flex justify-end gap-3">
+                                <button type="button" onClick={() => setShowModal(false)} className="px-6 py-3 rounded-lg font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancel</button>
+                                <button type="submit" disabled={processing} className="px-6 py-3 rounded-lg font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition disabled:opacity-50">Save Product</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-              </article>
-            ))}
-          </div>
-        </section>
-      </main>
-    </AppLayout>
-  );
+            )}
+        </AdminLayout>
+    );
 }

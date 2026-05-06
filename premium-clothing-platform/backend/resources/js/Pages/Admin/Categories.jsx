@@ -1,44 +1,82 @@
-import { useForm } from '@inertiajs/react';
-import AppLayout, { Field, SectionHeading } from '../../Layouts/AppLayout';
+import React, { useState } from 'react';
+import { Head, useForm } from '@inertiajs/react';
+import { Plus, X } from 'lucide-react';
+import AdminLayout from '../../Layouts/AdminLayout';
 
 export default function Categories({ categories }) {
-  const { data, setData, post, processing, errors, reset } = useForm({ name: '', slug: '', is_active: true });
+    const [showModal, setShowModal] = useState(false);
+    const { data, setData, post, processing, reset } = useForm({
+        name: '', slug: '', is_active: true
+    });
 
-  function submit(event) {
-    event.preventDefault();
-    post('/admin/categories', { onSuccess: () => reset('name', 'slug') });
-  }
+    const submitCategory = (e) => {
+        e.preventDefault();
+        post('/admin/categories', {
+            onSuccess: () => { setShowModal(false); reset(); }
+        });
+    };
 
-  return (
-    <AppLayout active="categories" admin>
-      <main className="mx-auto grid max-w-7xl gap-8 px-4 py-8 lg:grid-cols-[360px_minmax(0,1fr)] lg:px-8">
-        <form onSubmit={submit} className="h-fit border border-stone-300 bg-white p-6 shadow-sm">
-          <SectionHeading eyebrow="Admin" title="Add category" />
-          <div className="grid gap-4">
-            <Field label="Name" error={errors.name}>
-              <input className="input" value={data.name} onChange={(event) => setData('name', event.target.value)} required />
-            </Field>
-            <Field label="Slug" error={errors.slug}>
-              <input className="input" value={data.slug} onChange={(event) => setData('slug', event.target.value)} required />
-            </Field>
-            <button disabled={processing} className="min-h-11 bg-zinc-900 px-4 font-black text-white disabled:bg-stone-400">Save category</button>
-          </div>
-        </form>
-        <section>
-          <SectionHeading eyebrow="Catalog" title="Categories" aside={`${categories.length} total`} />
-          <div className="grid gap-3">
-            {categories.map((category) => (
-              <article key={category.id} className="flex items-center justify-between border border-stone-300 bg-white p-5 shadow-sm">
+    return (
+        <AdminLayout active="categories">
+            <Head title="Categories | Admin" />
+            
+            <div className="flex justify-between items-end mb-10">
                 <div>
-                  <h3 className="text-xl font-black">{category.name}</h3>
-                  <p className="text-sm text-zinc-500">{category.slug}</p>
+                    <h1 className="text-3xl font-black text-slate-900">Categories</h1>
+                    <p className="text-slate-500 mt-1">Manage clothing categories.</p>
                 </div>
-                <span className="font-black text-teal-700">{category.products_count} products</span>
-              </article>
-            ))}
-          </div>
-        </section>
-      </main>
-    </AppLayout>
-  );
+                <button onClick={() => setShowModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-bold shadow-md shadow-blue-500/30 flex items-center gap-2 transition">
+                    <Plus size={20} /> Add Category
+                </button>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden max-w-4xl">
+                <table className="w-full text-left">
+                    <thead className="bg-slate-50 text-slate-500 text-sm border-b border-slate-200">
+                        <tr>
+                            <th className="px-6 py-4 font-bold">Category Name</th>
+                            <th className="px-6 py-4 font-bold">Slug</th>
+                            <th className="px-6 py-4 font-bold text-center">Total Products</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                        {categories.map(category => (
+                            <tr key={category.id} className="hover:bg-slate-50 transition">
+                                <td className="px-6 py-4 font-bold text-slate-900">{category.name}</td>
+                                <td className="px-6 py-4 text-slate-500">{category.slug}</td>
+                                <td className="px-6 py-4 font-black text-blue-600 text-center">{category.products_count || 0}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Modal */}
+            {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+                        <div className="bg-slate-900 text-white p-5 flex justify-between items-center">
+                            <h3 className="font-bold text-lg">Add Category</h3>
+                            <button onClick={() => setShowModal(false)}><X size={24} /></button>
+                        </div>
+                        <form onSubmit={submitCategory} className="p-6">
+                            <div className="grid gap-5">
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 mb-2">Name</label>
+                                    <input required className="w-full border-slate-300 border p-3 rounded-lg" value={data.name} onChange={e => setData('name', e.target.value)} />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 mb-2">Slug</label>
+                                    <input required className="w-full border-slate-300 border p-3 rounded-lg" value={data.slug} onChange={e => setData('slug', e.target.value)} />
+                                </div>
+                            </div>
+                            <div className="mt-8 flex justify-end gap-3">
+                                <button type="submit" disabled={processing} className="w-full py-3 rounded-lg font-bold text-white bg-blue-600 hover:bg-blue-700">Save Category</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </AdminLayout>
+    );
 }

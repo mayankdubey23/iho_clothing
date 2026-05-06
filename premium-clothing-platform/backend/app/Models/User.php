@@ -2,20 +2,36 @@
 
 namespace App\Models;
 
-use Laravel\Sanctum\HasApiTokens;
-
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role', // <-- Yeh add karna zaroori tha
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
     /**
      * Get the attributes that should be cast.
@@ -30,8 +46,25 @@ class User extends Authenticatable
         ];
     }
 
-    public function franchises()
+    // ==========================================
+    // 🏢 FRANCHISE & ADMIN RELATIONSHIPS
+    // ==========================================
+
+    // Franchise ke sabhi service pincodes
+    public function servicePincodes()
     {
-        return $this->hasMany(UserFranchise::class);
+        return $this->hasMany(FranchisePincode::class, 'franchise_id');
+    }
+
+    // Franchise ka apna stock/inventory
+    public function inventories()
+    {
+        return $this->hasMany(Inventory::class, 'franchise_id');
+    }
+
+    // Franchise ne kitne orders fulfill kiye
+    public function fulfilledOrders()
+    {
+        return $this->hasMany(Order::class, 'franchise_id');
     }
 }

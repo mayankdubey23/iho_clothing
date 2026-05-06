@@ -5,15 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class OrderItem extends Model
+class FranchisePincode extends Model
 {
     use HasFactory;
-
+    
     protected $guarded = [];
 
-    // Yeh item kisi specific order se juda hai
-    public function order()
+    // Yeh pincode kis franchise ka hai
+    public function franchise()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(User::class, 'franchise_id');
     }
-} 
+}

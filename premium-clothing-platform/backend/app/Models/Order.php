@@ -11,9 +11,15 @@ class Order extends Model
 
     protected $guarded = []; // Security allow karne ke liye
 
-    // Ek order mein kai items hote hain
+    // Ek order mein kai items (kapde) hote hain
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    // Kis franchise ne is order ko fulfill kiya (Profit kiska hua)
+    public function fulfilledBy()
+    {
+        return $this->belongsTo(User::class, 'franchise_id');
     }
 }
