@@ -208,7 +208,6 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     // 🛡️ SUPER ADMIN ONLY SECTION (Fixed Error Here)
     Route::prefix('/')->group(function () {
-        
         Route::get('/products', function () {
             abort_unless(Auth::user()->role === 'super_admin', 403);
             return Inertia::render('Admin/Products', [
@@ -222,7 +221,6 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::post('/coupons', [App\Http\Controllers\CouponController::class, 'store']);
         Route::delete('/coupons/{coupon}', [App\Http\Controllers\CouponController::class, 'destroy']);
 
-
         // 📦 INVENTORY MANAGEMENT (Shared by Franchise & Super Admin)
         Route::post('/inventory/update', [InventoryController::class, 'updateStock'])->name('admin.inventory.update');
 
@@ -235,25 +233,26 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
             ]);
         });
 
-    Route::post('/categories', function (Request $request) {
-        abort_unless(Auth::user()->role === 'super_admin', 403);
+        Route::post('/categories', function (Request $request) {
+            abort_unless(Auth::user()->role === 'super_admin', 403);
 
-        Category::create($request->validate([
-            'name' => ['required', 'string', 'max:255', 'unique:categories,name'],
-            'slug' => ['required', 'string', 'max:255', 'unique:categories,slug'],
-            'is_active' => ['boolean'],
-        ]));
+            Category::create($request->validate([
+                'name' => ['required', 'string', 'max:255', 'unique:categories,name'],
+                'slug' => ['required', 'string', 'max:255', 'unique:categories,slug'],
+                'is_active' => ['boolean'],
+            ]));
 
-        return back()->with('success', 'Category created successfully.');
-    });
+            return back()->with('success', 'Category created successfully.');
+        });
 
-    // 🏢 FRANCHISES MANAGEMENT (Only Super Admin can see applications)
-    Route::get('/franchises', function () {
-        abort_unless(Auth::user()->role === 'super_admin', 403);
+        // 🏢 FRANCHISES MANAGEMENT (Only Super Admin can see applications)
+        Route::get('/franchises', function () {
+            abort_unless(Auth::user()->role === 'super_admin', 403);
 
-        return Inertia::render('Admin/Franchises', [
-            'applications' => UserFranchise::query()->with(['user', 'franchisePlan'])->latest()->get(),
-            'plans' => FranchisePlan::query()->orderBy('price')->get(),
-        ]);
+            return Inertia::render('Admin/Franchises', [
+                'applications' => UserFranchise::query()->with(['user', 'franchisePlan'])->latest()->get(),
+                'plans' => FranchisePlan::query()->orderBy('price')->get(),
+            ]);
+        });
     });
 });
