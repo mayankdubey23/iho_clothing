@@ -6,8 +6,8 @@ use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\UserFranchise;
-use App\Models\Order;
-use App\Http\Controllers\OrderController;
+use App\Models\Order; // Naya Order Model add kiya hai
+use App\Http\Controllers\OrderController; // Smart Checkout Controller
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -235,21 +235,25 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
             ]);
         });
 
-        Route::post('/categories', function (Request $request) {
-            abort_unless(Auth::user()->role === 'super_admin', 403);
-            Category::create($request->validate([
-                'name' => 'required|string|unique:categories,name',
-                'slug' => 'required|string|unique:categories,slug',
-                'is_active' => 'boolean',
-            ]));
-            return back()->with('success', 'Category added.');
-        });
+    Route::post('/categories', function (Request $request) {
+        abort_unless(Auth::user()->role === 'super_admin', 403);
 
-        Route::get('/franchises', function () {
-            abort_unless(Auth::user()->role === 'super_admin', 403);
-            return Inertia::render('Admin/Franchises', [
-                'applications' => UserFranchise::query()->with(['user', 'franchisePlan'])->latest()->get(),
-            ]);
-        });
+        Category::create($request->validate([
+            'name' => ['required', 'string', 'max:255', 'unique:categories,name'],
+            'slug' => ['required', 'string', 'max:255', 'unique:categories,slug'],
+            'is_active' => ['boolean'],
+        ]));
+
+        return back()->with('success', 'Category created successfully.');
+    });
+
+    // 🏢 FRANCHISES MANAGEMENT (Only Super Admin can see applications)
+    Route::get('/franchises', function () {
+        abort_unless(Auth::user()->role === 'super_admin', 403);
+
+        return Inertia::render('Admin/Franchises', [
+            'applications' => UserFranchise::query()->with(['user', 'franchisePlan'])->latest()->get(),
+            'plans' => FranchisePlan::query()->orderBy('price')->get(),
+        ]);
     });
 });
