@@ -3,63 +3,51 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inventory;
+use App\Models\Sku;
 use Illuminate\Http\Request;
 
 class InventoryController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Franchise ya Super Admin apna stock update kar sakein
      */
-    public function index()
+    public function updateStock(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'sku_id' => 'required|exists:skus,id',
+            'quantity' => 'required|integer',
+            'action' => 'required|in:add,subtract,set' // Stock badhana hai, ghatana hai, ya fix karna hai
+        ]);
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        $user = auth()->user();
+        
+        // Agar super admin hai toh wo kisi ka bhi stock manage kar sakta hai (abhi default null yani Main Warehouse le rahe hain)
+        // Agar franchise hai toh sirf apna hi stock update karega
+        $franchiseId = $user->role === 'franchise' ? $user->id : null;
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        // Inventory record dhundho, agar nahi hai toh naya bana do
+        $inventory = Inventory::firstOrCreate(
+            ['sku_id' => $request->sku_id, 'franchise_id' => $franchiseId],
+            ['stock_quantity' => 0]
+        );
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Inventory $inventory)
-    {
-        //
-    }
+        // Action ke hisaab se stock update karo
+        if ($request->action === 'add') {
+            $inventory->increment('stock_quantity', $request->quantity);
+            $message = "Stock added successfully!";
+        } elseif ($request->action === 'subtract') {
+            if ($inventory->stock_quantity >= $request->quantity) {
+                $inventory->decrement('stock_quantity', $request->quantity);
+                $message = "Stock reduced successfully!";
+            } else {
+                return back()->withErrors(['error' => 'Not enough stock to subtract.']);
+            }
+        } else {
+            // 'set' action - exact stock set karne ke liye
+            $inventory->update(['stock_quantity' => max(0, $request->quantity)]);
+            $message = "Stock level updated!";
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Inventory $inventory)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Inventory $inventory)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Inventory $inventory)
-    {
-        //
+        return back()->with('success', $message);
     }
 }

@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Sku;
+use App\Models\Inventory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -75,7 +78,72 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        abort_unless($request->user()?->role === 'super_admin', 403);
+
+        // 1. Inputs Validate Karein (Image optional hai)
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|unique:products,slug',
+            'category_id' => 'required|exists:categories,id',
+            'base_price' => 'required|numeric',
+            'franchise_price' => 'required|numeric',
+            'description' => 'nullable|string',
+            'is_active' => 'boolean',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048' // Real image validation
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // 2. Product Create Karein
+            $product = Product::create([
+                'name' => $validated['name'],
+                'slug' => $validated['slug'],
+                'category_id' => $validated['category_id'],
+                'base_price' => $validated['base_price'],
+                'franchise_price' => $validated['franchise_price'],
+                'description' => $validated['description'] ?? '',
+                'is_active' => $validated['is_active'] ?? true,
+            ]);
+
+            // 3. Image File Upload Logic
+            if ($request->hasFile('image')) {
+                // Image ko 'storage/app/public/products' mein save karega
+                $imagePath = $request->file('image')->store('products', 'public');
+                
+                $product->images()->create([
+                    'image_path' => '/storage/' . $imagePath,
+                    'is_primary' => true,
+                    'sort_order' => 1
+                ]);
+            }
+
+            // 4. 🤖 AUTO-SKU ENGINE: Automatically 4 sizes generate karein
+            $defaultSizes = ['S', 'M', 'L', 'XL'];
+            
+            foreach ($defaultSizes as $size) {
+                $sku = Sku::create([
+                    'product_id' => $product->id,
+                    'code' => strtoupper($validated['slug']) . '-' . $size, // Example: TSHIRT-BLACK-XL
+                    'size' => $size,
+                    'price_adjustment' => 0
+                ]);
+
+                // Har naye size ka initial stock 0 set karke Main Warehouse ko assign karein
+                Inventory::create([
+                    'sku_id' => $sku->id,
+                    'franchise_id' => null, 
+                    'stock_quantity' => 0
+                ]);
+            }
+
+            DB::commit();
+            return back()->with('success', 'Product with Auto-Sizes & Image created successfully!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Failed to create product: ' . $e->getMessage()]);
+        }
     }
 
     /**
