@@ -1,15 +1,19 @@
 import React, { useState, useRef } from 'react';
 import { Link, router, useForm } from '@inertiajs/react';
+import axios from 'axios';
 import { AnimatePresence, motion, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion';
 import {
   ArrowDown,
+  ArrowLeft,
   ArrowRight,
+  Banknote,
   BadgeCheck,
   Check,
   CheckCircle2,
   CreditCard,
   Filter,
   HeartHandshake,
+  Loader2,
   Mail,
   MapPin,
   Package,
@@ -22,6 +26,7 @@ import {
   Truck,
   X,
   Zap,
+  Tag,
 } from 'lucide-react';
 import AppLayout, { EmptyState, Field, SectionHeading, imageFor, money, stockFor } from '../Layouts/AppLayout';
 
@@ -29,12 +34,12 @@ const HERO_FALLBACK   = 'https://images.unsplash.com/photo-1523381294911-8d3cead
 const PRODUCT_FALLBACK = 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=70';
 
 const CAT_COLORS = [
-  'from-teal-900 to-teal-700',
-  'from-orange-900 to-orange-700',
-  'from-zinc-900 to-zinc-700',
-  'from-stone-800 to-stone-600',
-  'from-cyan-900 to-cyan-700',
-  'from-slate-800 to-slate-600',
+  'bg-teal-800 text-white ring-2 ring-teal-900/20',
+  'bg-orange-800 text-white ring-2 ring-orange-900/20',
+  'bg-zinc-900 text-white ring-2 ring-zinc-700/20',
+  'bg-stone-800 text-white ring-2 ring-stone-700/20',
+  'bg-cyan-800 text-white ring-2 ring-cyan-900/20',
+  'bg-slate-800 text-white ring-2 ring-slate-900/20',
 ];
 
 const fadeUp = {
@@ -113,6 +118,111 @@ const testimonials = [
   },
 ];
 
+const INDIAN_STATES = [
+  'Andhra Pradesh',
+  'Arunachal Pradesh',
+  'Assam',
+  'Bihar',
+  'Chhattisgarh',
+  'Goa',
+  'Gujarat',
+  'Haryana',
+  'Himachal Pradesh',
+  'Jharkhand',
+  'Karnataka',
+  'Kerala',
+  'Madhya Pradesh',
+  'Maharashtra',
+  'Manipur',
+  'Meghalaya',
+  'Mizoram',
+  'Nagaland',
+  'Odisha',
+  'Punjab',
+  'Rajasthan',
+  'Sikkim',
+  'Tamil Nadu',
+  'Telangana',
+  'Tripura',
+  'Uttar Pradesh',
+  'Uttarakhand',
+  'West Bengal',
+  'Andaman and Nicobar Islands',
+  'Chandigarh',
+  'Dadra and Nagar Haveli and Daman and Diu',
+  'Delhi',
+  'Jammu and Kashmir',
+  'Ladakh',
+  'Lakshadweep',
+  'Puducherry',
+];
+
+const CHECKOUT_ERROR_MESSAGES = {
+  full_name: 'Please enter a valid full name.',
+  mobile_number: 'Please enter a valid 10-digit mobile number.',
+  email: 'Please enter a valid email address.',
+  alternate_mobile_number: 'Please enter a valid alternate mobile number.',
+  house_flat_building: 'Please enter your house, flat, or building number.',
+  street_area_locality: 'Please enter your street, area, or locality.',
+  landmark: 'Please enter a valid landmark.',
+  city: 'Please enter a valid city name.',
+  state: 'Please select your state.',
+  pincode: 'Please enter a valid 6-digit pincode.',
+  country: 'Please select your country.',
+};
+
+const nameRegex = /^[A-Za-z ]{3,}$/;
+const mobileRegex = /^[6-9][0-9]{9}$/;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const cityRegex = /^[A-Za-z ]{2,}$/;
+const pincodeRegex = /^[1-9][0-9]{5}$/;
+
+function trimCheckoutData(data) {
+  return {
+    ...data,
+    full_name: (data.full_name || '').trim(),
+    mobile_number: (data.mobile_number || '').trim(),
+    email: (data.email || '').trim(),
+    alternate_mobile_number: (data.alternate_mobile_number || '').trim(),
+    house_flat_building: (data.house_flat_building || '').trim(),
+    street_area_locality: (data.street_area_locality || '').trim(),
+    landmark: (data.landmark || '').trim(),
+    city: (data.city || '').trim(),
+    state: (data.state || '').trim(),
+    pincode: (data.pincode || '').trim(),
+    country: (data.country || 'India').trim(),
+  };
+}
+
+function validateCheckout(data) {
+  const values = trimCheckoutData(data);
+  const errors = {};
+
+  if (!nameRegex.test(values.full_name)) errors.full_name = CHECKOUT_ERROR_MESSAGES.full_name;
+  if (!mobileRegex.test(values.mobile_number)) errors.mobile_number = CHECKOUT_ERROR_MESSAGES.mobile_number;
+  if (!emailRegex.test(values.email)) errors.email = CHECKOUT_ERROR_MESSAGES.email;
+  if (values.alternate_mobile_number && !mobileRegex.test(values.alternate_mobile_number)) {
+    errors.alternate_mobile_number = CHECKOUT_ERROR_MESSAGES.alternate_mobile_number;
+  }
+  if (values.house_flat_building.length < 2) errors.house_flat_building = CHECKOUT_ERROR_MESSAGES.house_flat_building;
+  if (values.street_area_locality.length < 3) errors.street_area_locality = CHECKOUT_ERROR_MESSAGES.street_area_locality;
+  if (values.landmark && (values.landmark.length < 3 || !/[A-Za-z0-9]/.test(values.landmark))) {
+    errors.landmark = CHECKOUT_ERROR_MESSAGES.landmark;
+  }
+  if (!cityRegex.test(values.city)) errors.city = CHECKOUT_ERROR_MESSAGES.city;
+  if (!values.state) errors.state = CHECKOUT_ERROR_MESSAGES.state;
+  if (!pincodeRegex.test(values.pincode)) errors.pincode = CHECKOUT_ERROR_MESSAGES.pincode;
+  if (values.country !== 'India') errors.country = CHECKOUT_ERROR_MESSAGES.country;
+
+  return errors;
+}
+
+function firstError(errors, field) {
+  const error = errors[field];
+  return Array.isArray(error) ? error[0] : error;
+}
+
+
 export default function Storefront({ products, categories, plans, filters }) {
   const { data, setData, get } = useForm({
     category: filters.category || 'all',
@@ -124,19 +234,37 @@ export default function Storefront({ products, categories, plans, filters }) {
   const [checkoutProduct, setCheckoutProduct] = useState(null);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterDone, setNewsletterDone] = useState(false);
+  const [orderProcessing, setOrderProcessing] = useState(false);
+  const [checkoutErrors, setCheckoutErrors] = useState({});
+  const [checkoutTouched, setCheckoutTouched] = useState({});
+  const [checkoutAttempted, setCheckoutAttempted] = useState(false);
+  const [checkoutMessage, setCheckoutMessage] = useState('');
+  const [isFetchingPincode, setIsFetchingPincode] = useState(false);
+  const [pincodeApiError, setPincodeApiError] = useState('');
+  const [paymentStep, setPaymentStep] = useState('form'); // 'form' | 'payment'
+
+  // Coupon logic state
+  const [couponCode, setCouponCode] = useState('');
+  const [discount, setDiscount] = useState(0);
+  const [finalTotal, setFinalTotal] = useState(0);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
 
   const {
     data: orderData,
     setData: setOrderData,
-    post: placeOrder,
-    processing,
     reset,
   } = useForm({
-    customer_name: '',
-    customer_phone: '',
-    customer_email: '',
-    shipping_address: '',
+    full_name: '',
+    mobile_number: '',
+    email: '',
+    alternate_mobile_number: '',
+    house_flat_building: '',
+    street_area_locality: '',
+    landmark: '',
+    city: '',
+    state: '',
     pincode: '',
+    country: 'India',
     total_amount: 0,
     items: [],
   });
@@ -184,31 +312,245 @@ export default function Storefront({ products, categories, plans, filters }) {
     get('/', { preserveState: true, preserveScroll: true });
   }
 
+
   function handleBuyNow(product) {
     const sku = product.skus?.[0];
     if (!sku) return alert('Out of stock!');
     setCheckoutProduct(product);
     setOrderData({
-      customer_name: '',
-      customer_phone: '',
-      customer_email: '',
-      shipping_address: '',
+      full_name: '',
+      mobile_number: '',
+      email: '',
+      alternate_mobile_number: '',
+      house_flat_building: '',
+      street_area_locality: '',
+      landmark: '',
+      city: '',
+      state: '',
       pincode: '',
+      country: 'India',
       total_amount: product.base_price,
       items: [{ product_id: product.id, sku_id: sku.id, quantity: 1, price: product.base_price }],
     });
+    setCheckoutErrors({});
+    setCheckoutTouched({});
+    setCheckoutAttempted(false);
+    setCheckoutMessage('');
+    setPincodeApiError('');
+    setIsFetchingPincode(false);
+    setPaymentStep('form');
+    setCouponCode('');
+    setDiscount(0);
+    setFinalTotal(product.base_price);
   }
 
-  function submitOrder(e) {
+  const liveCheckoutErrors = validateCheckout(orderData);
+  const checkoutIsValid = Object.keys(liveCheckoutErrors).length === 0 && (orderData.items?.length || 0) > 0;
+
+  function handleCheckoutField(field, value) {
+    setOrderData(field, value);
+    setCheckoutTouched((current) => ({ ...current, [field]: true }));
+    setCheckoutErrors((current) => {
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+  }
+
+  // Match API state name to INDIAN_STATES list (case-insensitive, handles & vs and)
+  function matchState(apiState) {
+    if (!apiState) return '';
+    const normalise = (s) => s.toLowerCase().replace(/&/g, 'and').replace(/\s+/g, ' ').trim();
+    const target = normalise(apiState);
+    return INDIAN_STATES.find((s) => normalise(s) === target) || '';
+  }
+
+  // Pincode auto-fill: calls postal API when 6 digits entered
+  async function handlePincodeChange(e) {
+    const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+    handleCheckoutField('pincode', val);
+    setPincodeApiError('');
+
+    if (val.length === 6) {
+      setIsFetchingPincode(true);
+      try {
+        const res = await axios.get(`https://api.postalpincode.in/pincode/${val}`);
+        const data = res.data[0];
+        if (data.Status === 'Success' && data.PostOffice?.length > 0) {
+          const po = data.PostOffice[0];
+          const detectedCity = po.District || po.Block || '';
+          const detectedState = matchState(po.State);
+          setOrderData('city', detectedCity);
+          setOrderData('state', detectedState);
+          // Clear any backend errors for these fields
+          setCheckoutErrors((cur) => {
+            const next = { ...cur };
+            delete next.city;
+            delete next.state;
+            return next;
+          });
+        } else {
+          setPincodeApiError('Invalid pincode. Please check and try again.');
+          setOrderData('city', '');
+          setOrderData('state', '');
+        }
+      } catch {
+        setPincodeApiError('Could not verify pincode. Please enter city and state manually.');
+      } finally {
+        setIsFetchingPincode(false);
+      }
+    } else if (val.length === 0) {
+      setOrderData('city', '');
+      setOrderData('state', '');
+    }
+  }
+
+  function fieldError(field) {
+    if (!checkoutTouched[field] && !checkoutAttempted && !checkoutErrors[field]) return '';
+    return firstError(checkoutErrors, field) || firstError(liveCheckoutErrors, field) || '';
+  }
+
+  function checkoutInputClass(field, extra = '') {
+    return `input ${fieldError(field) ? '!border-red-500 !bg-red-50 focus:!border-red-500' : ''} ${extra}`.trim();
+  }
+
+  function requiredLabel(label) {
+    return <span>{label} <span className="text-red-500">*</span></span>;
+  }
+
+
+  // Coupon apply logic for checkout modal
+  async function applyCoupon() {
+    if (!couponCode || !checkoutProduct) return;
+    setIsApplyingCoupon(true);
+    try {
+      const res = await axios.post('/coupons/apply', {
+        code: couponCode,
+        cart_total: checkoutProduct.base_price
+      });
+      if (res.data.success) {
+        setDiscount(res.data.discount_amount);
+        setFinalTotal(res.data.new_total);
+        setOrderData('total_amount', res.data.new_total);
+        alert(`Coupon Applied! You saved ₹${res.data.discount_amount}`);
+      }
+    } catch (error) {
+      alert(error.response?.data?.error || 'Invalid Coupon');
+      setDiscount(0);
+      setFinalTotal(checkoutProduct.base_price);
+      setOrderData('total_amount', checkoutProduct.base_price);
+    }
+    setIsApplyingCoupon(false);
+  }
+
+  // Step 1 — Validate form then advance to payment method selection
+  function handleCheckout(e) {
     e.preventDefault();
-    placeOrder('/orders', {
-      preserveScroll: true,
-      onSuccess: () => {
+    setCheckoutAttempted(true);
+    setCheckoutMessage('');
+
+    const validationErrors = validateCheckout(trimCheckoutData(orderData));
+    if (Object.keys(validationErrors).length > 0 || !checkoutProduct || !(orderData.items?.length > 0)) {
+      setCheckoutErrors(validationErrors);
+      setCheckoutMessage('Please fix the highlighted errors before continuing.');
+      return;
+    }
+
+    setPaymentStep('payment');
+  }
+
+  // Shared: build order POST payload
+  function buildOrderPayload(method) {
+    return {
+      ...trimCheckoutData(orderData),
+      total_amount: finalTotal || checkoutProduct.base_price,
+      coupon_code: discount > 0 ? couponCode : null,
+      items: orderData.items,
+      payment_method: method,
+    };
+  }
+
+  // Shared: handle backend error and return to form step
+  function handleOrderApiError(error) {
+    const data = error.response?.data || {};
+    if (error.response?.status === 422 && data.errors) {
+      setCheckoutErrors(data.errors);
+      setCheckoutMessage(data.message || 'Please fix the highlighted errors.');
+    } else {
+      setCheckoutMessage(data.message || data.error || 'Failed to place order. Please try again.');
+    }
+    setPaymentStep('form');
+  }
+
+  // Step 2a — Cash on Delivery
+  async function handleCOD() {
+    setOrderProcessing(true);
+    setCheckoutMessage('');
+    try {
+      const response = await axios.post('/orders', buildOrderPayload('cod'));
+      if (response.data.success || response.data.status) {
         setCheckoutProduct(null);
         reset();
-        alert('🎉 Order Placed Successfully! Sent to the nearest Franchise.');
-      },
-    });
+        alert('Order placed! Our team will collect payment at delivery.');
+        window.location.href = '/account';
+      }
+    } catch (error) {
+      handleOrderApiError(error);
+    } finally {
+      setOrderProcessing(false);
+    }
+  }
+
+  // Step 2b — Online payment via Razorpay
+  async function handleRazorpay() {
+    setOrderProcessing(true);
+    setCheckoutMessage('');
+    try {
+      const response = await axios.post('/orders', buildOrderPayload('online'));
+      if (response.data.success || response.data.status) {
+        if (!window.Razorpay) {
+          setCheckoutMessage('Payment gateway could not be loaded. Please refresh and try again.');
+          setPaymentStep('form');
+          return;
+        }
+        const sanitized = trimCheckoutData(orderData);
+        const options = {
+          key: 'rzp_test_Sm4nLu6gjKZ8zt',
+          amount: Number(response.data.amount || finalTotal || checkoutProduct.base_price) * 100,
+          currency: 'INR',
+          name: 'IHO Clothing',
+          description: 'Premium Fashion Order',
+          order_id: response.data.razorpay_order_id,
+          handler: async function (paymentResponse) {
+            try {
+              await axios.post('/payment/verify', {
+                razorpay_order_id: paymentResponse.razorpay_order_id,
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                razorpay_signature: paymentResponse.razorpay_signature,
+              });
+              alert('Payment Successful! Order Confirmed.');
+              setCheckoutProduct(null);
+              reset();
+              window.location.href = '/account';
+            } catch {
+              alert('Payment verification failed. Please contact support.');
+            }
+          },
+          prefill: {
+            name: sanitized.full_name,
+            email: sanitized.email,
+            contact: sanitized.mobile_number,
+          },
+          theme: { color: '#0f766e' },
+        };
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      }
+    } catch (error) {
+      handleOrderApiError(error);
+    } finally {
+      setOrderProcessing(false);
+    }
   }
 
   function handleNewsletter(e) {
@@ -554,12 +896,23 @@ export default function Storefront({ products, categories, plans, filters }) {
                 <motion.div key={cat.id} variants={fadeUp}>
                   <Link
                     href={`/?category=${cat.slug}`}
-                    className={`group flex flex-col items-center justify-end overflow-hidden rounded-2xl bg-gradient-to-b ${CAT_COLORS[i % CAT_COLORS.length]} p-5 pt-16 text-center text-white transition-all duration-300 hover:scale-[1.03] hover:shadow-xl`}
+                    className={`group relative flex flex-col overflow-hidden rounded-2xl border-2 border-white/10 p-5 pt-16 text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-xl ${CAT_COLORS[i % CAT_COLORS.length]}`}
                   >
-                    <strong className="block text-sm font-bold leading-tight">{cat.name}</strong>
-                    <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-white/60 group-hover:text-white/90 transition-colors">
-                      Shop <ArrowRight size={11} />
+                    {/* top cap highlight */}
+                    <span className="absolute left-3 top-3 grid size-10 place-items-center rounded-xl bg-white/10 ring-1 ring-white/10 transition-transform duration-200 group-hover:rotate-3">
+                      <ArrowRight size={14} className="text-white" />
                     </span>
+
+                    {/* subtle inner frame */}
+                    <span className="pointer-events-none absolute inset-0 border border-white/10 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+
+                    <strong className="block text-sm font-black leading-tight tracking-tight text-white">{cat.name}</strong>
+                    <span className="mt-2 inline-flex items-center justify-center gap-2 text-xs font-extrabold text-white/80 transition-colors group-hover:text-white">
+                      Shop now
+                    </span>
+
+                    {/* bottom flourish */}
+                    <span className="pointer-events-none absolute bottom-0 left-0 h-1 w-full bg-white/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
                   </Link>
                 </motion.div>
               ))}
@@ -1014,7 +1367,7 @@ export default function Storefront({ products, categories, plans, filters }) {
             onClick={(e) => e.target === e.currentTarget && setCheckoutProduct(null)}
           >
             <motion.div
-              className="w-full max-w-lg overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl"
+              className="max-h-[92vh] w-full max-w-3xl overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl"
               initial={{ scale: 0.94, y: 24, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.94, y: 24, opacity: 0 }}
@@ -1028,7 +1381,7 @@ export default function Storefront({ products, categories, plans, filters }) {
                   <X size={20} />
                 </button>
               </div>
-              <div className="p-6">
+              <div className="max-h-[calc(92vh-65px)] overflow-y-auto p-6">
                 <div className="mb-5 flex items-center gap-4 rounded-xl bg-stone-50 p-3">
                   <img
                     src={imageFor(checkoutProduct) || PRODUCT_FALLBACK}
@@ -1041,30 +1394,245 @@ export default function Storefront({ products, categories, plans, filters }) {
                     <p className="mt-0.5 text-lg font-bold text-teal-700">{money.format(Number(checkoutProduct.base_price))}</p>
                   </div>
                 </div>
-                <form onSubmit={submitOrder} className="grid gap-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <Field label="Full Name">
-                      <input required className="input" value={orderData.customer_name} onChange={(e) => setOrderData('customer_name', e.target.value)} />
+                {/* Coupon Section */}
+                <div className="mb-4 p-3 bg-slate-50 border border-slate-200 rounded-lg flex gap-3">
+                  <div className="relative flex-1">
+                    <Tag size={18} className="absolute left-3 top-3 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Have a coupon code?"
+                      className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded uppercase font-bold text-slate-700 outline-none focus:border-blue-500"
+                      value={couponCode}
+                      onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={applyCoupon}
+                    disabled={isApplyingCoupon}
+                    className="bg-slate-900 text-white px-5 rounded font-bold hover:bg-slate-800 disabled:opacity-50 transition"
+                  >
+                    Apply
+                  </button>
+                </div>
+                {/* Billing Summary */}
+                <div className="mb-4 space-y-2 text-sm">
+                  <div className="flex justify-between text-slate-500"><span>Product Price</span> <span>₹{checkoutProduct.base_price}</span></div>
+                  {discount > 0 && <div className="flex justify-between text-emerald-500 font-bold"><span>Discount</span> <span>- ₹{discount}</span></div>}
+                  <div className="flex justify-between text-xl font-black text-slate-900 pt-2 border-t border-slate-200 mt-2"><span>Payable Amount</span> <span>₹{finalTotal || checkoutProduct.base_price}</span></div>
+                </div>
+                {/* Global error banner — visible in both steps */}
+                {checkoutMessage && (
+                  <div className="mb-1 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">
+                    {checkoutMessage}
+                  </div>
+                )}
+
+                {/* ── STEP 1: Delivery details form ─────────────────── */}
+                {paymentStep === 'form' && (
+                <form onSubmit={handleCheckout} noValidate className="grid gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <Field label={requiredLabel('Full Name')} error={fieldError('full_name')}>
+                      <input
+                        className={checkoutInputClass('full_name')}
+                        value={orderData.full_name}
+                        onChange={(e) => handleCheckoutField('full_name', e.target.value)}
+                        placeholder="Rahul Sharma"
+                        autoComplete="name"
+                      />
                     </Field>
-                    <Field label="Phone">
-                      <input required className="input" value={orderData.customer_phone} onChange={(e) => setOrderData('customer_phone', e.target.value)} />
+                    <Field label={requiredLabel('Mobile Number')} error={fieldError('mobile_number')}>
+                      <input
+                        className={checkoutInputClass('mobile_number')}
+                        value={orderData.mobile_number}
+                        onChange={(e) => handleCheckoutField('mobile_number', e.target.value.replace(/\D/g, '').slice(0, 10))}
+                        placeholder="9876543210"
+                        inputMode="numeric"
+                        autoComplete="tel"
+                      />
                     </Field>
                   </div>
-                  <div className="grid grid-cols-[1fr_130px] gap-4">
-                    <Field label="Delivery Address">
-                      <input required className="input" value={orderData.shipping_address} onChange={(e) => setOrderData('shipping_address', e.target.value)} />
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <Field label={requiredLabel('Email Address')} error={fieldError('email')}>
+                      <input
+                        type="email"
+                        className={checkoutInputClass('email')}
+                        value={orderData.email}
+                        onChange={(e) => handleCheckoutField('email', e.target.value)}
+                        placeholder="rahul@example.com"
+                        autoComplete="email"
+                      />
                     </Field>
-                    <Field label="Pincode">
-                      <input required className="input border-teal-400 bg-teal-50 font-bold" value={orderData.pincode} onChange={(e) => setOrderData('pincode', e.target.value)} placeholder="201309" />
+                    <Field label="Alternate Mobile Number" error={fieldError('alternate_mobile_number')}>
+                      <input
+                        className={checkoutInputClass('alternate_mobile_number')}
+                        value={orderData.alternate_mobile_number}
+                        onChange={(e) => handleCheckoutField('alternate_mobile_number', e.target.value.replace(/\D/g, '').slice(0, 10))}
+                        placeholder="Optional"
+                        inputMode="numeric"
+                        autoComplete="tel"
+                      />
+                    </Field>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <Field label={requiredLabel('House / Flat / Building Number')} error={fieldError('house_flat_building')}>
+                      <input
+                        className={checkoutInputClass('house_flat_building')}
+                        value={orderData.house_flat_building}
+                        onChange={(e) => handleCheckoutField('house_flat_building', e.target.value)}
+                        placeholder="Flat 204, Tower B"
+                        autoComplete="address-line1"
+                      />
+                    </Field>
+                    <Field label={requiredLabel('Street / Area / Locality')} error={fieldError('street_area_locality')}>
+                      <input
+                        className={checkoutInputClass('street_area_locality')}
+                        value={orderData.street_area_locality}
+                        onChange={(e) => handleCheckoutField('street_area_locality', e.target.value)}
+                        placeholder="Sector 18 Market"
+                        autoComplete="address-line2"
+                      />
+                    </Field>
+                  </div>
+
+                  <Field label="Landmark" error={fieldError('landmark')}>
+                    <input
+                      className={checkoutInputClass('landmark')}
+                      value={orderData.landmark}
+                      onChange={(e) => handleCheckoutField('landmark', e.target.value)}
+                      placeholder="Near metro station"
+                    />
+                  </Field>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <Field label={requiredLabel('City')} error={fieldError('city')}>
+                      <input
+                        className={checkoutInputClass('city')}
+                        value={orderData.city}
+                        onChange={(e) => handleCheckoutField('city', e.target.value)}
+                        placeholder="Noida"
+                        autoComplete="address-level2"
+                      />
+                    </Field>
+                    <Field label={requiredLabel('State')} error={fieldError('state')}>
+                      <select
+                        className={checkoutInputClass('state')}
+                        value={orderData.state}
+                        onChange={(e) => handleCheckoutField('state', e.target.value)}
+                        autoComplete="address-level1"
+                      >
+                        <option value="">Select state</option>
+                        {INDIAN_STATES.map((state) => (
+                          <option key={state} value={state}>{state}</option>
+                        ))}
+                      </select>
+                    </Field>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <Field label={requiredLabel('Pincode')} error={fieldError('pincode') || pincodeApiError}>
+                      <div className="relative">
+                        <input
+                          className={checkoutInputClass('pincode', pincodeRegex.test((orderData.pincode || '').trim()) ? 'border-teal-400 bg-teal-50 font-bold' : 'font-bold')}
+                          value={orderData.pincode}
+                          onChange={handlePincodeChange}
+                          placeholder="201309"
+                          inputMode="numeric"
+                          autoComplete="postal-code"
+                          maxLength={6}
+                          disabled={isFetchingPincode}
+                        />
+                        {isFetchingPincode && (
+                          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-teal-600">
+                            <Loader2 size={16} className="animate-spin" />
+                          </span>
+                        )}
+                      </div>
+                    </Field>
+                    <Field label={requiredLabel('Country')} error={fieldError('country')}>
+                      <input
+                        className={checkoutInputClass('country')}
+                        value={orderData.country}
+                        onChange={(e) => handleCheckoutField('country', e.target.value)}
+                        placeholder="India"
+                        readOnly
+                        autoComplete="country-name"
+                      />
                     </Field>
                   </div>
                   <button
-                    disabled={processing}
-                    className="button-glow mt-2 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-orange-700 text-base font-bold text-white transition-colors hover:bg-orange-800 disabled:opacity-60"
+                    type="submit"
+                    disabled={!checkoutIsValid || orderProcessing}
+                    className="button-glow mt-2 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-orange-700 text-base font-bold text-white transition-colors hover:bg-orange-800 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {processing ? 'Processing…' : `Pay ${money.format(Number(checkoutProduct.base_price))}`}
+                    Proceed to Payment <ArrowRight size={17} />
                   </button>
                 </form>
+                )}
+
+                {/* ── STEP 2: Payment method selection ──────────────── */}
+                {paymentStep === 'payment' && (
+                  <div className="space-y-4 pt-1">
+                    {/* Delivery summary */}
+                    <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 text-sm">
+                      <p className="mb-1.5 text-xs font-bold uppercase tracking-widest text-stone-400">Delivering to</p>
+                      <p className="font-bold text-zinc-900">
+                        {orderData.full_name} <span className="font-normal text-stone-400">·</span> {orderData.mobile_number}
+                      </p>
+                      <p className="mt-1 leading-5 text-stone-500">
+                        {orderData.house_flat_building}, {orderData.street_area_locality}
+                        {orderData.landmark ? `, ${orderData.landmark}` : ''}, {orderData.city}, {orderData.state} – {orderData.pincode}
+                      </p>
+                    </div>
+
+                    <p className="text-center text-xs font-bold uppercase tracking-widest text-stone-400">Choose payment method</p>
+
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      {/* Cash on Delivery */}
+                      <button
+                        type="button"
+                        onClick={handleCOD}
+                        disabled={orderProcessing}
+                        className="group flex flex-col items-center gap-2.5 rounded-xl border-2 border-stone-200 bg-white p-5 text-center transition-all hover:border-teal-500 hover:bg-teal-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        <Banknote size={30} className="text-teal-600 transition-transform group-hover:scale-110" />
+                        <strong className="text-sm font-bold text-zinc-900">Cash on Delivery</strong>
+                        <span className="text-xs text-stone-500">Pay ₹{finalTotal || checkoutProduct.base_price} when delivered</span>
+                      </button>
+
+                      {/* Online via Razorpay */}
+                      <button
+                        type="button"
+                        onClick={handleRazorpay}
+                        disabled={orderProcessing}
+                        className="group flex flex-col items-center gap-2.5 rounded-xl border-2 border-stone-200 bg-white p-5 text-center transition-all hover:border-orange-500 hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        <CreditCard size={30} className="text-orange-600 transition-transform group-hover:scale-110" />
+                        <strong className="text-sm font-bold text-zinc-900">Pay Online</strong>
+                        <span className="text-xs text-stone-500">UPI · Cards · Net Banking</span>
+                        <span className="mt-0.5 text-xs font-bold text-orange-600">₹{finalTotal || checkoutProduct.base_price}</span>
+                      </button>
+                    </div>
+
+                    {orderProcessing && (
+                      <div className="flex items-center justify-center gap-2 text-sm font-semibold text-teal-700">
+                        <Loader2 size={15} className="animate-spin" />
+                        Processing your order…
+                      </div>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => { setPaymentStep('form'); setCheckoutMessage(''); }}
+                      disabled={orderProcessing}
+                      className="flex w-full items-center justify-center gap-1.5 text-sm font-semibold text-stone-400 transition-colors hover:text-stone-600 disabled:opacity-40"
+                    >
+                      <ArrowLeft size={14} /> Edit delivery details
+                    </button>
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>

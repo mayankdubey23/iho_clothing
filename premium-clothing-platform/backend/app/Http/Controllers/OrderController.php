@@ -6,131 +6,224 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Inventory;
 use App\Models\FranchisePincode;
+use App\Models\Sku;
+use App\Models\Coupon;
+use App\Http\Requests\CheckoutOrderRequest;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderInvoiceMail;
-use Razorpay\Api\Api; // Razorpay SDK import kiya
+use Razorpay\Api\Api;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
     /**
      * 🛒 THE SMART CHECKOUT ENGINE (With Razorpay Integration)
      */
-    public function store(Request $request)
+    public function store(CheckoutOrderRequest $request)
     {
-        // 1. Validation: Sabse pehle input check karein
-        $validatedData = $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'customer_phone' => 'required|string|max:20',
-            'customer_email' => 'nullable|email',
-            'shipping_address' => 'required|string',
-            'pincode' => 'required|string|max:10', 
-            'total_amount' => 'required|numeric',
-            'items' => 'required|array',
-            'items.*.product_id' => 'required|integer|exists:products,id',
-            'items.*.sku_id' => 'required|integer|exists:skus,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.price' => 'required|numeric'
-        ]);
+        $validatedData = $request->validated();
 
         try {
             DB::beginTransaction();
 
-            // 2. Routing Logic: Pincode ke basis par Franchise dhundhein
+            $orderItems = [];
+            $subtotal = 0;
+
+            foreach ($validatedData['items'] as $item) {
+                $sku = Sku::with('product')
+                    ->where('id', $item['sku_id'])
+                    ->where('product_id', $item['product_id'])
+                    ->first();
+
+                if (!$sku || !$sku->product || !$sku->product->is_active) {
+                    throw new \Exception('One of the selected products is no longer available.');
+                }
+
+                $unitPrice = (float) $sku->product->base_price;
+                $lineTotal = $unitPrice * (int) $item['quantity'];
+                $subtotal += $lineTotal;
+
+                $orderItems[] = [
+                    'product_id' => $sku->product_id,
+                    'sku_id' => $sku->id,
+                    'quantity' => (int) $item['quantity'],
+                    'price' => $unitPrice,
+                ];
+            }
+
+            $couponCode = $validatedData['coupon_code'] ?? null;
+            $discountAmount = 0;
+
+            if ($couponCode) {
+                $coupon = Coupon::where('code', strtoupper($couponCode))->first();
+
+                if (!$coupon || !$coupon->is_active) {
+                    throw new \Exception('Invalid or inactive coupon code.');
+                }
+
+                if ($coupon->expires_at && Carbon::now()->greaterThan($coupon->expires_at)) {
+                    throw new \Exception('This coupon has expired.');
+                }
+
+                if ($subtotal < (float) $coupon->min_cart_amount) {
+                    throw new \Exception("Minimum order amount should be ₹{$coupon->min_cart_amount} to apply this coupon.");
+                }
+
+                $discountAmount = $coupon->type === 'percent'
+                    ? ($subtotal * (float) $coupon->value) / 100
+                    : (float) $coupon->value;
+
+                $discountAmount = min($discountAmount, $subtotal);
+            }
+
+            $totalAmount = round($subtotal - $discountAmount, 2);
+
+            // Routing Logic: Pincode ke basis par Franchise dhundhein
             $franchisePincode = FranchisePincode::where('pincode', $validatedData['pincode'])->first();
             $targetFranchiseId = $franchisePincode ? $franchisePincode->franchise_id : null;
 
-            $finalFulfillerId = $targetFranchiseId; 
-            $canFranchiseFulfill = true;
-
-            // 3. Stock Check: Franchise ke paas stock hai ya nahi?
-            if ($targetFranchiseId) {
-                foreach ($validatedData['items'] as $item) {
-                    $franchiseStock = Inventory::where('franchise_id', $targetFranchiseId)
-                        ->where('sku_id', $item['sku_id'])
-                        ->value('stock_quantity') ?? 0;
-
-                    if ($franchiseStock < $item['quantity']) {
-                        $canFranchiseFulfill = false;
-                        break; 
-                    }
-                }
-            } else {
-                $canFranchiseFulfill = false;
+            $finalFulfillerId = null;
+            if ($targetFranchiseId && $this->canFulfillItems($orderItems, $targetFranchiseId)) {
+                $finalFulfillerId = $targetFranchiseId;
+            } elseif (!$this->canFulfillItems($orderItems, null)) {
+                throw new \Exception('Sorry! This item is currently out of stock everywhere.');
             }
 
-            // 4. Fallback: Agar Franchise ke paas nahi hai toh Main Warehouse check karein
-            if (!$canFranchiseFulfill) {
-                $finalFulfillerId = null; 
-                foreach ($validatedData['items'] as $item) {
-                    $superAdminStock = Inventory::whereNull('franchise_id')
-                        ->where('sku_id', $item['sku_id'])
-                        ->value('stock_quantity') ?? 0;
+            // Payment method: 'cod' skips Razorpay, 'online' creates Razorpay order
+            $paymentMethod = $validatedData['payment_method'] ?? 'online';
+            $razorpayOrderId = null;
 
-                    if ($superAdminStock < $item['quantity']) {
-                        throw new \Exception("Sorry! This item is currently out of stock everywhere.");
-                    }
-                }
+            if ($paymentMethod === 'online') {
+                $api = new Api(env('RAZORPAY_KEY_ID'), env('RAZORPAY_KEY_SECRET'));
+                $razorpayOrder = $api->order->create([
+                    'receipt' => 'rcpt_' . time(),
+                    'amount' => $totalAmount * 100,
+                    'currency' => 'INR',
+                ]);
+                $razorpayOrderId = $razorpayOrder['id'];
             }
 
-            // 5. Razorpay Order Creation: Payment Gateway ko batayein kitne ka order hai
-            $api = new Api(env('RAZORPAY_KEY_ID'), env('RAZORPAY_KEY_SECRET'));
-            $razorpayOrder = $api->order->create([
-                'receipt'         => 'rcpt_' . time(),
-                'amount'          => $validatedData['total_amount'] * 100, // Amount in paise
-                'currency'        => 'INR',
-            ]);
+            $shippingAddress = collect([
+                $validatedData['house_flat_building'],
+                $validatedData['street_area_locality'],
+                $validatedData['landmark'] ?? null,
+                $validatedData['city'],
+                $validatedData['state'],
+                $validatedData['pincode'],
+                $validatedData['country'],
+            ])->filter()->implode(', ');
 
-            // 6. DB Order Creation: Database mein order save karein
+            // DB Order Creation: Database mein order save karein
             $order = Order::create([
-                'customer_name'     => $validatedData['customer_name'],
-                'customer_phone'    => $validatedData['customer_phone'],
-                'customer_email'    => $validatedData['customer_email'] ?? null,
-                'shipping_address'  => $validatedData['shipping_address'],
-                'total_amount'      => $validatedData['total_amount'],
-                'status'            => 'pending',
-                'payment_status'    => 'pending',
-                'franchise_id'      => $finalFulfillerId,
-                'razorpay_order_id' => $razorpayOrder['id'], // Razorpay ID yahan save hogi
+                'full_name' => $validatedData['full_name'],
+                'mobile_number' => $validatedData['mobile_number'],
+                'email' => $validatedData['email'],
+                'alternate_mobile_number' => $validatedData['alternate_mobile_number'] ?? null,
+                'house_flat_building' => $validatedData['house_flat_building'],
+                'street_area_locality' => $validatedData['street_area_locality'],
+                'landmark' => $validatedData['landmark'] ?? null,
+                'city' => $validatedData['city'],
+                'state' => $validatedData['state'],
+                'pincode' => $validatedData['pincode'],
+                'country' => $validatedData['country'],
+                'customer_name' => $validatedData['full_name'],
+                'customer_phone' => $validatedData['mobile_number'],
+                'customer_email' => $validatedData['email'],
+                'shipping_address' => $shippingAddress,
+                'total_amount' => $totalAmount,
+                'payment_method' => $paymentMethod,
+                'status' => $paymentMethod === 'cod' ? 'confirmed' : 'pending',
+                'payment_status' => 'pending',
+                'franchise_id' => $finalFulfillerId,
+                'razorpay_order_id' => $razorpayOrderId,
             ]);
 
-            // 7. Order Items & Stock Update
-            foreach ($validatedData['items'] as $item) {
+            // Order Items & Stock Update
+            foreach ($orderItems as $item) {
                 OrderItem::create([
-                    'order_id'   => $order->id,
+                    'order_id' => $order->id,
                     'product_id' => $item['product_id'],
-                    'sku_id'     => $item['sku_id'],
-                    'quantity'   => $item['quantity'],
-                    'price'      => $item['price']
+                    'sku_id' => $item['sku_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
                 ]);
 
-                DB::table('inventories')
-                    ->where('franchise_id', $finalFulfillerId)
-                    ->where('sku_id', $item['sku_id'])
-                    ->decrement('stock_quantity', $item['quantity']);
+                $inventoryQuery = Inventory::where('sku_id', $item['sku_id']);
+                $finalFulfillerId
+                    ? $inventoryQuery->where('franchise_id', $finalFulfillerId)
+                    : $inventoryQuery->whereNull('franchise_id');
+
+                $inventory = $inventoryQuery->lockForUpdate()->first();
+                if (!$inventory || $inventory->stock_quantity < $item['quantity']) {
+                    throw new \Exception('Sorry! This item is currently out of stock everywhere.');
+                }
+
+                $inventory->decrement('stock_quantity', $item['quantity']);
             }
 
             DB::commit();
 
-            // Frontend ko Razorpay ID bhej rahe hain taaki modal khul sake
-            return response()->json([
+            // COD orders: send invoice immediately (Razorpay orders send after payment verification)
+            if ($paymentMethod === 'cod' && $order->customer_email) {
+                try {
+                    Mail::to($order->customer_email)->send(new OrderInvoiceMail($order));
+                } catch (\Exception $mailError) {
+                    Log::error('COD invoice mail failed for order #' . $order->id . ': ' . $mailError->getMessage());
+                }
+            }
+
+            $responseData = [
+                'status' => true,
                 'success' => true,
-                'razorpay_order_id' => $razorpayOrder['id'],
+                'message' => $paymentMethod === 'cod'
+                    ? 'Order placed successfully! Pay on delivery.'
+                    : 'Order placed successfully.',
                 'order_id' => $order->id,
-                'amount' => $validatedData['total_amount']
-            ]);
+                'amount' => $totalAmount,
+                'payment_method' => $paymentMethod,
+            ];
+
+            if ($paymentMethod === 'online') {
+                $responseData['razorpay_order_id'] = $razorpayOrderId;
+            }
+
+            return response()->json($responseData);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'error' => $e->getMessage()], 400);
+            return response()->json([
+                'status' => false,
+                'success' => false,
+                'message' => $e->getMessage(),
+                'error' => $e->getMessage(),
+            ], 400);
         }
     }
 
     /**
      * 🔄 STATUS UPDATE: Order life cycle management
      */
+    private function canFulfillItems(array $items, ?int $franchiseId): bool
+    {
+        foreach ($items as $item) {
+            $inventoryQuery = Inventory::where('sku_id', $item['sku_id']);
+            $franchiseId
+                ? $inventoryQuery->where('franchise_id', $franchiseId)
+                : $inventoryQuery->whereNull('franchise_id');
+
+            $stock = $inventoryQuery->value('stock_quantity') ?? 0;
+            if ($stock < $item['quantity']) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
@@ -189,6 +282,12 @@ class OrderController extends Controller
      */
     public function verifyPayment(Request $request)
     {
+        $request->validate([
+            'razorpay_order_id' => 'required|string',
+            'razorpay_payment_id' => 'required|string',
+            'razorpay_signature' => 'required|string',
+        ]);
+
         $api = new Api(env('RAZORPAY_KEY_ID'), env('RAZORPAY_KEY_SECRET'));
 
         try {
@@ -201,22 +300,26 @@ class OrderController extends Controller
             // Official signature verification
             $api->utility->verifyPaymentSignature($attributes);
 
-            $order = Order::where('razorpay_order_id', $request->razorpay_order_id)->first();
+            $order = Order::where('razorpay_order_id', $request->razorpay_order_id)->firstOrFail();
             $order->update([
                 'payment_status'      => 'success',
                 'razorpay_payment_id' => $request->razorpay_payment_id,
                 'status'              => 'confirmed' 
             ]);
 
-            // 📩 NEW LOGIC: Send Email Invoice automatically
+            // Send invoice email after successful payment
             if ($order->customer_email) {
-                Mail::to($order->customer_email)->send(new OrderInvoiceMail($order));
+                try {
+                    Mail::to($order->customer_email)->send(new OrderInvoiceMail($order));
+                } catch (\Exception $mailError) {
+                    Log::error('Online payment invoice mail failed for order #' . $order->id . ': ' . $mailError->getMessage());
+                }
             }
 
-            return response()->json(['success' => true, 'message' => 'Payment verified & Invoice sent!'], 200);
+            return response()->json(['status' => true, 'success' => true, 'message' => 'Payment verified & Order confirmed!'], 200);
 
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'error' => $e->getMessage()], 400);
+            return response()->json(['status' => false, 'success' => false, 'message' => $e->getMessage(), 'error' => $e->getMessage()], 400);
         }
     }
 }

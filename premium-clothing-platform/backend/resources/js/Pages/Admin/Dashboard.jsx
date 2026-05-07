@@ -2,6 +2,10 @@ import React from 'react';
 import { Head, usePage } from '@inertiajs/react';
 import { TrendingUp, ShoppingBag, Box, Store } from 'lucide-react';
 import AdminLayout from '../../Layouts/AdminLayout';
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart, Bar, Legend
+} from 'recharts';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
@@ -18,6 +22,7 @@ const STATUS_BADGE = {
   completed: 'bg-emerald-100 text-emerald-800',
   processing: 'bg-blue-100 text-blue-800',
   cancelled: 'bg-red-100 text-red-800',
+  delivered: 'bg-green-100 text-green-800',
 };
 
 function formatCurrency(value) {
@@ -30,19 +35,37 @@ function formatCurrency(value) {
 
 export default function Dashboard({ stats }) {
     const { auth } = usePage().props;
-    const isSuperAdmin = auth.user.role === 'super_admin';
+    const isSuperAdmin = auth.user.role === 'super_admin' || auth.user.role === 'admin';
+
+    // Dummy data for charts if none is provided or it's empty
+    const chartData = stats.chart_data && stats.chart_data.length > 0 
+        ? stats.chart_data.map(item => ({
+            ...item,
+            revenue: parseFloat(item.revenue),
+            orders: parseInt(item.orders),
+            name: new Date(item.name).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })
+          }))
+        : [
+            { name: 'Mon', revenue: 4000, orders: 24 },
+            { name: 'Tue', revenue: 3000, orders: 13 },
+            { name: 'Wed', revenue: 2000, orders: 98 },
+            { name: 'Thu', revenue: 2780, orders: 39 },
+            { name: 'Fri', revenue: 1890, orders: 48 },
+            { name: 'Sat', revenue: 2390, orders: 38 },
+            { name: 'Sun', revenue: 3490, orders: 43 },
+        ];
 
     return (
         <AdminLayout active="dashboard">
             <Head title="Dashboard | Admin" />
             
-            <div className="mb-10">
-                <h1 className="text-3xl font-black text-slate-900">Overview</h1>
-                <p className="text-slate-500 mt-1">Real-time performance metrics and recent activity.</p>
+            <div className="mb-8">
+                <h1 className="text-3xl font-black text-slate-900">Dashboard Overview</h1>
+                <p className="text-slate-500 mt-1">Real-time performance metrics, analytics, and recent activity.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                <StatCard title="Total Revenue" value={`₹${stats.total_revenue || 0}`} icon={<TrendingUp size={24}/>} color="bg-emerald-500" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <StatCard title="Total Revenue" value={formatCurrency(stats.total_revenue)} icon={<TrendingUp size={24}/>} color="bg-emerald-500" />
                 <StatCard title="Total Orders" value={stats.total_orders || 0} icon={<ShoppingBag size={24}/>} color="bg-blue-500" />
                 <StatCard title="Stock Units" value={stats.stock || 0} icon={<Box size={24}/>} color="bg-indigo-500" />
                 {isSuperAdmin && (
@@ -50,9 +73,55 @@ export default function Dashboard({ stats }) {
                 )}
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50">
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h2 className="text-lg font-bold text-slate-800 mb-6">Revenue Trend (Last 7 Days)</h2>
+                    <div className="h-72">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
+                                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} tickFormatter={(value) => `₹${value}`} />
+                                <Tooltip 
+                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                    formatter={(value) => [`₹${value}`, 'Revenue']}
+                                />
+                                <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h2 className="text-lg font-bold text-slate-800 mb-6">Orders Volume (Last 7 Days)</h2>
+                    <div className="h-72">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
+                                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
+                                <Tooltip 
+                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                    cursor={{fill: '#f1f5f9'}}
+                                />
+                                <Bar dataKey="orders" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={32} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-10">
+                <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
                     <h2 className="text-lg font-bold text-slate-800">Recent Orders</h2>
+                    <a href="/admin/orders" className="text-sm font-semibold text-blue-600 hover:text-blue-800">View All</a>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
@@ -68,20 +137,20 @@ export default function Dashboard({ stats }) {
                         <tbody className="divide-y divide-slate-100">
                             {stats.recent_orders?.length > 0 ? (
                                 stats.recent_orders.map(order => (
-                                    <tr key={order.id} className="hover:bg-slate-50 transition">
+                                    <tr key={order.id} className="hover:bg-slate-50 transition group">
                                         <td className="px-6 py-4 font-black text-blue-600">#{order.id}</td>
-                                        <td className="px-6 py-4 font-semibold text-slate-800">{order.customer_name}</td>
-                                        <td className="px-6 py-4 text-slate-500 text-sm">{order.shipping_address}</td>
-                                        <td className="px-6 py-4 font-black text-slate-900">₹{order.total_amount}</td>
+                                        <td className="px-6 py-4 font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">{order.customer_name}</td>
+                                        <td className="px-6 py-4 text-slate-500 text-sm max-w-xs truncate">{order.shipping_address}</td>
+                                        <td className="px-6 py-4 font-black text-slate-900">{formatCurrency(order.total_amount)}</td>
                                         <td className="px-6 py-4">
-                                            <span className="bg-amber-100 text-amber-800 text-xs px-3 py-1 rounded-full font-bold uppercase">
+                                            <span className={`text-xs px-3 py-1 rounded-full font-bold uppercase ${STATUS_BADGE[order.status] || 'bg-gray-100 text-gray-800'}`}>
                                                 {order.status}
                                             </span>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
-                                <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500">No orders received yet.</td></tr>
+                                <tr><td colSpan="5" className="px-6 py-12 text-center text-slate-500 bg-slate-50/30 font-medium">No orders received yet.</td></tr>
                             )}
                         </tbody>
                     </table>
@@ -93,8 +162,8 @@ export default function Dashboard({ stats }) {
 
 function StatCard({ title, value, icon, color }) {
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center gap-5 hover:shadow-md transition">
-            <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-white shadow-sm ${color}`}>
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center gap-5 hover:shadow-md hover:-translate-y-1 transition duration-300">
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-sm ${color}`}>
                 {icon}
             </div>
             <div>

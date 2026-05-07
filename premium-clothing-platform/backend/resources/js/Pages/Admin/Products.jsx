@@ -4,7 +4,7 @@ import { Head, router, useForm } from '@inertiajs/react';
 import {
   AlertTriangle, ChevronDown, ChevronRight,
   Eye, Image as ImageIcon, Package, PackagePlus,
-  Pencil, Plus, Trash2, X,
+  Pencil, Plus, Trash2, X, UploadCloud
 } from 'lucide-react';
 import AdminLayout from '../../Layouts/AdminLayout';
 
@@ -142,13 +142,31 @@ export default function Products({ products, categories }) {
 
   // ── Create product ─────────────────────────────────────────────────────────
   const [showCreate, setShowCreate] = useState(false);
+  const [preview, setPreview] = useState(null); // Local state for image preview
+
   const { data, setData, post, processing, reset, errors } = useForm({
     name: '', slug: '', category_id: categories[0]?.id || '',
-    base_price: '', franchise_price: '', description: '', is_active: true,
+    base_price: '', franchise_price: '', description: '', is_active: true, image: null
   });
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setData('image', file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
   function submitCreate(e) {
     e.preventDefault();
-    post('/admin/products', { onSuccess: () => { setShowCreate(false); reset(); } });
+    post('/admin/products', { 
+      forceFormData: true, // Required for file uploads
+      onSuccess: () => { 
+        setShowCreate(false); 
+        reset(); 
+        setPreview(null);
+      } 
+    });
   }
 
   // ── Edit product ───────────────────────────────────────────────────────────
@@ -227,6 +245,7 @@ export default function Products({ products, categories }) {
     post: postSku, processing: skuProcessing,
     reset: resetSku, errors: skuErrors,
   } = useForm({ name: '', size: '', color: '', stock_quantity: '' });
+  
   function submitSku(e) {
     e.preventDefault();
     postSku(`/admin/products/${skuProduct.id}/skus`, {
@@ -322,8 +341,13 @@ export default function Products({ products, categories }) {
                         </td>
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-3.5">
-                            <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-400">
-                              <ImageIcon size={18} />
+                            {/* ── Updated Image Display ── */}
+                            <div className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-100 text-slate-400">
+                              {product.images?.[0] ? (
+                                <img src={product.images[0].image_path} alt={product.name} className="h-full w-full object-cover" />
+                              ) : (
+                                <ImageIcon size={18} />
+                              )}
                             </div>
                             <div>
                               <span className="font-bold text-slate-900">{product.name}</span>
@@ -449,13 +473,37 @@ export default function Products({ products, categories }) {
       {/* ══ CREATE PRODUCT MODAL ══ */}
       <AnimatePresence>
         {showCreate && (
-          <ModalWrapper onClose={() => setShowCreate(false)}>
-            <ModalHeader title="Create New Product" onClose={() => setShowCreate(false)} />
+          <ModalWrapper onClose={() => { setShowCreate(false); setPreview(null); }}>
+            <ModalHeader title="Create New Product" onClose={() => { setShowCreate(false); setPreview(null); }} />
             <div className="p-6">
               <form onSubmit={submitCreate}>
+                
+                {/* ── Image Upload Area ── */}
+                <div className="mb-6">
+                  <label className="mb-1.5 block text-sm font-bold text-slate-700">Product Image</label>
+                  <div className="group relative cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 transition-colors hover:bg-slate-100">
+                    <input type="file" accept="image/*" onChange={handleImageChange} className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0" />
+                    {preview ? (
+                      <div className="relative h-48 w-full">
+                        <img src={preview} alt="Preview" className="h-full w-full object-contain p-2" />
+                        <div className="absolute inset-0 bg-slate-900/10 opacity-0 transition-opacity group-hover:opacity-100" />
+                      </div>
+                    ) : (
+                      <div className="flex h-32 flex-col items-center justify-center text-slate-400 group-hover:text-blue-500">
+                        <UploadCloud size={32} className="mb-2" />
+                        <p className="text-sm font-bold">Click or drag image to upload</p>
+                      </div>
+                    )}
+                  </div>
+                  {errors.image && <p className="mt-1 text-xs font-medium text-red-500">{errors.image}</p>}
+                </div>
+
                 <div className="grid grid-cols-2 gap-5">
                   <FormField label="Product Name" error={errors.name}>
-                    <input required className={inputCls} value={data.name} onChange={(e) => setData('name', e.target.value)} />
+                    <input required className={inputCls} value={data.name} onChange={(e) => {
+                      setData('name', e.target.value);
+                      setData('slug', e.target.value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''));
+                    }} />
                   </FormField>
                   <FormField label="URL Slug" error={errors.slug}>
                     <input required className={`${inputCls} font-mono`} placeholder="tshirt-black" value={data.slug} onChange={(e) => setData('slug', e.target.value)} />
@@ -487,7 +535,7 @@ export default function Products({ products, categories }) {
                   💡 After creating, click the <strong>✏ Edit</strong> button on the product row to add SKUs and set stock.
                 </p>
                 <div className="mt-5 flex justify-end gap-3">
-                  <button type="button" onClick={() => setShowCreate(false)} className="rounded-xl bg-slate-100 px-5 py-2.5 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-200">Cancel</button>
+                  <button type="button" onClick={() => { setShowCreate(false); setPreview(null); }} className="rounded-xl bg-slate-100 px-5 py-2.5 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-200">Cancel</button>
                   <button type="submit" disabled={processing} className="rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-blue-500/20 transition-all hover:bg-blue-700 disabled:opacity-60">
                     {processing ? 'Saving…' : 'Save Product'}
                   </button>
@@ -657,13 +705,21 @@ function ProductDetailPanel({ product, onClose }) {
           <StockBadge qty={total} />
         </div>
         <div className="flex-1 space-y-6 overflow-y-auto p-6">
+          
+          {/* ── Updated Image Display in Detail Panel ── */}
+          {product.images?.[0] && (
+            <div className="w-full h-48 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+              <img src={product.images[0].image_path} alt={product.name} className="h-full w-full object-contain" />
+            </div>
+          )}
+
           <div>
             <h2 className="text-2xl font-black text-slate-900">{product.name}</h2>
             <p className="mt-1 font-mono text-sm text-slate-400">Slug: /{product.slug}</p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label: 'Category',        value: product.category?.name || '—',                                          sub: product.category?.slug ? `/${product.category.slug}` : null },
+              { label: 'Category',        value: product.category?.name || '—',                                        sub: product.category?.slug ? `/${product.category.slug}` : null },
               { label: 'Category ID',     value: product.category?.id   ? `#${product.category.id}` : '—', mono: true },
               { label: 'Retail Price',    value: `₹${Number(product.base_price).toLocaleString('en-IN')}`,      bold: true },
               { label: 'Franchise Price', value: `₹${Number(product.franchise_price).toLocaleString('en-IN')}`, bold: true, accent: true },

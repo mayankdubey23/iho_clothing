@@ -10,6 +10,8 @@
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.jsx'])
         @inertiaHead
+        {{-- Razorpay Payment Gateway --}}
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     </head>
     <body>
         @inertia

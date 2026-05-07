@@ -84,6 +84,7 @@ Route::get('/sports-wear', function () {
 // 🛒 SMART CHECKOUT ENGINE
 // ==========================================
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+Route::post('/payment/verify', [OrderController::class, 'verifyPayment'])->name('payment.verify');
 
 // 🎁 COUPON API
 Route::post('/coupons/apply', [CouponController::class, 'apply'])->name('coupons.apply');
@@ -171,8 +172,9 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->prefix('admin')->group(function () {
     
     // 📊 SHARED DASHBOARD
-    Route::get('/', function () {
-        abort_unless(in_array(Auth::user()->role, ['super_admin', 'franchise']), 403);
+        Route::get('/', function () {
+            $role = strtolower(trim(Auth::user()->role));
+            abort_unless(in_array($role, ['super_admin', 'super_adin', 'franchise', 'admin']), 403);
 
         $user = Auth::user();
         $ordersQuery = Order::query();
@@ -193,6 +195,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
                 'total_revenue' => (float) (clone $ordersQuery)->where('status', 'delivered')->sum('total_amount'),
                 'total_orders' => (clone $ordersQuery)->count(),
                 'recent_orders' => (clone $ordersQuery)->with('items')->latest()->take(10)->get(),
+                'chart_data' => (clone $ordersQuery)->selectRaw('DATE(created_at) as name, sum(total_amount) as revenue, count(*) as orders')->where('created_at', '>=', now()->subDays(7))->groupBy('name')->orderBy('name')->get(),
             ],
         ]);
     })->name('admin.dashboard');
@@ -201,15 +204,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.status');
 
 
-    // Payment verify API route
-    Route::post('/payment/verify', [OrderController::class, 'verifyPayment'])->name('payment.verify');
-
-    
-
     // 🛡️ SUPER ADMIN ONLY SECTION (Fixed Error Here)
     Route::prefix('/')->group(function () {
         Route::get('/products', function () {
-            abort_unless(Auth::user()->role === 'super_admin', 403);
+            abort_unless(in_array(Auth::user()->role, ['super_admin', 'super_adin', 'admin']), 403);
             return Inertia::render('Admin/Products', [
                 'products' => Product::query()->with(['category', 'skus.inventory'])->latest()->paginate(15),
                 'categories' => Category::query()->orderBy('name')->get(),
@@ -227,14 +225,15 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::post('/products', [ProductController::class, 'store'])->name('admin.products.store');
 
         Route::get('/categories', function () {
-            abort_unless(Auth::user()->role === 'super_admin', 403);
+            abort_unless(in_array(Auth::user()->role, ['super_admin', 'super_adin', 'admin']), 403);
             return Inertia::render('Admin/Categories', [
                 'categories' => Category::query()->withCount('products')->latest()->get(),
             ]);
         });
 
         Route::post('/categories', function (Request $request) {
-            abort_unless(Auth::user()->role === 'super_admin', 403);
+            $role = strtolower(trim(Auth::user()->role));
+            abort_unless(in_array($role, ['super_admin', 'super_adin', 'admin']), 403);
 
             Category::create($request->validate([
                 'name' => ['required', 'string', 'max:255', 'unique:categories,name'],
@@ -247,7 +246,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
         // 🏢 FRANCHISES MANAGEMENT (Only Super Admin can see applications)
         Route::get('/franchises', function () {
-            abort_unless(Auth::user()->role === 'super_admin', 403);
+            $role = strtolower(trim(Auth::user()->role));
+            abort_unless(in_array($role, ['super_admin', 'super_adin', 'admin']), 403);
 
             return Inertia::render('Admin/Franchises', [
                 'applications' => UserFranchise::query()->with(['user', 'franchisePlan'])->latest()->get(),

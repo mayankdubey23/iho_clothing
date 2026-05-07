@@ -3,6 +3,8 @@ import { Link, router, usePage } from '@inertiajs/react';
 import {
   ChevronDown,
   Dumbbell,
+  FileText,
+  HeartHandshake,
   LayoutDashboard,
   LogOut,
   Mail,
@@ -10,12 +12,27 @@ import {
   Menu,
   Package,
   Phone,
+  Shield,
   Share2,
   ShoppingBag,
   Store,
+  Tag,
   User,
   X,
 } from 'lucide-react';
+// ACCOUNT menu items are shared across desktop avatar dropdown and mobile menu.
+export const ACCOUNT_MENU = [
+  { key: 'profile', label: 'My Profile', href: '/account', icon: User },
+  { key: 'orders', label: 'My Orders', href: '/account', icon: Package },
+  { key: 'addresses', label: 'My Addresses', href: '/account', icon: MapPin },
+  { key: 'wishlist', label: 'Wishlist', href: '/account', icon: HeartHandshake },
+  { key: 'cart', label: 'Cart', href: '/account', icon: ShoppingBag },
+  { key: 'coupons', label: 'Coupons', href: '/account', icon: Tag },
+  { key: 'returns', label: 'Returns & Refunds', href: '/account', icon: FileText },
+  { key: 'help', label: 'Help & Support', href: '/account', icon: Phone },
+  { key: 'settings', label: 'Account Settings', href: '/account', icon: Shield },
+];
+
 import { useEffect, useState } from 'react';
 
 export const money = new Intl.NumberFormat('en-IN', {
@@ -146,22 +163,64 @@ export default function AppLayout({ children, active = 'home', admin = false }) 
                     Admin
                   </Link>
                 )}
+
                 {!admin && (
-                  <Link
-                    href="/account"
-                    className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-teal-700 px-4 text-sm font-semibold text-white transition-colors hover:bg-teal-800"
-                  >
-                    <User size={15} />
-                    {user.name.split(' ')[0]}
-                  </Link>
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      className="flex min-h-9 items-center gap-2 rounded-lg bg-zinc-900 px-3.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 focus:outline-none"
+                      aria-label="Open account menu"
+                    >
+                      <span className="grid size-7 place-items-center rounded-full bg-white/10 ring-1 ring-white/10">
+                        <User size={15} />
+                      </span>
+                      <span className="hidden lg:inline">{user.name.split(' ')[0]}</span>
+                      <ChevronDown size={14} className="transition-transform duration-200 group-hover:rotate-180" />
+                    </button>
+
+                    <div className="pointer-events-none invisible absolute right-0 top-[calc(100%+10px)] w-[320px] translate-y-2 rounded-xl border border-stone-200 bg-white p-2.5 opacity-0 shadow-xl shadow-stone-900/10 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
+                      <div className="mb-2 rounded-lg bg-stone-50 p-3">
+                        <div className="flex items-center gap-3">
+                          <span className="grid size-10 place-items-center rounded-full bg-zinc-900 text-white">
+                            {user.name.split(' ').map((p) => p[0]).slice(0, 2).join('')}
+                          </span>
+                          <div>
+                            <p className="text-sm font-bold text-zinc-900">{user.name}</p>
+                            <p className="text-xs font-semibold text-stone-500">{user.email}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid">
+                        {ACCOUNT_MENU.map(({ key, label, href, icon: Icon }) => (
+                          <Link
+                            key={key}
+                            href={href}
+                            className="flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-100"
+                          >
+                            <span className="grid size-9 place-items-center rounded-lg bg-stone-100 text-stone-600">
+                              <Icon size={16} />
+                            </span>
+                            {label}
+                          </Link>
+                        ))}
+                      </div>
+
+                      <div className="mt-2 border-t border-stone-100 pt-2">
+                        <button
+                          type="button"
+                          onClick={logout}
+                          className="flex w-full items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-semibold text-red-600 transition-colors hover:bg-red-50"
+                        >
+                          <span className="grid size-9 place-items-center rounded-lg bg-red-50 text-red-600">
+                            <LogOut size={16} />
+                          </span>
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 )}
-                <button
-                  onClick={logout}
-                  className="grid size-9 place-items-center rounded-lg bg-stone-100 text-stone-500 transition-colors hover:bg-red-50 hover:text-red-600"
-                  aria-label="Logout"
-                >
-                  <LogOut size={15} />
-                </button>
               </>
             ) : (
               <>
@@ -232,11 +291,29 @@ export default function AppLayout({ children, active = 'home', admin = false }) 
                   {user ? (
                     <>
                       {!admin && (
-                        <Link href="/account" onClick={() => setOpen(false)} className="rounded-lg bg-teal-700 px-3 py-2.5 text-center text-sm font-semibold text-white">
-                          My Account
-                        </Link>
+                        <div className="grid gap-1">
+                          {ACCOUNT_MENU.map(({ key, label, href, icon: Icon }) => (
+                            <Link
+                              key={key}
+                              href={href}
+                              onClick={() => setOpen(false)}
+                              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-50"
+                            >
+                              <span className="grid size-9 place-items-center rounded-lg bg-stone-100 text-stone-600">
+                                <Icon size={16} />
+                              </span>
+                              {label}
+                            </Link>
+                          ))}
+                        </div>
                       )}
-                      <button onClick={logout} className="rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-red-600 transition-colors hover:bg-red-50">
+                      <button
+                        onClick={() => {
+                          logout();
+                          setOpen(false);
+                        }}
+                        className="mt-1 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-red-600 transition-colors hover:bg-red-50"
+                      >
                         Logout
                       </button>
                     </>
