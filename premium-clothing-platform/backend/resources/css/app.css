@@ -10,6 +10,16 @@
     --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
     --font-display: 'Playfair Display', ui-serif, Georgia, 'Times New Roman', serif;
+    --color-brand-dark: #1A1A2E;
+    --color-brand-navy: #16213E;
+    --color-brand-accent: #E94E3C;
+    --color-brand-secondary: #0F3460;
+    --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    --gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    --gradient-fluid: linear-gradient(-45deg, #1A1A2E, #16213E, #0F3460, #E94E3C);
 }
 
 @layer base {
@@ -53,8 +63,8 @@
     }
 
     .input:focus {
-        border-color: #0f766e;
-        box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+        border-color: var(--color-brand-accent);
+        box-shadow: 0 0 0 3px rgba(233, 78, 60, 0.15);
     }
 
     .badge {
@@ -100,10 +110,10 @@
 
 .lift-card:hover {
     transform: translateY(-6px);
-    border-color: rgba(15, 118, 110, 0.35);
+    border-color: rgba(233, 78, 60, 0.3);
     box-shadow:
-        0 20px 44px rgba(28, 25, 23, 0.10),
-        0 4px 12px rgba(28, 25, 23, 0.06);
+        0 20px 44px rgba(26, 26, 46, 0.15),
+        0 4px 12px rgba(26, 26, 46, 0.08);
 }
 
 /* ─── Image Zoom ─── */
@@ -176,6 +186,224 @@
 @keyframes shimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
+}
+
+/* ─── Fluid Gradient Background ─── */
+.fluid-gradient {
+    background: var(--gradient-fluid);
+    background-size: 400% 400%;
+    animation: gradient-flow 15s ease infinite;
+}
+
+@keyframes gradient-flow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* ─── Gradient Orbs for Background ─── */
+.gradient-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 0;
+    animation: orb-float 20s ease-in-out infinite;
+}
+
+.gradient-orb-1 {
+    width: 500px;
+    height: 500px;
+    background: #667eea;
+    top: -100px;
+    right: -100px;
+}
+
+.gradient-orb-2 {
+    width: 400px;
+    height: 400px;
+    background: #f5576c;
+    bottom: -100px;
+    left: -100px;
+    animation-delay: -10s;
+}
+
+.gradient-orb-3 {
+    width: 300px;
+    height: 300px;
+    background: #4facfe;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation-delay: -5s;
+}
+
+@keyframes orb-float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(50px, -50px) scale(1.1); }
+    50% { transform: translate(-30px, 30px) scale(0.9); }
+    75% { transform: translate(40px, 40px) scale(1.05); }
+}
+
+/* ─── Premium Hover States ─── */
+.hover-lift {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(26, 26, 46, 0.15),
+                0 8px 16px rgba(26, 26, 46, 0.1);
+}
+
+.hover-glow {
+    transition: box-shadow 0.3s ease;
+}
+
+.hover-glow:hover {
+    box-shadow: 0 0 30px rgba(233, 78, 60, 0.3),
+                0 0 60px rgba(233, 78, 60, 0.1);
+}
+
+/* ─── Shimmer Effect ─── */
+.shimmer-effect {
+    position: relative;
+    overflow: hidden;
+}
+
+.shimmer-effect::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transition: left 0.6s ease;
+}
+
+.shimmer-effect:hover::before {
+    left: 100%;
+}
+
+/* ─── Magnetic Button Effect ─── */
+.magnetic-btn {
+    position: relative;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.magnetic-btn:hover {
+    transform: scale(1.02);
+}
+
+/* ─── Ripple Effect ─── */
+.ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.ripple:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* ─── Page Transition Base ─── */
+.page-transition-enter {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.page-transition-exit {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.page-transition-exit-active {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* ─── Stagger Animation ─── */
+.stagger-item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: stagger-in 0.6s ease forwards;
+}
+
+@keyframes stagger-in {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─── Pulse Animation ─── */
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(233, 78, 60, 0.2); }
+    50% { box-shadow: 0 0 40px rgba(233, 78, 60, 0.4); }
+}
+
+.pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ─── Fade Slide ─── */
+@keyframes fade-slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-slide-up {
+    animation: fade-slide-up 0.8s ease forwards;
+}
+
+/* ─── Scale In ─── */
+@keyframes scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.scale-in {
+    animation: scale-in 0.6s ease forwards;
 }
 
 /* ─── Reduced Motion ─── */

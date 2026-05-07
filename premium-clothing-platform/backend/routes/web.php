@@ -53,6 +53,52 @@ Route::get('/', function (Request $request) {
     ]);
 })->name('home');
 
+
+// Cart Route
+Route::get('/cart', function () {
+    return Inertia::render('Cart');
+})->name('cart');
+
+// Wishlist Route (Requires user to be logged in usually, but we will make it render for now)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/account/wishlist', function () {
+        return Inertia::render('Wishlist');
+    })->name('wishlist');
+});
+
+// Single Product Page Route
+Route::get('/product/{id}', function ($id) {
+    // In the future, this will fetch the real product from the database:
+    // $product = Product::with('images', 'skus')->findOrFail($id);
+    
+    return Inertia::render('Product', [
+        'productId' => $id,
+        // We pass null for now so the frontend uses our beautiful premium placeholders
+        'product' => null 
+    ]);
+})->name('product.show');
+
+// Shop / Catalog Route
+Route::get('/shop', function (\Illuminate\Http\Request $request) {
+    // In the future, you will query the Product model here and apply the filters
+    return Inertia::render('Shop', [
+        'filters' => $request->all(), // Passes search queries or filter categories to React
+        'products' => null // We will use premium placeholders for now
+    ]);
+})->name('shop');
+
+// User Account Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/account', function () {
+        return Inertia::render('Account');
+    })->name('account');
+});
+
+// Checkout Route
+Route::get('/checkout', function () {
+    return Inertia::render('Checkout');
+})->name('checkout');
+
 // 🛡️ SECURITY: Rate limiting added to prevent order/payment spam
 Route::middleware('throttle:10,1')->group(function() {
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
