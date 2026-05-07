@@ -8,11 +8,14 @@ use App\Models\Inventory;
 use App\Models\FranchisePincode;
 use App\Models\Sku;
 use App\Models\Coupon;
+use App\Models\User;           // ✅ FIX: Missing Import Added
+use App\Models\UserFranchise;
 use App\Http\Requests\CheckoutOrderRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use App\Models\StockTransaction;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderInvoiceMail;
 use Razorpay\Api\Api;
@@ -227,7 +230,7 @@ class OrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled'
+        'status' => 'required|in:pending,confirmed,packed,shipped,out_for_delivery,delivered,cancelled,returned,refunded'
         ]);
 
         $order = Order::findOrFail($id);
@@ -259,22 +262,35 @@ class OrderController extends Controller
      * 📊 ADMIN DASHBOARD DATA
      */
     public function dashboard(Request $request)
-    {
-        $user = auth()->user(); 
-        $query = Order::query();
+{
+    $user = auth()->user();
+    $role = $user->role;
 
-        if ($user && $user->role === 'franchise') {
-            $query->where('franchise_id', $user->id);
-        }
-
+    if ($role === 'super_admin') {
+        // Superadmin: Global View
         return Inertia::render('Admin/Dashboard', [
             'stats' => [
-                'total_revenue' => (clone $query)->where('status', 'delivered')->sum('total_amount'),
-                'total_orders'  => (clone $query)->count(),
-                'recent_orders' => (clone $query)->latest()->take(10)->get(),
-                'stock'         => (int) Inventory::when($user->role === 'franchise', fn($q) => $q->where('franchise_id', $user->id))->sum('stock_quantity'),
+                'total_sales' => (float) Order::where('status', 'delivered')->sum('total_amount'),
+                'total_orders' => Order::count(),
+                'total_customers' => User::where('role', 'customer')->count(),
+                'total_franchises' => User::where('role', 'franchise')->count(),
+                'pending_orders' => Order::where('status', 'pending')->count(),
+                'low_stock' => Inventory::where('stock_quantity', '<', 10)->count(),
+                'recent_orders' => Order::with('items')->latest()->take(10)->get(),
             ]
         ]);
+    } else {
+        // Franchise Admin: Scoped View
+        return Inertia::render('Franchise/Dashboard', [
+            'stats' => [
+                'my_sales' => (float) Order::where('franchise_id', $user->id)->where('status', 'delivered')->sum('total_amount'),
+                'my_orders' => Order::where('franchise_id', $user->id)->count(),
+                'available_stock' => (int) Inventory::where('franchise_id', $user->id)->sum('stock_quantity'),
+                'pending_fulfillment' => Order::where('franchise_id', $user->id)->whereIn('status', ['pending', 'confirmed'])->count(),
+                'recent_orders' => Order::where('franchise_id', $user->id)->latest()->take(5)->get(),
+            ]
+        ]);
+    }
     }
 
     /**

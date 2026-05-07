@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import { Head } from '@inertiajs/react';
-import { Store } from 'lucide-react';
+import { Head, router } from '@inertiajs/react';
+import { Store, Check, X } from 'lucide-react';
 import AdminLayout from '../../Layouts/AdminLayout';
 
 const STATUS_BADGE = {
@@ -24,6 +24,16 @@ function getInitials(name) {
 }
 
 export default function Franchises({ applications }) {
+  function updateStatus(applicationId, status) {
+    if (!confirm(`Are you sure you want to ${status} this application?`)) return;
+
+    router.patch(`/admin/franchise-applications/${applicationId}`, { status }, {
+      preserveScroll: true,
+      onSuccess: () => console.log('Status updated!'),
+      onError: (errors) => console.error('Failed to update status:', errors),
+    });
+  }
+
   return (
     <AdminLayout active="franchises">
       <Head title="Franchise Applications | Admin" />
@@ -75,7 +85,7 @@ export default function Franchises({ applications }) {
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/80">
-                  {['Applicant', 'Business Name', 'Selected Plan', 'Applied', 'Status'].map((h) => (
+                  {['Applicant', 'Business Name', 'Selected Plan', 'Applied', 'Status', 'Actions'].map((h) => (
                     <th
                       key={h}
                       className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-400"
@@ -126,6 +136,24 @@ export default function Franchises({ applications }) {
                       >
                         {app.status}
                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {app.status === 'pending' && (
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => updateStatus(app.id, 'approved')}
+                            className="flex items-center gap-1.5 rounded-lg bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-700 transition-colors hover:bg-emerald-200"
+                          >
+                            <Check size={14} /> Approve
+                          </button>
+                          <button
+                            onClick={() => updateStatus(app.id, 'rejected')}
+                            className="flex items-center gap-1.5 rounded-lg bg-red-100 px-3 py-1.5 text-xs font-bold text-red-700 transition-colors hover:bg-red-200"
+                          >
+                            <X size={14} /> Reject
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}

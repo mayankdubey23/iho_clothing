@@ -1338,8 +1338,8 @@ export default function Storefront({ products, categories, plans, filters }) {
                   <strong className="mt-1 block text-3xl font-bold text-teal-700">{money.format(Number(plan.price))}</strong>
                 </div>
                 <ul className="grid flex-1 gap-2.5">
-                  {(plan.features_list || []).map((feature) => (
-                    <li className="flex gap-2.5 text-sm text-stone-600" key={feature}>
+                  {(Array.isArray(plan.features_list) ? plan.features_list : []).map((feature, idx) => (
+                    <li className="flex gap-2.5 text-sm text-stone-600" key={`${feature}-${idx}`}>
                       <Check className="mt-0.5 shrink-0 text-teal-600" size={15} />
                       {feature}
                     </li>

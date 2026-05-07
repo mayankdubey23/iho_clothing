@@ -1,6 +1,6 @@
 import React from 'react';
 import { Head, usePage } from '@inertiajs/react';
-import { TrendingUp, ShoppingBag, Box, Store } from 'lucide-react';
+import { TrendingUp, ShoppingBag, Box, Store, Users, IndianRupee } from 'lucide-react';
 import AdminLayout from '../../Layouts/AdminLayout';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -33,13 +33,13 @@ function formatCurrency(value) {
   }).format(value || 0);
 }
 
-export default function Dashboard({ stats }) {
+export default function Dashboard({ stats, recent_orders, chart_data }) {
     const { auth } = usePage().props;
-    const isSuperAdmin = auth.user.role === 'super_admin' || auth.user.role === 'admin';
+    const isSuperAdmin = ['super_admin', 'admin'].includes(auth.user.role);
 
     // Dummy data for charts if none is provided or it's empty
-    const chartData = stats.chart_data && stats.chart_data.length > 0 
-        ? stats.chart_data.map(item => ({
+    const processedChartData = chart_data && chart_data.length > 0
+        ? chart_data.map(item => ({
             ...item,
             revenue: parseFloat(item.revenue),
             orders: parseInt(item.orders),
@@ -65,21 +65,30 @@ export default function Dashboard({ stats }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <StatCard title="Total Revenue" value={formatCurrency(stats.total_revenue)} icon={<TrendingUp size={24}/>} color="bg-emerald-500" />
-                <StatCard title="Total Orders" value={stats.total_orders || 0} icon={<ShoppingBag size={24}/>} color="bg-blue-500" />
-                <StatCard title="Stock Units" value={stats.stock || 0} icon={<Box size={24}/>} color="bg-indigo-500" />
-                {isSuperAdmin && (
-                    <StatCard title="Franchise Apps" value={stats.applications || 0} icon={<Store size={24}/>} color="bg-orange-500" />
+                {isSuperAdmin ? (
+                    <>
+                        <StatCard title="Total Revenue" value={formatCurrency(stats.total_revenue)} icon={<TrendingUp size={24}/>} color="bg-emerald-500" />
+                        <StatCard title="Total Orders" value={stats.total_orders || 0} icon={<ShoppingBag size={24}/>} color="bg-blue-500" />
+                        <StatCard title="Total Customers" value={stats.total_customers || 0} icon={<Users size={24}/>} color="bg-sky-500" />
+                        <StatCard title="Franchise Apps" value={stats.applications || 0} icon={<Store size={24}/>} color="bg-orange-500" />
+                    </>
+                ) : (
+                    <>
+                        <StatCard title="My Total Sales" value={formatCurrency(stats.total_revenue)} icon={<TrendingUp size={24}/>} color="bg-emerald-500" />
+                        <StatCard title="My Total Profit" value={formatCurrency(stats.total_profit)} icon={<IndianRupee size={24}/>} color="bg-green-500" />
+                        <StatCard title="My Total Orders" value={stats.total_orders || 0} icon={<ShoppingBag size={24}/>} color="bg-blue-500" />
+                        <StatCard title="My Stock Units" value={stats.stock || 0} icon={<Box size={24}/>} color="bg-indigo-500" />
+                    </>
                 )}
             </div>
 
             {/* Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                    <h2 className="text-lg font-bold text-slate-800 mb-6">Revenue Trend (Last 7 Days)</h2>
+                    <h2 className="text-lg font-bold text-slate-800 mb-6">{isSuperAdmin ? 'Revenue Trend' : 'My Sales Trend'} (Last 7 Days)</h2>
                     <div className="h-72">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                            <AreaChart data={processedChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                                 <defs>
                                     <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
@@ -100,10 +109,10 @@ export default function Dashboard({ stats }) {
                 </div>
 
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                    <h2 className="text-lg font-bold text-slate-800 mb-6">Orders Volume (Last 7 Days)</h2>
+                    <h2 className="text-lg font-bold text-slate-800 mb-6">{isSuperAdmin ? 'Orders Volume' : 'My Orders Volume'} (Last 7 Days)</h2>
                     <div className="h-72">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                            <BarChart data={processedChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
                                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
@@ -135,8 +144,8 @@ export default function Dashboard({ stats }) {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                            {stats.recent_orders?.length > 0 ? (
-                                stats.recent_orders.map(order => (
+                            {recent_orders?.length > 0 ? (
+                                recent_orders.map(order => (
                                     <tr key={order.id} className="hover:bg-slate-50 transition group">
                                         <td className="px-6 py-4 font-black text-blue-600">#{order.id}</td>
                                         <td className="px-6 py-4 font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">{order.customer_name}</td>

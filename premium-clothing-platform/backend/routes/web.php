@@ -2,257 +2,228 @@
 
 use App\Models\Category;
 use App\Models\FranchisePlan;
-use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\UserFranchise;
-use App\Models\Order; // Naya Order Model add kiya hai
-use App\Http\Controllers\OrderController; // Smart Checkout Controller
+use App\Models\Order;
+use App\Http\Controllers\AdminInventoryController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\CouponController;
+use App\Http\Controllers\UserFranchiseController;
+use App\Http\Controllers\StockController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rules\Password;
-use App\Http\Controllers\ProductController;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
-use App\Http\Controllers\InventoryController;
-use App\Http\Controllers\CouponController;
 
+/*
+|--------------------------------------------------------------------------
+| 🛍️ PUBLIC STOREFRONT ROUTES
+|--------------------------------------------------------------------------
+*/
 
-// ==========================================
-// 🛍️ STOREFRONT & PRODUCTS (Public)
-// ==========================================
 Route::get('/', function (Request $request) {
     $filters = $request->validate([
-        'category' => ['nullable', 'string'],
-        'search' => ['nullable', 'string', 'max:255'],
+        'category'  => ['nullable', 'string'],
+        'search'    => ['nullable', 'string', 'max:255'],
         'min_price' => ['nullable', 'numeric', 'min:0'],
         'max_price' => ['nullable', 'numeric', 'min:0'],
     ]);
 
     $products = Product::query()
-        ->with([
-            'category',
-            'skus.inventory',
-            'images' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('sort_order'),
-        ])
+        ->with(['category', 'skus.inventory', 'images' => fn ($q) => $q->orderByDesc('is_primary')])
         ->where('is_active', true)
-        ->when(($filters['category'] ?? 'all') !== 'all' && ($filters['category'] ?? null), function ($query) use ($filters) {
-            $query->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('slug', $filters['category']));
-        })
-        ->when($filters['search'] ?? null, function ($query, $search) {
-            $query->where(fn ($searchQuery) => $searchQuery
-                ->where('name', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%"));
-        })
-        ->when($filters['min_price'] ?? null, fn ($query, $price) => $query->where('base_price', '>=', $price))
-        ->when($filters['max_price'] ?? null, fn ($query, $price) => $query->where('base_price', '<=', $price))
+        ->when(($filters['category'] ?? 'all') !== 'all', fn($q) => $q->whereHas('category', fn($cq) => $cq->where('slug', $filters['category'])))
+        ->when($filters['search'] ?? null, fn($q, $s) => $q->where('name', 'like', "%{$s}%"))
         ->latest()
         ->paginate(12)
         ->withQueryString();
 
     return Inertia::render('Storefront', [
-        'products' => $products,
-        'categories' => Category::query()->where('is_active', true)->orderBy('name')->get(),
-        'plans' => FranchisePlan::query()->orderBy('price')->get(),
-        'filters' => [
-            'category' => $filters['category'] ?? 'all',
-            'search' => $filters['search'] ?? '',
-            'min_price' => $filters['min_price'] ?? '',
-            'max_price' => $filters['max_price'] ?? '',
-        ],
+        'products'   => $products,
+        'categories' => Category::where('is_active', true)->orderBy('name')->get(),
+        'plans'      => FranchisePlan::orderBy('price')->get(),
+        'filters'    => $filters,
     ]);
 })->name('home');
 
-// Sports Wear Special Page
-Route::get('/sports-wear', function () {
-    $sportsCategorySlugs = ['premium-tshirts', 'performance-bottoms', 'compression-sets', 'teamwear-jerseys', 'training-accessories'];
-
-    return Inertia::render('SportsWear', [
-        'products' => Product::query()
-            ->with(['category', 'skus.inventory', 'images' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('sort_order')])
-            ->where('is_active', true)
-            ->whereHas('category', fn ($query) => $query->whereIn('slug', $sportsCategorySlugs))
-            ->latest()
-            ->get(),
-        'categories' => Category::query()->where('is_active', true)->whereIn('slug', $sportsCategorySlugs)->orderBy('name')->get(),
-        'plans' => FranchisePlan::query()->orderBy('price')->get(),
-    ]);
+// 🛡️ SECURITY: Rate limiting added to prevent order/payment spam
+Route::middleware('throttle:10,1')->group(function() {
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::post('/payment/verify', [OrderController::class, 'verifyPayment'])->name('payment.verify');
+    Route::post('/coupons/apply', [CouponController::class, 'apply'])->name('coupons.apply');
 });
 
-// ==========================================
-// 🛒 SMART CHECKOUT ENGINE
-// ==========================================
-Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
-Route::post('/payment/verify', [OrderController::class, 'verifyPayment'])->name('payment.verify');
+/*
+|--------------------------------------------------------------------------
+| 🔒 AUTHENTICATION & SMART REDIRECTS
+|--------------------------------------------------------------------------
+*/
 
-// 🎁 COUPON API
-Route::post('/coupons/apply', [CouponController::class, 'apply'])->name('coupons.apply');
-
-
-// ==========================================
-// 🔒 AUTHENTICATION (Guest)
-// ==========================================
 Route::middleware('guest')->group(function () {
     Route::get('/login', fn () => Inertia::render('Auth/Login'))->name('login');
-    Route::get('/register', fn () => Inertia::render('Auth/Register'));
-
-    Route::post('/login', function (Request $request) {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
-        ]);
-
-        if (! Auth::attempt($credentials)) {
-            return back()->withErrors(['email' => 'The provided credentials are incorrect.'])->onlyInput('email');
-        }
-
-        $request->session()->regenerate();
-        $role = Auth::user()->role;
-        return redirect()->intended(in_array($role, ['super_admin', 'franchise']) ? '/admin' : '/account');
-    });
+    Route::get('/register', fn () => Inertia::render('Auth/Register'))->name('register.view');
 
     Route::post('/register', function (Request $request) {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email'],
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', Password::min(8)],
         ]);
 
         $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
+            'name'     => $validated['name'],
+            'email'    => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role' => 'customer',
+            'role'     => 'customer',
         ]);
 
         Auth::login($user);
         $request->session()->regenerate();
-        return redirect('/account')->with('success', 'Account created successfully.');
-    });
-});
 
-// ==========================================
-// 👤 USER / CUSTOMER ROUTES (Auth)
-// ==========================================
-Route::middleware('auth')->group(function () {
-    Route::post('/logout', function (Request $request) {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect('/')->with('success', 'Logged out safely.');
-    });
+        return redirect()->intended('/account')->with('success', 'Account created successfully.');
+    })->name('register.store');
 
-    Route::get('/account', function () {
-        return Inertia::render('Account', [
-            'applications' => UserFranchise::query()->with('franchisePlan')->where('user_id', Auth::id())->latest()->get(),
-        ]);
-    });
-
-    Route::get('/franchise-apply', function () {
-        return Inertia::render('FranchiseApply', [
-            'plans' => FranchisePlan::query()->orderBy('price')->get(),
-        ]);
-    });
-
-    Route::post('/franchise-applications', function (Request $request) {
-        $validated = $request->validate([
-            'franchise_plan_id' => ['required', 'exists:franchise_plans,id'],
-            'business_name' => ['nullable', 'string', 'max:255'],
-        ]);
-
-        UserFranchise::create([...$validated, 'user_id' => Auth::id(), 'status' => 'pending']);
-        return redirect('/account')->with('success', 'Application submitted.');
-    });
-});
-
-// ==========================================
-// 👑 ADMIN & FRANCHISE CONTROL PANEL
-// ==========================================
-Route::middleware(['auth'])->prefix('admin')->group(function () {
-    
-    // 📊 SHARED DASHBOARD
-        Route::get('/', function () {
-            $role = strtolower(trim(Auth::user()->role));
-            abort_unless(in_array($role, ['super_admin', 'super_adin', 'franchise', 'admin']), 403);
-
-        $user = Auth::user();
-        $ordersQuery = Order::query();
-
-        if ($user->role === 'franchise') {
-            $ordersQuery->where('franchise_id', $user->id);
-            $stockCount = Inventory::where('franchise_id', $user->id)->sum('stock_quantity');
-        } else {
-            $stockCount = Inventory::sum('stock_quantity');
+    Route::post('/login', function (Request $request) {
+        $creds = $request->validate(['email' => 'required|email', 'password' => 'required']);
+        
+        if (!Auth::attempt($creds)) {
+            return back()->withErrors(['email' => 'Invalid credentials.']);
         }
+        
+        $request->session()->regenerate();
+        $role = strtolower(trim(Auth::user()->role ?? 'customer'));
+        
+        if (in_array($role, ['super_admin', 'admin'])) {
+            return redirect()->intended('/admin');
+        } elseif ($role === 'franchise') {
+            return redirect()->intended('/franchise');
+        } else {
+            return redirect()->intended('/account');
+        }
+    })->middleware('throttle:5,1')->name('login.store');
+});
 
-        return Inertia::render('Admin/Dashboard', [
-            'stats' => [
-                'products' => Product::query()->count(),
-                'categories' => Category::query()->count(),
-                'stock' => (int) $stockCount,
-                'applications' => UserFranchise::query()->count(),
-                'total_revenue' => (float) (clone $ordersQuery)->where('status', 'delivered')->sum('total_amount'),
-                'total_orders' => (clone $ordersQuery)->count(),
-                'recent_orders' => (clone $ordersQuery)->with('items')->latest()->take(10)->get(),
-                'chart_data' => (clone $ordersQuery)->selectRaw('DATE(created_at) as name, sum(total_amount) as revenue, count(*) as orders')->where('created_at', '>=', now()->subDays(7))->groupBy('name')->orderBy('name')->get(),
-            ],
-        ]);
-    })->name('admin.dashboard');
+/*
+|--------------------------------------------------------------------------
+| 👤 SECURE SECTORS (Consumer, Franchise, SuperAdmin)
+|--------------------------------------------------------------------------
+*/
 
-    // 🔄 ORDER LIFECYCLE (PATCH)
-    Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.status');
+Route::middleware(['auth'])->group(function () {
+    
+    // 🚪 Logout
+    Route::post('/logout', function (Request $request) {
+        Auth::logout(); 
+        $request->session()->invalidate(); 
+        $request->session()->regenerateToken();
+        return redirect('/');
+    })->name('logout');
 
 
-    // 🛡️ SUPER ADMIN ONLY SECTION (Fixed Error Here)
-    Route::prefix('/')->group(function () {
+    // ==========================================
+    // 🛒 1. CONSUMER SECTOR (URL: /account)
+    // ==========================================
+    Route::prefix('account')->group(function () {
+        Route::get('/', fn () => Inertia::render('Account', [
+            'orders'       => Order::where('customer_email', Auth::user()->email)->latest()->get(),
+            'applications' => UserFranchise::with('franchisePlan')->where('user_id', Auth::id())->get(),
+        ]))->name('account');
+
+        Route::get('/franchise-apply', fn () => Inertia::render('FranchiseApply', [
+            'plans' => FranchisePlan::orderBy('price')->get()
+        ]))->name('account.franchise-apply');
+        
+        Route::post('/franchise-apply', [UserFranchiseController::class, 'store'])
+            ->name('account.franchise-apply.store')
+            ->middleware('throttle:3,1');
+    });
+
+
+    // ==========================================
+    // 👑 2. SUPER ADMIN SECTOR (URL: /admin)
+    // ==========================================
+    Route::prefix('admin')->group(function () {
+        
+        Route::get('/', [OrderController::class, 'dashboard'])->name('admin.dashboard');
+
+        Route::get('/inventory', [AdminInventoryController::class, 'index'])->name('admin.inventory.index');
+        Route::post('/inventory/add', [AdminInventoryController::class, 'addMasterStock'])->name('admin.inventory.add');
+        Route::get('/inventory/franchise/{id}', [AdminInventoryController::class, 'viewFranchiseStock'])
+            ->name('admin.inventory.franchise')->whereNumber('id');
+        Route::get('/inventory/history', [AdminInventoryController::class, 'stockHistory'])->name('admin.inventory.history');
+        
+        Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus'])
+            ->name('admin.orders.status')->whereNumber('id');
+
         Route::get('/products', function () {
-            abort_unless(in_array(Auth::user()->role, ['super_admin', 'super_adin', 'admin']), 403);
             return Inertia::render('Admin/Products', [
-                'products' => Product::query()->with(['category', 'skus.inventory'])->latest()->paginate(15),
+                'products'   => Product::query()->with(['category', 'skus.inventory'])->latest()->paginate(15),
                 'categories' => Category::query()->orderBy('name')->get(),
             ]);
-        });
-
-        // 🎁 COUPONS MANAGEMENT (Super Admin Only)
-        Route::get('/coupons', [App\Http\Controllers\CouponController::class, 'index'])->name('admin.coupons');
-        Route::post('/coupons', [App\Http\Controllers\CouponController::class, 'store']);
-        Route::delete('/coupons/{coupon}', [App\Http\Controllers\CouponController::class, 'destroy']);
-
-        // 📦 INVENTORY MANAGEMENT (Shared by Franchise & Super Admin)
-        Route::post('/inventory/update', [InventoryController::class, 'updateStock'])->name('admin.inventory.update');
-
+        })->name('admin.products');
+        
         Route::post('/products', [ProductController::class, 'store'])->name('admin.products.store');
-
-        Route::get('/categories', function () {
-            abort_unless(in_array(Auth::user()->role, ['super_admin', 'super_adin', 'admin']), 403);
-            return Inertia::render('Admin/Categories', [
-                'categories' => Category::query()->withCount('products')->latest()->get(),
-            ]);
-        });
-
-        Route::post('/categories', function (Request $request) {
-            $role = strtolower(trim(Auth::user()->role));
-            abort_unless(in_array($role, ['super_admin', 'super_adin', 'admin']), 403);
-
-            Category::create($request->validate([
-                'name' => ['required', 'string', 'max:255', 'unique:categories,name'],
-                'slug' => ['required', 'string', 'max:255', 'unique:categories,slug'],
-                'is_active' => ['boolean'],
-            ]));
-
-            return back()->with('success', 'Category created successfully.');
-        });
-
-        // 🏢 FRANCHISES MANAGEMENT (Only Super Admin can see applications)
+        Route::resource('categories', CategoryController::class);
+        
         Route::get('/franchises', function () {
-            $role = strtolower(trim(Auth::user()->role));
-            abort_unless(in_array($role, ['super_admin', 'super_adin', 'admin']), 403);
-
             return Inertia::render('Admin/Franchises', [
                 'applications' => UserFranchise::query()->with(['user', 'franchisePlan'])->latest()->get(),
-                'plans' => FranchisePlan::query()->orderBy('price')->get(),
+                'plans'        => FranchisePlan::query()->orderBy('price')->get(),
             ]);
-        });
+        })->name('admin.franchises');
+        
+        Route::patch('/franchise-applications/{application}', [UserFranchiseController::class, 'updateStatus'])
+            ->name('admin.franchises.update')->whereNumber('application');
+        
+        Route::get('/franchises/{id}', [UserFranchiseController::class, 'show'])
+            ->name('admin.franchises.show')->whereNumber('id');
+        
+        Route::get('/stock-requests', [StockController::class, 'index'])->name('admin.stock-requests');
+        Route::patch('/stock-requests/{id}/approve', [StockController::class, 'approve'])
+            ->name('admin.stock-requests.approve')->whereNumber('id');
+        
+        Route::get('/customers', fn() => Inertia::render('Admin/Customers', [
+            'customers' => User::where('role', 'customer')->paginate(20)
+        ]))->name('admin.customers');
+            
+        Route::get('/coupons', [CouponController::class, 'index'])->name('admin.coupons');
+        Route::post('/coupons', [CouponController::class, 'store']);
+        Route::delete('/coupons/{coupon}', [CouponController::class, 'destroy'])->whereNumber('coupon');
     });
-});
+
+
+    // ==========================================
+    // 🏢 3. FRANCHISE SECTOR (URL: /franchise)
+    // ==========================================
+    Route::prefix('franchise')->group(function () {
+
+        Route::get('/', [OrderController::class, 'dashboard'])->name('franchise.dashboard');
+        Route::get('/my-customers', [OrderController::class, 'franchiseCustomers'])->name('franchise.customers');
+
+        Route::get('/my-inventory', [InventoryController::class, 'index'])->name('franchise.inventory');
+        Route::post('/inventory/update', [InventoryController::class, 'updateStock'])->name('franchise.inventory.update');
+
+        Route::get('/buy-stock', [ProductController::class, 'franchiseCatalog'])->name('franchise.buy-stock');
+        Route::post('/stock-requests', [StockController::class, 'store'])->name('franchise.stock-requests.store');
+        Route::get('/my-stock-requests', [StockController::class, 'myRequests'])->name('franchise.stock-requests.history');
+
+        Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus'])
+            ->name('franchise.orders.status')->whereNumber('id');
+
+        Route::get('/my-wallet', function() {
+            return Inertia::render('Franchise/Wallet', [
+                'stats' => DB::table('wallets')->where('franchise_id', Auth::id())->first() ?? 
+                           ['balance' => 0, 'total_earned' => 0, 'pending_dues' => 0]
+            ]);
+        })->name('franchise.wallet');
+
+    });
+
+}); // <-- Closes the main Auth Middleware

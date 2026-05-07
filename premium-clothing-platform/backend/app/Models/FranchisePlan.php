@@ -6,18 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class FranchisePlan extends Model
 {
+    // Agar $guarded ya $fillable pehle se likha hai toh usko waise hi rehne dein
     protected $guarded = [];
 
-    protected function casts(): array
-    {
-        return [
-            'price' => 'decimal:2',
-            'features_list' => 'array',
-        ];
-    }
-
-    public function userFranchises()
-    {
-        return $this->hasMany(UserFranchise::class);
-    }
+    // ✅ ADD THIS BLOCK: Yeh string ko automatically Array mein badal dega
+    protected $casts = [
+        'features_list' => 'array',
+    ];
 }

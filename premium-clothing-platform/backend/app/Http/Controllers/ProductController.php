@@ -78,11 +78,13 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        abort_unless($request->user()?->role === 'super_admin', 403);
+        $user = $request->user();
+        abort_unless($user && in_array($user->role, ['super_admin', 'admin']), 403, 'This action is unauthorized.');
 
         // 1. Inputs Validate Karein (Image optional hai)
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'mrp' => 'required|numeric',
             'slug' => 'required|string|unique:products,slug',
             'category_id' => 'required|exists:categories,id',
             'base_price' => 'required|numeric',

@@ -3,74 +3,111 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inventory;
-use App\Models\Product;
 use App\Models\Sku;
+use App\Models\User;
+use App\Models\StockTransaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class AdminInventoryController extends Controller
 {
     /**
-     * Get inventory for a SKU.
+     * 1. GLOBAL STOCK OVERVIEW (Super Admin sees everything)
      */
-    public function show(Sku $sku)
+    public function index(Request $request)
     {
-        $inventory = $sku->inventory;
+        // Get all SKUs with Master Stock and Total Franchise Stock
+        $skus = Sku::with(['product', 'inventory' => function($query) {
+            $query->whereNull('franchise_id'); // Master Stock
+        }])->withSum('inventories as total_franchise_stock', 'stock_quantity')
+          ->paginate(20);
 
+        if ($request->wantsJson() || !$request->hasHeader('X-Inertia')) {
         return response()->json([
-            'success' => true,
-            'data' => $inventory,
+            'skus' => $skus
+        ]);
+        }
+
+        return Inertia::render('Admin/Inventory/Index', [
+            'skus' => $skus
         ]);
     }
 
     /**
-     * Update inventory stock quantity.
+     * 2. ADD NEW STOCK TO MASTER WAREHOUSE
      */
-    public function updateStock(Request $request, Sku $sku)
+    public function addMasterStock(Request $request)
     {
-        $validated = $request->validate([
-            'stock_quantity' => ['required', 'integer', 'min:0'],
-            'reorder_level' => ['integer', 'min:0'],
+        $request->validate([
+            'sku_id' => 'required|exists:skus,id',
+            'quantity' => 'required|integer|min:1',
+            'reason' => 'required|string|max:255' // e.g., "Received from Manufacturer"
         ]);
 
-        $inventory = $sku->inventory();
+        try {
+            DB::beginTransaction();
 
-        if (!$inventory->exists()) {
-            $inventory->create([
-                'stock_quantity' => $validated['stock_quantity'],
-                'reorder_level' => $validated['reorder_level'] ?? 10,
+            $inventory = Inventory::firstOrCreate(
+                ['sku_id' => $request->sku_id, 'franchise_id' => null],
+                ['stock_quantity' => 0]
+            );
+
+            $inventory->increment('stock_quantity', $request->quantity);
+
+            // Maintain Ledger
+            StockTransaction::create([
+                'sku_id' => $request->sku_id,
+                'franchise_id' => null,
+                'transaction_type' => 'in',
+                'quantity' => $request->quantity,
+                'reason' => $request->reason,
+                'performed_by' => auth()->id()
             ]);
-        } else {
-            $inventory->update($validated);
-        }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Inventory updated successfully',
-            'data' => $inventory->first(),
-        ]);
+            DB::commit();
+            return back()->with('success', 'Master Stock updated successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Failed to add stock.']);
+        }
     }
 
     /**
-     * Get inventory status for all products.
+     * 3. X-RAY VISION: SEE A SPECIFIC FRANCHISE'S STOCK
      */
-    public function status(Request $request)
+    public function viewFranchiseStock($franchise_id)
     {
-        $lowStock = $request->boolean('low_stock', false);
+        $franchise = User::where('role', 'franchise')->findOrFail($franchise_id);
+        
+        $stock = Inventory::with('sku.product')
+                    ->where('franchise_id', $franchise_id)
+                    ->paginate(20);
 
-        $query = Sku::with(['product', 'inventory'])
-            ->whereHas('inventory');
-
-        if ($lowStock) {
-            $query->whereHas('inventory', function ($q) {
-                $q->whereColumn('stock_quantity', '<=', 'reorder_level');
-            });
-        }
-
-        $skus = $query->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $skus,
+        return Inertia::render('Admin/Inventory/FranchiseStock', [
+            'franchise' => $franchise,
+            'stock' => $stock
         ]);
     }
+    
+
+    /**
+     * 4. VIEW FULL LEDGER (History of movements)
+     */
+    public function stockHistory(Request $request)
+{
+    $history = StockTransaction::with(['sku.product', 'franchise', 'performer'])
+                    ->latest()
+                    ->paginate(50);
+
+    // 🎯 Force JSON for Postman
+    if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+        return response()->json($history);
+    }
+
+    return Inertia::render('Admin/Inventory/History', [
+        'history' => $history
+    ]);
+    }
+
 }

@@ -99,6 +99,24 @@ class AuthController extends Controller
         ]);
     }
 
+    public function store(LoginRequest $request)
+{
+    $request->authenticate();
+
+    $request->session()->regenerate();
+
+    // ✨ Smart Check for Postman/API
+    if ($request->wantsJson()) {
+        return response()->json([
+            'message' => 'Logged in successfully!',
+            'user' => auth()->user(),
+            'redirect' => route('dashboard') // Ya jo bhi aapka route ho
+        ]);
+    }
+
+    return redirect()->intended(route('dashboard', absolute: false));
+}
+
     /**
      * Logout - revoke all tokens.
      */

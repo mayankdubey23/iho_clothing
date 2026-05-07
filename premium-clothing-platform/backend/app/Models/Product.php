@@ -11,6 +11,7 @@ class Product extends Model
     protected function casts(): array
     {
         return [
+            'mrp' => 'decimal:2',
             'base_price' => 'decimal:2',
             'franchise_price' => 'decimal:2',
             'is_active' => 'boolean',

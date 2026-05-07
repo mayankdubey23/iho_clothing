@@ -17,10 +17,11 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role', // <-- Yeh add karna zaroori tha
+    'name',
+    'email',
+    'password',
+    'role',
+    'serviceable_pincodes', // 👈 Yeh add karein
     ];
 
     /**
@@ -40,10 +41,11 @@ class User extends Authenticatable
      */
     protected function casts(): array
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+    return [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'serviceable_pincodes' => 'array', // 👈 Yeh add karein
+    ];
     }
 
     // ==========================================
