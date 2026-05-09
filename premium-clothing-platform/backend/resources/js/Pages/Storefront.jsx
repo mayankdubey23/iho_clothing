@@ -3,7 +3,7 @@ import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Truck, RefreshCcw, Shield, Zap, Flame, Award } from 'lucide-react';
-import { FaInstagram } from 'react-icons/fa6';
+import { FaInstagram } from 'react-icons/fa';
 import HeroSection from '@/Components/HeroSection';
 import PremiumProductCard from '@/Components/PremiumProductCard';
 
@@ -20,7 +20,8 @@ export default function Storefront({ categories, products }) {
         { id: 'd8', name: 'Training Gloves', base_price: '1,299', category_name: 'Accessories', image: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?q=80&w=800&auto=format&fit=crop' }
     ];
 
-    const displayProducts = products && products.length > 0 ? products : dummyProducts;
+    const productList = Array.isArray(products) ? products : products?.data;
+    const displayProducts = productList && productList.length > 0 ? productList : dummyProducts;
 
     const featuredCategories = [
         { id: 1, name: 'New Arrivals', slug: 'new', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=800&auto=format&fit=crop', description: 'Latest performance gear' },

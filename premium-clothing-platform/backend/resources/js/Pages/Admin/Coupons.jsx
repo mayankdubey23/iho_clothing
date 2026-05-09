@@ -15,14 +15,14 @@ export default function Coupons({ coupons }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post('/admin/coupons', {
+        post('/franchise-superadmin/coupons', {
             onSuccess: () => reset()
         });
     };
 
     const handleDelete = (id) => {
         if (confirm('Are you sure you want to delete this coupon?')) {
-            router.delete(`/admin/coupons/${id}`);
+            router.delete(`/franchise-superadmin/coupons/${id}`);
         }
     };
 

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
-import { FaInstagram, FaXTwitter, FaFacebookF } from 'react-icons/fa6';
+import { FaInstagram, FaTwitter, FaFacebookF } from 'react-icons/fa';
 
 export default function Footer() {
     return (
@@ -28,7 +28,7 @@ export default function Footer() {
                         <h4 className="text-xs uppercase tracking-widest font-bold mb-6 text-gray-500">Company</h4>
                         <ul className="flex flex-col gap-4 text-sm font-light">
                             <li><Link href="/about" className="hover:text-[#E94E3C]">About Us</Link></li>
-                            <li><Link href="/franchise" className="hover:text-[#E94E3C]">Franchise Program</Link></li>
+                            <li><Link href="/franchise-apply" className="hover:text-[#E94E3C]">Franchise Program</Link></li>
                         </ul>
                     </div>
                 </div>
@@ -36,7 +36,7 @@ export default function Footer() {
                     <p>&copy; {new Date().getFullYear()} IHO Clothing. All rights reserved.</p>
                     <div className="flex gap-6">
                         <a href="#" className="hover:text-[#E94E3C]"><FaInstagram size={18} /></a>
-                        <a href="#" className="hover:text-[#E94E3C]"><FaXTwitter size={18} /></a>
+                        <a href="#" className="hover:text-[#E94E3C]"><FaTwitter size={18} /></a>
                         <a href="#" className="hover:text-[#E94E3C]"><FaFacebookF size={18} /></a>
                     </div>
                 </div>

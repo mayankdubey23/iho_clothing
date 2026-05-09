@@ -56,8 +56,11 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.1, delayChildren: 0.06 } },
 };
 
-export default function SportsWear({ products, categories, plans }) {
-  const heroImage = imageFor(products?.[0]) || HERO_FALLBACK;
+export default function SportsWear({ products = [], categories = [], plans = [] }) {
+  const productList = Array.isArray(products) ? products : products?.data || [];
+  const categoryList = Array.isArray(categories) ? categories : categories?.data || [];
+  const planList = Array.isArray(plans) ? plans : plans?.data || [];
+  const heroImage = imageFor(productList?.[0]) || HERO_FALLBACK;
 
   return (
     <AppLayout active="sports">
@@ -161,7 +164,7 @@ export default function SportsWear({ products, categories, plans }) {
           <SectionHeading
             eyebrow="Sports options"
             title="Built for movement"
-            aside={`${categories.length} active categories`}
+            aside={`${categoryList.length} active categories`}
           />
         </motion.div>
         <motion.div
@@ -196,7 +199,7 @@ export default function SportsWear({ products, categories, plans }) {
         id="teamwear"
         eyebrow="Collection"
         title="Sportswear catalog"
-        products={products}
+        products={productList}
       />
 
       {/* ── Franchise packs ── */}
@@ -214,7 +217,7 @@ export default function SportsWear({ products, categories, plans }) {
             <SectionHeading
               eyebrow="Partner channel"
               title="Franchise-ready sports packs"
-              aside={`${plans.length} plans`}
+              aside={`${planList.length} plans`}
             />
           </motion.div>
           <motion.div
@@ -224,7 +227,7 @@ export default function SportsWear({ products, categories, plans }) {
             whileInView="visible"
             viewport={{ once: true, amount: 0.15 }}
           >
-            {plans.map((plan) => (
+            {planList.map((plan) => (
               <motion.article
                 className="lift-card flex flex-col gap-5 rounded-2xl border border-white/10 bg-white/10 p-7"
                 key={plan.id}
@@ -263,7 +266,9 @@ export default function SportsWear({ products, categories, plans }) {
   );
 }
 
-function ProductRail({ id, eyebrow, title, products }) {
+function ProductRail({ id, eyebrow, title, products = [] }) {
+  const productList = Array.isArray(products) ? products : products?.data || [];
+
   return (
     <section id={id} className="border-t border-stone-200 bg-stone-50 px-4 py-14 lg:px-8 lg:py-20">
       <div className="mx-auto max-w-7xl">
@@ -273,7 +278,7 @@ function ProductRail({ id, eyebrow, title, products }) {
           viewport={{ once: true, amount: 0.3 }}
           variants={fadeUp}
         >
-          <SectionHeading eyebrow={eyebrow} title={title} aside={`${products.length} products`} />
+          <SectionHeading eyebrow={eyebrow} title={title} aside={`${productList.length} products`} />
         </motion.div>
         <motion.div
           className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4"
@@ -282,7 +287,7 @@ function ProductRail({ id, eyebrow, title, products }) {
           whileInView="visible"
           viewport={{ once: true, amount: 0.08 }}
         >
-          {products.map((product) => {
+          {productList.map((product) => {
             const img = imageFor(product) || PRODUCT_FALLBACK;
             const stock = stockFor(product);
             return (

@@ -2,340 +2,180 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Inventory;
-use App\Models\FranchisePincode;
-use App\Models\Sku;
-use App\Models\Coupon;
-use App\Models\User;           // ✅ FIX: Missing Import Added
-use App\Models\UserFranchise;
-use App\Http\Requests\CheckoutOrderRequest;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
-use App\Models\StockTransaction;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\OrderInvoiceMail;
-use Razorpay\Api\Api;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use App\Models\Inventory;
+use App\Models\Order;
+use App\Models\User;
 
 class OrderController extends Controller
 {
-    /**
-     * 🛒 THE SMART CHECKOUT ENGINE (With Razorpay Integration)
-     */
-    public function store(CheckoutOrderRequest $request)
+    public function dashboard(Request $request)
     {
-        $validatedData = $request->validated();
+        if ($request->is('franchise-admin*')) {
+            $franchiseId = Auth::id();
 
-        try {
-            DB::beginTransaction();
+            $ordersQuery = Order::query()->where('franchise_id', $franchiseId);
 
-            $orderItems = [];
-            $subtotal = 0;
-
-            foreach ($validatedData['items'] as $item) {
-                $sku = Sku::with('product')
-                    ->where('id', $item['sku_id'])
-                    ->where('product_id', $item['product_id'])
-                    ->first();
-
-                if (!$sku || !$sku->product || !$sku->product->is_active) {
-                    throw new \Exception('One of the selected products is no longer available.');
-                }
-
-                $unitPrice = (float) $sku->product->base_price;
-                $lineTotal = $unitPrice * (int) $item['quantity'];
-                $subtotal += $lineTotal;
-
-                $orderItems[] = [
-                    'product_id' => $sku->product_id,
-                    'sku_id' => $sku->id,
-                    'quantity' => (int) $item['quantity'],
-                    'price' => $unitPrice,
-                ];
-            }
-
-            $couponCode = $validatedData['coupon_code'] ?? null;
-            $discountAmount = 0;
-
-            if ($couponCode) {
-                $coupon = Coupon::where('code', strtoupper($couponCode))->first();
-
-                if (!$coupon || !$coupon->is_active) {
-                    throw new \Exception('Invalid or inactive coupon code.');
-                }
-
-                if ($coupon->expires_at && Carbon::now()->greaterThan($coupon->expires_at)) {
-                    throw new \Exception('This coupon has expired.');
-                }
-
-                if ($subtotal < (float) $coupon->min_cart_amount) {
-                    throw new \Exception("Minimum order amount should be ₹{$coupon->min_cart_amount} to apply this coupon.");
-                }
-
-                $discountAmount = $coupon->type === 'percent'
-                    ? ($subtotal * (float) $coupon->value) / 100
-                    : (float) $coupon->value;
-
-                $discountAmount = min($discountAmount, $subtotal);
-            }
-
-            $totalAmount = round($subtotal - $discountAmount, 2);
-
-            // Routing Logic: Pincode ke basis par Franchise dhundhein
-            $franchisePincode = FranchisePincode::where('pincode', $validatedData['pincode'])->first();
-            $targetFranchiseId = $franchisePincode ? $franchisePincode->franchise_id : null;
-
-            $finalFulfillerId = null;
-            if ($targetFranchiseId && $this->canFulfillItems($orderItems, $targetFranchiseId)) {
-                $finalFulfillerId = $targetFranchiseId;
-            } elseif (!$this->canFulfillItems($orderItems, null)) {
-                throw new \Exception('Sorry! This item is currently out of stock everywhere.');
-            }
-
-            // Payment method: 'cod' skips Razorpay, 'online' creates Razorpay order
-            $paymentMethod = $validatedData['payment_method'] ?? 'online';
-            $razorpayOrderId = null;
-
-            if ($paymentMethod === 'online') {
-                $api = new Api(env('RAZORPAY_KEY_ID'), env('RAZORPAY_KEY_SECRET'));
-                $razorpayOrder = $api->order->create([
-                    'receipt' => 'rcpt_' . time(),
-                    'amount' => $totalAmount * 100,
-                    'currency' => 'INR',
-                ]);
-                $razorpayOrderId = $razorpayOrder['id'];
-            }
-
-            $shippingAddress = collect([
-                $validatedData['house_flat_building'],
-                $validatedData['street_area_locality'],
-                $validatedData['landmark'] ?? null,
-                $validatedData['city'],
-                $validatedData['state'],
-                $validatedData['pincode'],
-                $validatedData['country'],
-            ])->filter()->implode(', ');
-
-            // DB Order Creation: Database mein order save karein
-            $order = Order::create([
-                'full_name' => $validatedData['full_name'],
-                'mobile_number' => $validatedData['mobile_number'],
-                'email' => $validatedData['email'],
-                'alternate_mobile_number' => $validatedData['alternate_mobile_number'] ?? null,
-                'house_flat_building' => $validatedData['house_flat_building'],
-                'street_area_locality' => $validatedData['street_area_locality'],
-                'landmark' => $validatedData['landmark'] ?? null,
-                'city' => $validatedData['city'],
-                'state' => $validatedData['state'],
-                'pincode' => $validatedData['pincode'],
-                'country' => $validatedData['country'],
-                'customer_name' => $validatedData['full_name'],
-                'customer_phone' => $validatedData['mobile_number'],
-                'customer_email' => $validatedData['email'],
-                'shipping_address' => $shippingAddress,
-                'total_amount' => $totalAmount,
-                'payment_method' => $paymentMethod,
-                'status' => $paymentMethod === 'cod' ? 'confirmed' : 'pending',
-                'payment_status' => 'pending',
-                'franchise_id' => $finalFulfillerId,
-                'razorpay_order_id' => $razorpayOrderId,
+            return Inertia::render('Franchise/Dashboard', [
+                'stats' => [
+                    'revenue' => (float) (clone $ordersQuery)
+                        ->whereNotIn('status', ['cancelled', 'returned', 'refunded'])
+                        ->sum('total_amount'),
+                    'orders_count' => (clone $ordersQuery)->count(),
+                    'stock_level' => (int) Inventory::where('franchise_id', $franchiseId)->sum('stock_quantity'),
+                    'pending' => (clone $ordersQuery)
+                        ->whereIn('status', ['pending', 'confirmed', 'packed'])
+                        ->count(),
+                ],
+                'recent_orders' => (clone $ordersQuery)
+                    ->latest()
+                    ->take(8)
+                    ->get(),
             ]);
-
-            // Order Items & Stock Update
-            foreach ($orderItems as $item) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $item['product_id'],
-                    'sku_id' => $item['sku_id'],
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price'],
-                ]);
-
-                $inventoryQuery = Inventory::where('sku_id', $item['sku_id']);
-                $finalFulfillerId
-                    ? $inventoryQuery->where('franchise_id', $finalFulfillerId)
-                    : $inventoryQuery->whereNull('franchise_id');
-
-                $inventory = $inventoryQuery->lockForUpdate()->first();
-                if (!$inventory || $inventory->stock_quantity < $item['quantity']) {
-                    throw new \Exception('Sorry! This item is currently out of stock everywhere.');
-                }
-
-                $inventory->decrement('stock_quantity', $item['quantity']);
-            }
-
-            DB::commit();
-
-            // COD orders: send invoice immediately (Razorpay orders send after payment verification)
-            if ($paymentMethod === 'cod' && $order->customer_email) {
-                try {
-                    Mail::to($order->customer_email)->send(new OrderInvoiceMail($order));
-                } catch (\Exception $mailError) {
-                    Log::error('COD invoice mail failed for order #' . $order->id . ': ' . $mailError->getMessage());
-                }
-            }
-
-            $responseData = [
-                'status' => true,
-                'success' => true,
-                'message' => $paymentMethod === 'cod'
-                    ? 'Order placed successfully! Pay on delivery.'
-                    : 'Order placed successfully.',
-                'order_id' => $order->id,
-                'amount' => $totalAmount,
-                'payment_method' => $paymentMethod,
-            ];
-
-            if ($paymentMethod === 'online') {
-                $responseData['razorpay_order_id'] = $razorpayOrderId;
-            }
-
-            return response()->json($responseData);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'status' => false,
-                'success' => false,
-                'message' => $e->getMessage(),
-                'error' => $e->getMessage(),
-            ], 400);
         }
+
+        $ordersQuery = Order::query();
+        $activeOrdersQuery = Order::query()->whereNotIn('status', ['cancelled', 'returned', 'refunded']);
+
+        $chartData = Order::query()
+            ->selectRaw('DATE(created_at) as name, COALESCE(SUM(total_amount), 0) as revenue, COUNT(*) as orders')
+            ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('name')
+            ->get();
+
+        $applicationsCount = Schema::hasTable('franchise_applications')
+            ? DB::table('franchise_applications')->where('status', 'pending')->count()
+            : 0;
+
+        return Inertia::render('Admin/Dashboard', [
+            'stats' => [
+                'total_revenue' => (float) (clone $activeOrdersQuery)->sum('total_amount'),
+                'total_orders' => (clone $ordersQuery)->count(),
+                'total_customers' => User::where('role', 'customer')->count(),
+                'applications' => $applicationsCount,
+                'pending_orders' => (clone $ordersQuery)->where('status', 'pending')->count(),
+                'low_stock' => Inventory::whereNull('franchise_id')->where('stock_quantity', '<=', 10)->count(),
+                'online_sales' => (float) (clone $activeOrdersQuery)
+                    ->when(Schema::hasColumn('orders', 'sales_channel'), fn ($query) => $query->where('sales_channel', 'online'))
+                    ->sum('total_amount'),
+                'offline_sales' => (float) (clone $activeOrdersQuery)
+                    ->when(Schema::hasColumn('orders', 'sales_channel'), fn ($query) => $query->where('sales_channel', 'offline'))
+                    ->sum('total_amount'),
+            ],
+            'recent_orders' => Order::with('franchise:id,name')
+                ->latest()
+                ->take(8)
+                ->get(),
+            'chart_data' => $chartData,
+        ]);
     }
 
-    /**
-     * 🔄 STATUS UPDATE: Order life cycle management
-     */
-    private function canFulfillItems(array $items, ?int $franchiseId): bool
+    public function index(Request $request)
     {
-        foreach ($items as $item) {
-            $inventoryQuery = Inventory::where('sku_id', $item['sku_id']);
-            $franchiseId
-                ? $inventoryQuery->where('franchise_id', $franchiseId)
-                : $inventoryQuery->whereNull('franchise_id');
+        $relations = ['franchise:id,name,city,state'];
 
-            $stock = $inventoryQuery->value('stock_quantity') ?? 0;
-            if ($stock < $item['quantity']) {
-                return false;
-            }
+        if (Schema::hasColumn('orders', 'user_id')) {
+            $relations[] = 'user:id,name,email';
         }
 
-        return true;
+        $ordersQuery = Order::with($relations);
+
+        // Search
+        $ordersQuery->when($request->search, function ($q, $search) {
+            $q->where(function ($sub) use ($search) {
+                $sub->where('id', 'like', "%{$search}%")
+                    ->orWhere('razorpay_order_id', 'like', "%{$search}%")
+                    ->orWhere('city', 'like', "%{$search}%")
+                    ->orWhere('pincode', 'like', "%{$search}%")
+                    ->orWhere('customer_name', 'like', "%{$search}%");
+            });
+        });
+
+        // Status
+        $ordersQuery->when($request->status, fn ($q, $status) => $q->where('status', $status));
+
+        // Franchise filter
+        $ordersQuery->when($request->franchise_id, function ($q, $franchise_id) {
+            if ($franchise_id === 'master') {
+                $q->where(function ($sub) {
+                    $sub->whereNull('franchise_id')
+                        ->orWhere('fulfillment_type', 'master');
+                });
+            } else {
+                $q->where('franchise_id', $franchise_id);
+            }
+        });
+
+        // City/state filters
+        $ordersQuery->when($request->city, fn ($q, $city) => $q->where('city', 'like', "%{$city}%"));
+        $ordersQuery->when($request->state, fn ($q, $state) => $q->where('state', 'like', "%{$state}%"));
+
+        // Customer filter
+        $ordersQuery->when($request->customer_id, function ($q, $customer_id) {
+            $q->where(function ($sub) use ($customer_id) {
+                if (Schema::hasColumn('orders', 'user_id')) {
+                    $sub->where('user_id', $customer_id);
+                }
+
+                $sub->orWhere('customer_email', function ($x) use ($customer_id) {
+                    $x->select('email')->from('users')->where('id', $customer_id);
+                });
+            });
+        });
+
+        $orders = $ordersQuery->latest()->paginate(15)->withQueryString();
+
+        $franchises = User::where('role', 'franchise')->select('id', 'name', 'city', 'state')->get();
+
+        $stats = [
+            'total' => (clone $ordersQuery)->count(),
+            'pending' => (clone $ordersQuery)->where('status', 'pending')->count(),
+            'shipped' => (clone $ordersQuery)->whereIn('status', ['shipped', 'out_for_delivery'])->count(),
+            'returned' => (clone $ordersQuery)->whereIn('status', ['returned', 'refunded'])->count(),
+        ];
+
+        return Inertia::render('Admin/Orders', [
+            'orders' => $orders,
+            'franchises' => $franchises,
+            'filters' => $request->only(['search', 'status', 'franchise_id', 'city', 'state', 'customer_id']),
+            'stats' => $stats,
+        ]);
     }
 
-    public function updateStatus(Request $request, $id)
+
+    // 🚀 Manual Reassign Logic (Super Admin Tool)
+    public function reassignOrder(Request $request, $id)
     {
         $request->validate([
-        'status' => 'required|in:pending,confirmed,packed,shipped,out_for_delivery,delivered,cancelled,returned,refunded'
+            'franchise_id' => 'nullable|exists:users,id', // null means assigning to Master
         ]);
 
         $order = Order::findOrFail($id);
-        $user = auth()->user();
+        $order->franchise_id = $request->franchise_id;
+        $order->fulfillment_type = $request->franchise_id ? 'franchise' : 'master';
+        $order->save();
 
-        // Security check
-        if ($user->role === 'franchise' && $order->franchise_id !== $user->id) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $oldStatus = $order->status;
-        $newStatus = $request->status;
-
-        // Agar CANCEL ho raha hai, toh stock restore karein
-        if ($newStatus === 'cancelled' && $oldStatus !== 'cancelled') {
-            foreach ($order->items as $item) {
-                DB::table('inventories')
-                    ->where('franchise_id', $order->franchise_id)
-                    ->where('sku_id', $item->sku_id)
-                    ->increment('stock_quantity', $item->quantity);
-            }
-        }
-
-        $order->update(['status' => $newStatus]);
-        return back()->with('success', "Order status updated to {$newStatus}!");
+        // Here you would also trigger: Send Notification to new Franchise
+        
+        return back()->with('success', 'Order reassigned successfully.');
     }
 
-    /**
-     * 📊 ADMIN DASHBOARD DATA
-     */
-    public function dashboard(Request $request)
-{
-    $user = auth()->user();
-    $role = $user->role;
-
-    if ($role === 'super_admin') {
-        // Superadmin: Global View
-        return Inertia::render('Admin/Dashboard', [
-            'stats' => [
-                'total_sales' => (float) Order::where('status', 'delivered')->sum('total_amount'),
-                'total_orders' => Order::count(),
-                'total_customers' => User::where('role', 'customer')->count(),
-                'total_franchises' => User::where('role', 'franchise')->count(),
-                'pending_orders' => Order::where('status', 'pending')->count(),
-                'low_stock' => Inventory::where('stock_quantity', '<', 10)->count(),
-                'recent_orders' => Order::with('items')->latest()->take(10)->get(),
-            ]
-        ]);
-    } else {
-        // Franchise Admin: Scoped View
-        return Inertia::render('Franchise/Dashboard', [
-            'stats' => [
-                'my_sales' => (float) Order::where('franchise_id', $user->id)->where('status', 'delivered')->sum('total_amount'),
-                'my_orders' => Order::where('franchise_id', $user->id)->count(),
-                'available_stock' => (int) Inventory::where('franchise_id', $user->id)->sum('stock_quantity'),
-                'pending_fulfillment' => Order::where('franchise_id', $user->id)->whereIn('status', ['pending', 'confirmed'])->count(),
-                'recent_orders' => Order::where('franchise_id', $user->id)->latest()->take(5)->get(),
-            ]
-        ]);
-    }
-    }
-
-    /**
-     * ✅ PAYMENT VERIFICATION: Razorpay signature check
-     */
-    public function verifyPayment(Request $request)
+    // Update Order Status
+    public function updateStatus(Request $request, $id)
     {
-        $request->validate([
-            'razorpay_order_id' => 'required|string',
-            'razorpay_payment_id' => 'required|string',
-            'razorpay_signature' => 'required|string',
-        ]);
+        $request->validate(['status' => 'required|string']);
+        
+        $order = Order::findOrFail($id);
+        $order->status = $request->status;
+        $order->save();
 
-        $api = new Api(env('RAZORPAY_KEY_ID'), env('RAZORPAY_KEY_SECRET'));
+        // DB::table('order_status_logs')->insert([...]) logic comes here
 
-        try {
-            $attributes = [
-                'razorpay_order_id'   => $request->razorpay_order_id,
-                'razorpay_payment_id' => $request->razorpay_payment_id,
-                'razorpay_signature'  => $request->razorpay_signature
-            ];
-
-            // Official signature verification
-            $api->utility->verifyPaymentSignature($attributes);
-
-            $order = Order::where('razorpay_order_id', $request->razorpay_order_id)->firstOrFail();
-            $order->update([
-                'payment_status'      => 'success',
-                'razorpay_payment_id' => $request->razorpay_payment_id,
-                'status'              => 'confirmed' 
-            ]);
-
-            // Send invoice email after successful payment
-            if ($order->customer_email) {
-                try {
-                    Mail::to($order->customer_email)->send(new OrderInvoiceMail($order));
-                } catch (\Exception $mailError) {
-                    Log::error('Online payment invoice mail failed for order #' . $order->id . ': ' . $mailError->getMessage());
-                }
-            }
-
-            return response()->json(['status' => true, 'success' => true, 'message' => 'Payment verified & Order confirmed!'], 200);
-
-        } catch (\Exception $e) {
-            return response()->json(['status' => false, 'success' => false, 'message' => $e->getMessage(), 'error' => $e->getMessage()], 400);
-        }
+        return back()->with('success', 'Order status updated to ' . $request->status);
     }
 }

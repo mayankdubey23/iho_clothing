@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, ChevronDown, ChevronUp, SlidersHorizontal, X } from 'lucide-react';
 import PremiumProductCard from '@/Components/PremiumProductCard';
 
-export default function Shop({ filters, products }) {
+export default function Shop({ filters, products, categories = [] }) {
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
     const [openFilterSections, setOpenFilterSections] = useState({
         categories: true,
@@ -18,8 +18,8 @@ export default function Shop({ filters, products }) {
         setOpenFilterSections(prev => ({ ...prev, [section]: !prev[section] }));
     };
 
-    // Premium placeholder data
-    const displayProducts = products && products.length > 0 ? products : [
+    const productRows = Array.isArray(products) ? products : products?.data;
+    const displayProducts = productRows && productRows.length > 0 ? productRows : [
         { id: 1, name: 'Essential Boxy Tee', base_price: '2,499', category_name: 'T-Shirts', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop' },
         { id: 2, name: 'Technical Cargo Trousers', base_price: '4,999', category_name: 'Bottoms', image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=800&auto=format&fit=crop' },
         { id: 3, name: 'Oversized Knit Sweater', base_price: '5,499', category_name: 'Knitwear', image: 'https://images.unsplash.com/photo-1614083321526-0e1cb2d74483?q=80&w=800&auto=format&fit=crop' },
@@ -40,14 +40,19 @@ export default function Shop({ filters, products }) {
                     {openFilterSections.categories && (
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                             <ul className="flex flex-col gap-3 text-sm font-bold text-[#7A756B]">
-                                {['All Items', 'T-Shirts', 'Outerwear', 'Knitwear', 'Bottoms', 'Accessories'].map(cat => (
-                                    <li key={cat} className="flex items-center gap-3 cursor-pointer hover:text-[#1A1A1A] transition-colors">
-                                        <div className={`w-4 h-4 border ${cat === 'All Items' ? 'border-[#1A1A1A] bg-[#1A1A1A]' : 'border-[#A39E93]'} flex items-center justify-center rounded-sm`}>
-                                            {cat === 'All Items' && <div className="w-1.5 h-1.5 bg-[#F9F8F6]" />}
-                                        </div>
-                                        {cat}
-                                    </li>
-                                ))}
+                                {[{ name: 'All Items', slug: '' }, ...categories].map(cat => {
+                                    const isActive = (filters?.category || '') === (cat.slug || '');
+                                    return (
+                                        <li key={cat.slug || 'all'}>
+                                            <Link href={cat.slug ? `/shop?category=${cat.slug}` : '/shop'} className="flex items-center gap-3 hover:text-[#1A1A1A] transition-colors">
+                                                <div className={`w-4 h-4 border ${isActive ? 'border-[#1A1A1A] bg-[#1A1A1A]' : 'border-[#A39E93]'} flex items-center justify-center rounded-sm`}>
+                                                    {isActive && <div className="w-1.5 h-1.5 bg-[#F9F8F6]" />}
+                                                </div>
+                                                {cat.name}
+                                            </Link>
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         </motion.div>
                     )}

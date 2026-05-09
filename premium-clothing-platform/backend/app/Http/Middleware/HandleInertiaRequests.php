@@ -37,11 +37,29 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
+            
             'auth' => [
-                'user' => fn () => $request->user()
-                    ? $request->user()->only('id', 'name', 'email', 'role', 'created_at')
-                    : null,
+                // Direct evaluation (Removed fn() =>) to ensure React gets data instantly on first load
+                'user' => $request->user() ? $request->user()->only([
+                    'id',
+                    'name',
+                    'email',
+                    'mobile_number',
+                    'role',
+                    'address_line',
+                    'city',
+                    'state',
+                    'pincode',
+                    'country',
+                    'store_name',
+                    'store_address',
+                    'store_contact',
+                    'business_hours',
+                    'serviceable_pincodes',
+                    'created_at'
+                ]) : null,
             ],
+            
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),

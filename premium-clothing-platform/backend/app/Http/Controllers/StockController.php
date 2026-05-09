@@ -48,7 +48,7 @@ class StockController extends Controller
         'status' => 'pending'
     ]);
 
-    return response()->json(['message' => 'Stock request sent successfully!']);
+    return back()->with('success', 'Stock request sent successfully!');
     }
 
     // 👑 SUPER ADMIN: Approve Stock & Update Ledger + Wallet

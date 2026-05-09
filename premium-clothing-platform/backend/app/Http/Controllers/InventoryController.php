@@ -3,51 +3,140 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inventory;
-use App\Models\Sku;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Inertia\Inertia;
 
 class InventoryController extends Controller
 {
-    /**
-     * Franchise ya Super Admin apna stock update kar sakein
-     */
-    public function updateStock(Request $request)
+    public function index(Request $request)
+    {
+        $inventory = Inventory::with(['sku.product.category'])
+            ->whereNull('franchise_id')
+            ->when($request->search, function ($query, $search) {
+                $query->whereHas('sku', function ($skuQuery) use ($search) {
+                    $skuQuery->where('sku_code', 'like', "%{$search}%")
+                        ->orWhereHas('product', fn ($productQuery) => $productQuery->where('name', 'like', "%{$search}%"));
+                });
+            })
+            ->when($request->status, function ($query, $status) {
+                if ($status === 'low') {
+                    $query->where('stock_quantity', '<=', 10)->where('stock_quantity', '>', 0);
+                }
+
+                if ($status === 'out') {
+                    $query->where('stock_quantity', 0);
+                }
+            })
+            ->orderBy('stock_quantity')
+            ->paginate(15)
+            ->withQueryString()
+            ->through(function (Inventory $item) {
+                $sku = $item->sku;
+                $product = $sku?->product;
+
+                return [
+                    'id' => $item->id,
+                    'name' => $product?->name ?? 'Deleted Product',
+                    'category' => $product?->category,
+                    'sku' => $sku?->sku_code ?? 'N/A',
+                    'stock_quantity' => (int) $item->stock_quantity,
+                    'damaged_quantity' => 0,
+                    'image' => null,
+                ];
+            });
+
+        $stats = [
+            'total_items' => Product::count(),
+            'total_stock' => Inventory::whereNull('franchise_id')->sum('stock_quantity') ?? 0,
+            'low_stock' => Inventory::whereNull('franchise_id')->where('stock_quantity', '<=', 10)->count() ?? 0,
+            'damaged_stock' => 0,
+        ];
+
+        $franchises = User::whereIn('role', ['franchise', 'franchise_owner', 'franchise_admin'])
+            ->when(Schema::hasColumn('users', 'status'), fn ($query) => $query->where('status', 'active'))
+            ->select('id', 'name', 'city')
+            ->get();
+
+        return Inertia::render('Admin/MasterStock', [
+            'inventory' => $inventory,
+            'franchises' => $franchises,
+            'filters' => $request->only(['search', 'status']),
+            'stats' => $stats,
+        ]);
+    }
+
+    public function adjustStock(Request $request, $inventory_id)
     {
         $request->validate([
-            'sku_id' => 'required|exists:skus,id',
-            'quantity' => 'required|integer',
-            'action' => 'required|in:add,subtract,set' // Stock badhana hai, ghatana hai, ya fix karna hai
+            'type' => 'required|in:add,reduce,damaged',
+            'quantity' => 'required|integer|min:1',
+            'reason' => 'nullable|string',
         ]);
 
-        $user = auth()->user();
-        
-        // Agar super admin hai toh wo kisi ka bhi stock manage kar sakta hai (abhi default null yani Main Warehouse le rahe hain)
-        // Agar franchise hai toh sirf apna hi stock update karega
-        $franchiseId = $user->role === 'franchise' ? $user->id : null;
+        $stock = Inventory::whereNull('franchise_id')->findOrFail($inventory_id);
 
-        // Inventory record dhundho, agar nahi hai toh naya bana do
-        $inventory = Inventory::firstOrCreate(
-            ['sku_id' => $request->sku_id, 'franchise_id' => $franchiseId],
-            ['stock_quantity' => 0]
-        );
-
-        // Action ke hisaab se stock update karo
-        if ($request->action === 'add') {
-            $inventory->increment('stock_quantity', $request->quantity);
-            $message = "Stock added successfully!";
-        } elseif ($request->action === 'subtract') {
-            if ($inventory->stock_quantity >= $request->quantity) {
-                $inventory->decrement('stock_quantity', $request->quantity);
-                $message = "Stock reduced successfully!";
+        DB::transaction(function () use ($request, $stock) {
+            if ($request->type === 'add') {
+                $stock->stock_quantity += $request->quantity;
             } else {
-                return back()->withErrors(['error' => 'Not enough stock to subtract.']);
+                $stock->stock_quantity = max(0, $stock->stock_quantity - $request->quantity);
             }
-        } else {
-            // 'set' action - exact stock set karne ke liye
-            $inventory->update(['stock_quantity' => max(0, $request->quantity)]);
-            $message = "Stock level updated!";
+
+            $stock->save();
+
+            DB::table('stock_transactions')->insert([
+                'sku_id' => $stock->sku_id,
+                'franchise_id' => null,
+                'transaction_type' => $request->type === 'add' ? 'in' : 'out',
+                'quantity' => $request->quantity,
+                'reason' => $request->reason ?? ucfirst($request->type) . ' stock adjustment',
+                'performed_by' => auth()->id(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        });
+
+        return back()->with('success', 'Stock updated successfully!');
+    }
+
+    public function transferStock(Request $request, $inventory_id)
+    {
+        $request->validate([
+            'franchise_id' => 'required|exists:users,id',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $masterStock = Inventory::whereNull('franchise_id')->findOrFail($inventory_id);
+
+        if ($masterStock->stock_quantity < $request->quantity) {
+            return back()->withErrors(['quantity' => 'Not enough master stock available!']);
         }
 
-        return back()->with('success', $message);
+        DB::transaction(function () use ($request, $masterStock) {
+            $masterStock->decrement('stock_quantity', $request->quantity);
+
+            $franchiseStock = Inventory::firstOrCreate(
+                ['sku_id' => $masterStock->sku_id, 'franchise_id' => $request->franchise_id],
+                ['stock_quantity' => 0]
+            );
+            $franchiseStock->increment('stock_quantity', $request->quantity);
+
+            DB::table('stock_transactions')->insert([
+                'sku_id' => $masterStock->sku_id,
+                'franchise_id' => $request->franchise_id,
+                'transaction_type' => 'out',
+                'quantity' => $request->quantity,
+                'reason' => 'Transfer to Franchise',
+                'performed_by' => auth()->id(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        });
+
+        return back()->with('success', 'Stock transferred to franchise successfully!');
     }
 }

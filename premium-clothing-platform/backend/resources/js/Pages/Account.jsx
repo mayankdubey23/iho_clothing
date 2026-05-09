@@ -1,182 +1,288 @@
-import React, { useState } from 'react';
-import AppLayout, { ACCOUNT_MENU, SectionHeading, EmptyState } from '@/Layouts/AppLayout';
-import { Head, usePage } from '@inertiajs/react';
+import React, { useState, useEffect } from 'react';
+import { Head, usePage, Link, router } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Package, MapPin, Edit2, Plus, LogOut } from 'lucide-react';
+import {
+    User, Package, MapPin, ChevronRight, PackageOpen,
+    Heart, Ticket, RefreshCcw, ShieldCheck, Bell, CreditCard,
+    Lock, HelpCircle, Trash2, LogOut, Wrench
+} from 'lucide-react';
+import {
+    ProfileSettings,
+    SecuritySettings,
+    DeleteAccount,
+    AddressBook,
+    HelpSupport,
+    Notifications,
+    PrivacySettings,
+    PaymentMethods,
+    Coupons,
+    ReturnsRefunds
+} from '@/Components/Account/SettingsTabs';
 
 export default function Account() {
     const { auth } = usePage().props;
-    const user = auth?.user || { name: 'Guest User', email: 'guest@example.com' };
-    
-    // State to handle which tab is currently active
-    const [activeTab, setActiveTab] = useState('profile');
+    const user = auth?.user;
 
-    // Tab transition animations
-    const tabVariants = {
-        hidden: { opacity: 0, y: 10 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
-        exit: { opacity: 0, y: -10, transition: { duration: 0.2 } }
+    const queryParams = new URLSearchParams(window.location.search);
+    const initialTab = queryParams.get('tab') || 'profile';
+    const [activeTab, setActiveTab] = useState(initialTab);
+
+    useEffect(() => {
+        window.history.pushState(null, '', `?tab=${activeTab}`);
+    }, [activeTab]);
+
+    const handleLogout = (e) => {
+        e.preventDefault();
+        router.post('/logout');
     };
 
-    // Render content based on active tab
-    const renderContent = () => {
-        switch (activeTab) {
-            case 'profile':
-                return (
-                    <motion.div key="profile" variants={tabVariants} initial="hidden" animate="visible" exit="exit" className="flex flex-col gap-8">
-                        <SectionHeading title="My Profile" description="Manage your personal information and security settings." />
-                        
-                        <div className="bg-white border border-[#E8E4D9] rounded-sm p-6 md:p-8 shadow-sm">
-                            <div className="flex justify-between items-start mb-6">
-                                <div>
-                                    <h3 className="text-lg font-black text-[#1A1A1A] uppercase tracking-widest">Personal Info</h3>
-                                    <p className="text-sm text-[#7A756B] mt-1">Your basic account details.</p>
-                                </div>
-                                <button className="text-sm font-bold uppercase tracking-widest text-[#7A756B] flex items-center gap-2 hover:text-[#4A001F] transition-colors">
-                                    <Edit2 size={16} /> Edit
-                                </button>
-                            </div>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <span className="block text-xs font-bold uppercase tracking-widest text-[#A39E93] mb-1">Full Name</span>
-                                    <p className="text-base font-bold text-[#1A1A1A]">{user.name}</p>
-                                </div>
-                                <div>
-                                    <span className="block text-xs font-bold uppercase tracking-widest text-[#A39E93] mb-1">Email Address</span>
-                                    <p className="text-base font-bold text-[#1A1A1A]">{user.email}</p>
-                                </div>
-                                <div>
-                                    <span className="block text-xs font-bold uppercase tracking-widest text-[#A39E93] mb-1">Phone Number</span>
-                                    <p className="text-base font-bold text-[#1A1A1A]">+91 98765 43210</p>
-                                </div>
-                                <div>
-                                    <span className="block text-xs font-bold uppercase tracking-widest text-[#A39E93] mb-1">Password</span>
-                                    <p className="text-base font-bold text-[#1A1A1A]">••••••••</p>
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
-                );
+    const orders = [];
+    const wishlistItems = [];
 
-            case 'orders':
-                return (
-                    <motion.div key="orders" variants={tabVariants} initial="hidden" animate="visible" exit="exit" className="flex flex-col gap-8">
-                        <SectionHeading title="Order History" description="Check the status of recent orders, manage returns, and discover similar products." />
-                        <EmptyState 
-                            icon={Package} 
-                            text="You haven't placed any orders yet." 
-                            action={
-                                <a href="/shop" className="inline-block mt-4 bg-[#1A1A1A] text-[#F9F8F6] px-8 py-3 text-sm font-bold uppercase tracking-widest hover:bg-[#4A001F] transition-colors rounded-sm">
-                                    Start Shopping
-                                </a>
-                            }
-                        />
-                    </motion.div>
-                );
+    const MENU_GROUPS = [
+        {
+            title: 'My Dashboard',
+            items: [
+                { id: 'profile', label: 'Profile Details', icon: User },
+                { id: 'orders', label: 'My Orders', icon: Package },
+                { id: 'addresses', label: 'Address Book', icon: MapPin },
+                { id: 'wishlist', label: 'Wishlist', icon: Heart },
+                { id: 'coupons', label: 'Coupons', icon: Ticket },
+                { id: 'returns', label: 'Returns & Refunds', icon: RefreshCcw },
+            ],
+        },
+        {
+            title: 'Account Settings',
+            items: [
+                { id: 'security', label: 'Login & Security', icon: ShieldCheck },
+                { id: 'notifications', label: 'Notifications', icon: Bell },
+                { id: 'payments', label: 'Payment Methods', icon: CreditCard },
+                { id: 'privacy', label: 'Privacy Settings', icon: Lock },
+                { id: 'support', label: 'Help & Support', icon: HelpCircle },
+                { id: 'delete', label: 'Delete Account', icon: Trash2, danger: true },
+            ],
+        },
+    ];
 
-            case 'addresses':
-                return (
-                    <motion.div key="addresses" variants={tabVariants} initial="hidden" animate="visible" exit="exit" className="flex flex-col gap-8">
-                        <div className="flex justify-between items-end mb-2">
-                            <SectionHeading title="Saved Addresses" description="Manage your delivery addresses for faster checkout." />
-                            <button className="hidden sm:flex bg-[#1A1A1A] text-[#F9F8F6] px-6 py-2.5 text-sm font-bold uppercase tracking-widest hover:bg-[#4A001F] transition-colors rounded-sm items-center gap-2">
-                                <Plus size={16} /> Add New
-                            </button>
-                        </div>
-                        <EmptyState 
-                            icon={MapPin} 
-                            text="You haven't saved any addresses yet." 
-                            action={
-                                <button className="sm:hidden mt-4 bg-[#1A1A1A] text-[#F9F8F6] px-8 py-3 text-sm font-bold uppercase tracking-widest hover:bg-[#4A001F] transition-colors rounded-sm flex items-center justify-center gap-2 w-full">
-                                    <Plus size={16} /> Add Address
-                                </button>
-                            }
-                        />
-                    </motion.div>
-                );
+    if (!user) return null;
 
-            default:
-                return (
-                    <motion.div key="default" variants={tabVariants} initial="hidden" animate="visible" exit="exit">
-                        <SectionHeading title={ACCOUNT_MENU.find(i => i.key === activeTab)?.label || 'Dashboard'} />
-                        <div className="p-12 text-center border border-dashed border-[#E8E4D9] rounded-sm bg-white">
-                            <p className="text-[#7A756B] font-bold uppercase tracking-widest">This section is currently under construction.</p>
-                        </div>
-                    </motion.div>
-                );
-        }
-    };
+    const getUnderConstructionTitle = () =>
+        MENU_GROUPS.flatMap((g) => g.items).find((i) => i.id === activeTab)?.label;
 
     return (
-        <AppLayout>
+        <div className="min-h-screen bg-[#f9f8f6] font-sans pb-20">
             <Head title="My Account | IHO Clothing" />
 
-            <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12 md:py-24 min-h-[75vh]">
-                
-                {/* Mobile Welcome Header */}
-                <div className="md:hidden mb-8 pb-8 border-b border-[#E8E4D9]">
-                    <h1 className="text-3xl font-black tracking-tight text-[#1A1A1A] uppercase">Hello, {user.name.split(' ')[0]}</h1>
-                    <p className="text-sm text-[#7A756B] mt-1 font-medium">{user.email}</p>
-                </div>
-
-                <div className="flex flex-col md:flex-row gap-12">
-                    
-                    {/* Sidebar Navigation */}
-                    <aside className="w-full md:w-64 flex-shrink-0">
-                        {/* Desktop Welcome */}
-                        <div className="hidden md:block mb-8 pb-8 border-b border-[#E8E4D9]">
-                            <div className="grid size-16 place-items-center rounded-full bg-[#1A1A1A] text-[#F9F8F6] font-black text-xl tracking-widest mb-4">
-                                {user.name.split(' ').map(p => p[0]).slice(0, 2).join('')}
-                            </div>
-                            <h2 className="text-xl font-black tracking-tight text-[#1A1A1A] uppercase truncate">{user.name}</h2>
-                            <p className="text-sm text-[#7A756B] mt-1 truncate">{user.email}</p>
-                        </div>
-
-                        {/* Navigation Links - Scrollable horizontally on mobile, vertical on desktop */}
-                        <nav className="flex md:flex-col overflow-x-auto md:overflow-visible pb-4 md:pb-0 gap-2 md:gap-1 no-scrollbar">
-                            {ACCOUNT_MENU.map((item) => {
-                                const Icon = item.icon;
-                                const isActive = activeTab === item.key;
-                                
-                                return (
-                                    <button
-                                        key={item.key}
-                                        onClick={() => {
-                                            // Redirect for cart and wishlist since they are standalone pages
-                                            if (item.key === 'cart' || item.key === 'wishlist') {
-                                                window.location.href = item.href;
-                                            } else {
-                                                setActiveTab(item.key);
-                                            }
-                                        }}
-                                        className={`flex items-center gap-3 px-4 py-3 text-sm font-bold uppercase tracking-widest whitespace-nowrap rounded-sm transition-all ${
-                                            isActive 
-                                                ? 'bg-[#1A1A1A] text-[#F9F8F6] md:translate-x-2' 
-                                                : 'text-[#7A756B] hover:bg-[#F3F0EA] hover:text-[#1A1A1A]'
-                                        }`}
-                                    >
-                                        <Icon size={18} strokeWidth={isActive ? 2.5 : 2} /> 
-                                        {item.label}
-                                    </button>
-                                );
-                            })}
-                            
-                            <button className="flex items-center gap-3 px-4 py-3 text-sm font-bold uppercase tracking-widest text-red-600 hover:bg-red-50 rounded-sm transition-colors md:mt-8">
-                                <LogOut size={18} strokeWidth={2} /> Sign Out
-                            </button>
-                        </nav>
-                    </aside>
-
-                    {/* Main Content Area */}
-                    <main className="flex-1 min-w-0">
-                        <AnimatePresence mode="wait">
-                            {renderContent()}
-                        </AnimatePresence>
-                    </main>
-
+            <div className="bg-[#1A1A2E] text-white pt-32 pb-20 px-4 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#E94E3C]/20 to-transparent rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/3"></div>
+                <div className="max-w-7xl mx-auto flex items-center gap-6">
+                    <div className="size-20 rounded-full bg-gradient-to-tr from-[#E94E3C] to-[#c0392b] text-white flex items-center justify-center font-black text-3xl shadow-lg border-4 border-white/10 shrink-0">
+                        {user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter">
+                            {user.name}
+                        </h1>
+                        <p className="mt-1 text-gray-400 font-bold tracking-widest text-sm">{user.email}</p>
+                    </div>
                 </div>
             </div>
-        </AppLayout>
+
+            <div className="max-w-7xl mx-auto px-4 -mt-8">
+                <div className="flex flex-col lg:flex-row gap-8">
+                    <div className="w-full lg:w-80 shrink-0">
+                        <div className="bg-white rounded-3xl shadow-xl shadow-black/5 p-4 border border-gray-100 sticky top-28">
+                            {MENU_GROUPS.map((group, idx) => (
+                                <div key={idx} className="mb-6 last:mb-2">
+                                    <p className="px-4 text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase mb-3">
+                                        {group.title}
+                                    </p>
+                                    <nav className="space-y-1">
+                                        {group.items.map((tab) => {
+                                            const Icon = tab.icon;
+                                            const isActive = activeTab === tab.id;
+                                            return (
+                                                <button
+                                                    key={tab.id}
+                                                    onClick={() => setActiveTab(tab.id)}
+                                                    className={`w-full flex items-center justify-between p-3.5 rounded-2xl transition-all group ${isActive
+                                                        ? 'bg-[#1A1A2E] text-white shadow-md'
+                                                        : 'text-gray-600 hover:bg-gray-50 hover:text-[#1A1A2E]'
+                                                        }`}
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <Icon
+                                                            size={18}
+                                                            className={`${isActive
+                                                                ? 'text-[#E94E3C]'
+                                                                : tab.danger
+                                                                    ? 'text-red-400 group-hover:text-red-500'
+                                                                    : 'text-gray-400'
+                                                                }`}
+                                                        />
+                                                        <span
+                                                            className={`text-sm font-bold ${tab.danger && !isActive ? 'text-red-500' : ''
+                                                                }`}
+                                                        >
+                                                            {tab.label}
+                                                        </span>
+                                                    </div>
+                                                    <ChevronRight
+                                                        size={16}
+                                                        className={`transition-transform ${isActive
+                                                            ? 'text-gray-400'
+                                                            : 'opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0'
+                                                            }`}
+                                                    />
+                                                </button>
+                                            );
+                                        })}
+                                    </nav>
+                                </div>
+                            ))}
+
+                            <div className="h-px bg-gray-100 my-4"></div>
+
+                            <button
+                                onClick={handleLogout}
+                                className="w-full flex items-center gap-3 p-3.5 rounded-2xl transition-all text-red-500 font-bold text-sm hover:bg-red-50"
+                            >
+                                <LogOut size={18} /> Logout
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="flex-1">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={activeTab}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.3 }}
+                                className="bg-white rounded-3xl shadow-xl shadow-black/5 p-6 md:p-10 border border-gray-100 min-h-[600px]"
+                            >
+                                {activeTab === 'profile' && <ProfileSettings user={user} />}
+
+                                {activeTab === 'addresses' && <AddressBook />}
+
+                                {activeTab === 'orders' && (
+                                    <div>
+                                        <h3 className="text-2xl font-black text-[#1A1A2E] uppercase tracking-wide border-b border-gray-100 pb-4 mb-6">
+                                            Order History
+                                        </h3>
+                                        {orders.length > 0 ? (
+                                            <div className="space-y-4">{/* Render Orders Here */}</div>
+                                        ) : (
+                                            <EmptyState
+                                                icon={PackageOpen}
+                                                color="text-blue-400"
+                                                bg="bg-blue-50"
+                                                title="No orders yet"
+                                                message="Looks like you haven't made your first purchase. Discover our latest collections now!"
+                                                btnText="Start Shopping"
+                                            />
+                                        )}
+                                    </div>
+                                )}
+
+                                {activeTab === 'wishlist' && (
+                                    <div>
+                                        <h3 className="text-2xl font-black text-[#1A1A2E] uppercase tracking-wide border-b border-gray-100 pb-4 mb-6">
+                                            My Wishlist
+                                        </h3>
+                                        {wishlistItems.length > 0 ? (
+                                            <div className="space-y-4">{/* Render Wishlist Here */}</div>
+                                        ) : (
+                                            <EmptyState
+                                                icon={Heart}
+                                                color="text-[#E94E3C]"
+                                                bg="bg-[#E94E3C]/10"
+                                                title="Your Wishlist is Empty"
+                                                message="You haven't saved any items yet. Find something you love and tap the heart icon to save it here."
+                                                btnText="Explore Collection"
+                                            />
+                                        )}
+                                    </div>
+                                )}
+
+                                {activeTab === 'security' && <SecuritySettings />}
+
+                                {activeTab === 'support' && <HelpSupport />}
+
+                                {activeTab === 'delete' && <DeleteAccount />}
+
+                                {/* Phase 2 tabs already handled above (avoid duplicate rendering) */}
+
+                                {/* Premium additional tabs */}
+                                {activeTab === 'notifications' && <Notifications />}
+                                {activeTab === 'privacy' && <PrivacySettings />}
+                                {activeTab === 'payments' && <PaymentMethods />}
+                                {activeTab === 'coupons' && <Coupons />}
+                                {activeTab === 'returns' && <ReturnsRefunds />}
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }
+
+function DetailBox({ label, value }) {
+    return (
+        <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100">
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{label}</p>
+            <p className="text-sm font-bold text-[#1A1A2E]">{value}</p>
+        </div>
+    );
+}
+
+function EmptyState({ icon: Icon, color, bg, title, message, btnText }) {
+    return (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className={`size-24 ${bg} rounded-full flex items-center justify-center mb-6`}>
+                <Icon size={40} className={color} strokeWidth={1.5} />
+            </div>
+            <h4 className="text-2xl font-black text-[#1A1A2E] mb-3 uppercase tracking-tight">{title}</h4>
+            <p className="text-gray-500 font-medium mb-8 max-w-sm">{message}</p>
+            <Link
+                href="/shop"
+                className="bg-[#1A1A2E] text-white px-8 py-3.5 rounded-full text-xs font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-all shadow-lg hover:-translate-y-0.5"
+            >
+                {btnText}
+            </Link>
+        </div>
+    );
+}
+
+function UnderConstruction({ title }) {
+    return (
+        <div>
+            <h3 className="text-2xl font-black text-[#1A1A2E] uppercase tracking-wide border-b border-gray-100 pb-4 mb-6">
+                {title}
+            </h3>
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+                <motion.div
+                    animate={{ rotate: [0, -15, 15, -15, 15, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}
+                    className="size-24 bg-orange-50 rounded-full flex items-center justify-center mb-6"
+                >
+                    <Wrench size={40} className="text-orange-400" strokeWidth={1.5} />
+                </motion.div>
+                <h4 className="text-2xl font-black text-[#1A1A2E] mb-3 uppercase tracking-tight">Feature Coming Soon</h4>
+                <p className="text-gray-500 font-medium mb-8 max-w-md mx-auto">
+                    We are currently building the <strong className="text-[#1A1A2E]">{title}</strong> feature to give you a
+                    seamless and premium experience. Check back soon!
+                </p>
+                <Link
+                    href="/shop"
+                    className="bg-gray-100 text-[#1A1A2E] px-8 py-3.5 rounded-full text-xs font-black uppercase tracking-widest hover:bg-gray-200 transition-all font-bold"
+                >
+                    Continue Shopping
+                </Link>
+            </div>
+        </div>
+    );
+}
+

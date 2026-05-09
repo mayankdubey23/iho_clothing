@@ -27,7 +27,7 @@ export default function Franchises({ applications }) {
   function updateStatus(applicationId, status) {
     if (!confirm(`Are you sure you want to ${status} this application?`)) return;
 
-    router.patch(`/admin/franchise-applications/${applicationId}`, { status }, {
+    router.patch(`/franchise-superadmin/franchise-applications/${applicationId}`, { status }, {
       preserveScroll: true,
       onSuccess: () => console.log('Status updated!'),
       onError: (errors) => console.error('Failed to update status:', errors),

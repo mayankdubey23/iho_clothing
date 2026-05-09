@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,60 +10,48 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-    'name',
-    'email',
-    'password',
-    'role',
-    'serviceable_pincodes', // 👈 Yeh add karein
+        'name',
+        'email',
+        'mobile_number',
+        'password',
+        'role',
+        'serviceable_pincodes',
+        'address_line',
+        'city',
+        'state',
+        'pincode',
+        'country',
+        'store_name',
+        'store_address',
+        'store_contact',
+        'business_hours',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
-    return [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-        'serviceable_pincodes' => 'array', // 👈 Yeh add karein
-    ];
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'serviceable_pincodes' => 'array',
+        ];
     }
 
-    // ==========================================
-    // 🏢 FRANCHISE & ADMIN RELATIONSHIPS
-    // ==========================================
-
-    // Franchise ke sabhi service pincodes
     public function servicePincodes()
     {
         return $this->hasMany(FranchisePincode::class, 'franchise_id');
     }
 
-    // Franchise ka apna stock/inventory
     public function inventories()
     {
         return $this->hasMany(Inventory::class, 'franchise_id');
     }
 
-    // Franchise ne kitne orders fulfill kiye
     public function fulfilledOrders()
     {
         return $this->hasMany(Order::class, 'franchise_id');

@@ -159,7 +159,7 @@ export default function Products({ products, categories }) {
 
   function submitCreate(e) {
     e.preventDefault();
-    post('/admin/products', { 
+    post('/franchise-superadmin/products', { 
       forceFormData: true, // Required for file uploads
       onSuccess: () => { 
         setShowCreate(false); 
@@ -191,7 +191,7 @@ export default function Products({ products, categories }) {
   }
   function submitEdit(e) {
     e.preventDefault();
-    patchProduct(`/admin/products/${editProduct.id}`, {
+    patchProduct(`/franchise-superadmin/products/${editProduct.id}`, {
       onSuccess: () => { setEditProduct(null); resetEdit(); },
     });
   }
@@ -227,7 +227,7 @@ export default function Products({ products, categories }) {
   function saveSkuEdit(skuId) {
     const payload = editingSkus[skuId];
     setSavingSkuId(skuId);
-    router.patch(`/admin/skus/${skuId}`, payload, {
+    router.patch(`/franchise-superadmin/skus/${skuId}`, payload, {
       preserveScroll: true,
       onSuccess: () => { cancelSkuEdit(skuId); setSavingSkuId(null); },
       onError:   () =>  setSavingSkuId(null),
@@ -235,7 +235,7 @@ export default function Products({ products, categories }) {
   }
   function deleteSku(skuId) {
     if (!confirm('Delete this SKU? Its inventory will also be removed.')) return;
-    router.delete(`/admin/skus/${skuId}`, { preserveScroll: true });
+    router.delete(`/franchise-superadmin/skus/${skuId}`, { preserveScroll: true });
   }
 
   // ── Add SKU ────────────────────────────────────────────────────────────────
@@ -248,7 +248,7 @@ export default function Products({ products, categories }) {
   
   function submitSku(e) {
     e.preventDefault();
-    postSku(`/admin/products/${skuProduct.id}/skus`, {
+    postSku(`/franchise-superadmin/products/${skuProduct.id}/skus`, {
       preserveScroll: true,
       onSuccess: () => { setSkuProduct(null); resetSku(); },
     });

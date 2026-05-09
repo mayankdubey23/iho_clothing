@@ -3,10 +3,25 @@ import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Heart, Share2, Ruler, ChevronDown, ChevronUp, Star } from 'lucide-react';
+import { addCartItem } from '@/lib/cart';
 
 export default function Product({ product }) {
-    // Premium placeholder data for design testing
-    const displayProduct = product || {
+    const productSkus = product?.skus || [];
+    const colorOptions = [...new Set(productSkus.map((sku) => sku.color).filter(Boolean))];
+    const sizeOptions = [...new Set(productSkus.map((sku) => sku.size).filter(Boolean))];
+    const productImages = product?.images?.length ? product.images.map((image) => image.image_path) : null;
+
+    const displayProduct = product ? {
+        id: product.id,
+        name: product.name,
+        price: Number(product.base_price || 0),
+        category: product.category?.name || 'Collection',
+        description: product.description || 'Premium IHO Clothing product with clean construction and live SKU inventory.',
+        features: ['Premium construction', 'Live SKU stock tracking', 'Fast fulfillment'],
+        images: productImages || ['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1200&auto=format&fit=crop'],
+        colors: (colorOptions.length ? colorOptions : ['Default']).map((name) => ({ name, hex: name.toLowerCase().includes('black') ? '#1A1A1A' : '#F9F8F6' })),
+        sizes: sizeOptions.length ? sizeOptions : ['Default'],
+    } : {
         id: 1,
         name: 'Essential Heavyweight Boxy Tee',
         price: 2499,
@@ -27,8 +42,25 @@ export default function Product({ product }) {
     };
 
     const [selectedColor, setSelectedColor] = useState(displayProduct.colors[0].name);
-    const [selectedSize, setSelectedSize] = useState('L');
+    const [selectedSize, setSelectedSize] = useState(displayProduct.sizes.includes('L') ? 'L' : displayProduct.sizes[0]);
     const [openAccordion, setOpenAccordion] = useState('details');
+    const selectedSku = productSkus.find((sku) => (sku.color || 'Default') === selectedColor && (sku.size || 'Default') === selectedSize) || productSkus[0];
+
+    const addToBag = () => {
+        if (!product?.id || !selectedSku?.id) return;
+
+        addCartItem({
+            id: selectedSku.id,
+            product_id: product.id,
+            sku_id: selectedSku.id,
+            name: product.name,
+            size: selectedSku.size || selectedSize,
+            color: selectedSku.color || selectedColor,
+            price: Number(product.base_price || 0),
+            quantity: 1,
+            image: displayProduct.images[0],
+        });
+    };
 
     const staggerContainer = {
         hidden: { opacity: 0 },
@@ -141,7 +173,7 @@ export default function Product({ product }) {
 
                             {/* Action Buttons */}
                             <div className="flex gap-3 mt-4">
-                                <button className="flex-1 bg-[#1A1A1A] text-[#F9F8F6] py-4 md:py-5 text-sm font-bold uppercase tracking-widest hover:bg-[#4A001F] transition-all flex items-center justify-center gap-2 rounded-sm shadow-xl hover:shadow-2xl hover:-translate-y-0.5">
+                                <button onClick={addToBag} disabled={Boolean(product) && !selectedSku} className="flex-1 bg-[#1A1A1A] text-[#F9F8F6] py-4 md:py-5 text-sm font-bold uppercase tracking-widest hover:bg-[#4A001F] transition-all flex items-center justify-center gap-2 rounded-sm shadow-xl hover:shadow-2xl hover:-translate-y-0.5 disabled:opacity-60">
                                     <ShoppingBag size={18} strokeWidth={2} /> Add to Bag
                                 </button>
                                 <button className="w-14 md:w-16 bg-[#F3F0EA] text-[#1A1A1A] flex items-center justify-center border border-[#E8E4D9] hover:bg-[#E8E4D9] hover:text-[#4A001F] transition-all rounded-sm">

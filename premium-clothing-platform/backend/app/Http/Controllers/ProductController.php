@@ -7,6 +7,7 @@ use App\Models\Sku;
 use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class ProductController extends Controller
 {
@@ -79,7 +80,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $user = $request->user();
-        abort_unless($user && in_array($user->role, ['super_admin', 'admin']), 403, 'This action is unauthorized.');
+        abort_unless($user && $user->role === 'super_admin', 403, 'This action is unauthorized.');
 
         // 1. Inputs Validate Karein (Image optional hai)
         $validated = $request->validate([
@@ -189,5 +190,17 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         //
+    }
+
+    public function franchiseCatalog()
+    {
+        abort_unless(in_array(auth()->user()->role, ['admin', 'franchise', 'franchise_admin']), 403);
+
+        return Inertia::render('Franchise/BuyStock', [
+            'products' => Product::with(['category', 'skus.inventory'])
+                ->where('is_active', true)
+                ->latest()
+                ->get(),
+        ]);
     }
 }

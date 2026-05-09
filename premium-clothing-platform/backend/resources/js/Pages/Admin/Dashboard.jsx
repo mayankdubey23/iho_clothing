@@ -1,184 +1,325 @@
 import React from 'react';
-import { Head, usePage } from '@inertiajs/react';
-import { TrendingUp, ShoppingBag, Box, Store, Users, IndianRupee } from 'lucide-react';
-import AdminLayout from '../../Layouts/AdminLayout';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { motion } from 'framer-motion';
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Legend
+    TrendingUp, ShoppingBag, Box, Store, Users, IndianRupee,
+    ArrowUpRight, ShieldAlert, PackageOpen, Globe, Activity, AlertCircle
+} from 'lucide-react';
+import AdminLayout from '@/Layouts/AdminLayout';
+import {
+    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+    BarChart, Bar, Cell
 } from 'recharts';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } },
-};
-
+// 🚀 Fluid Animation Variants
 const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.07, delayChildren: 0.04 } },
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
 };
 
+const fadeUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+};
+
+// Premium Status Badges
 const STATUS_BADGE = {
-  pending: 'bg-amber-100 text-amber-800',
-  completed: 'bg-emerald-100 text-emerald-800',
-  processing: 'bg-blue-100 text-blue-800',
-  cancelled: 'bg-red-100 text-red-800',
-  delivered: 'bg-green-100 text-green-800',
+    pending: 'bg-[#fef3c7] text-[#92400e] border border-[#fcd34d]',
+    confirmed: 'bg-blue-50 text-blue-700 border border-blue-200',
+    packed: 'bg-indigo-50 text-indigo-700 border border-indigo-200',
+    shipped: 'bg-purple-50 text-purple-700 border border-purple-200',
+    delivered: 'bg-[#1A1A2E] text-white border border-[#1A1A2E]',
+    cancelled: 'bg-red-50 text-[#E94E3C] border border-red-200',
 };
 
 function formatCurrency(value) {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0,
-  }).format(value || 0);
+    return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        maximumFractionDigits: 0,
+    }).format(Number(value) || 0);
 }
 
 export default function Dashboard({ stats, recent_orders, chart_data }) {
     const { auth } = usePage().props;
-    const isSuperAdmin = ['super_admin', 'admin'].includes(auth.user.role);
 
-    // Dummy data for charts if none is provided or it's empty
+    // ✅ SAFETY LOCKS
+    const user = auth?.user || { name: 'Super Admin', role: 'super_admin' };
+    const safeStats = stats || {};
+    const safeOrders = Array.isArray(recent_orders) ? recent_orders : [];
+
+    // Map backend stats dynamically
+    const revenue = safeStats.total_revenue || safeStats.revenue || 0;
+    const totalOrders = safeStats.total_orders || safeStats.orders_count || 0;
+    const customersCount = safeStats.total_customers || 0;
+    const franchiseApps = safeStats.applications || 0; // New franchise applications
+    const pendingOrders = safeStats.pending_orders || 0;
+    const lowStockCount = safeStats.low_stock || 0;
+
+    // Dynamic Chart Data Processing
     const processedChartData = chart_data && chart_data.length > 0
         ? chart_data.map(item => ({
             ...item,
             revenue: parseFloat(item.revenue),
             orders: parseInt(item.orders),
             name: new Date(item.name).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })
-          }))
+        }))
         : [
-            { name: 'Mon', revenue: 4000, orders: 24 },
-            { name: 'Tue', revenue: 3000, orders: 13 },
-            { name: 'Wed', revenue: 2000, orders: 98 },
-            { name: 'Thu', revenue: 2780, orders: 39 },
-            { name: 'Fri', revenue: 1890, orders: 48 },
-            { name: 'Sat', revenue: 2390, orders: 38 },
-            { name: 'Sun', revenue: 3490, orders: 43 },
+            { name: 'Mon', revenue: 40000, orders: 124 },
+            { name: 'Tue', revenue: 35000, orders: 113 },
+            { name: 'Wed', revenue: 58000, orders: 198 },
+            { name: 'Thu', revenue: 27800, orders: 89 },
+            { name: 'Fri', revenue: 68900, orders: 248 },
+            { name: 'Sat', revenue: 83900, orders: 338 },
+            { name: 'Sun', revenue: 94900, orders: 443 },
         ];
 
     return (
         <AdminLayout active="dashboard">
-            <Head title="Dashboard | Admin" />
-            
-            <div className="mb-8">
-                <h1 className="text-3xl font-black text-slate-900">Dashboard Overview</h1>
-                <p className="text-slate-500 mt-1">Real-time performance metrics, analytics, and recent activity.</p>
-            </div>
+            <Head title="Global Command Center | IHO Admin" />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                {isSuperAdmin ? (
-                    <>
-                        <StatCard title="Total Revenue" value={formatCurrency(stats.total_revenue)} icon={<TrendingUp size={24}/>} color="bg-emerald-500" />
-                        <StatCard title="Total Orders" value={stats.total_orders || 0} icon={<ShoppingBag size={24}/>} color="bg-blue-500" />
-                        <StatCard title="Total Customers" value={stats.total_customers || 0} icon={<Users size={24}/>} color="bg-sky-500" />
-                        <StatCard title="Franchise Apps" value={stats.applications || 0} icon={<Store size={24}/>} color="bg-orange-500" />
-                    </>
-                ) : (
-                    <>
-                        <StatCard title="My Total Sales" value={formatCurrency(stats.total_revenue)} icon={<TrendingUp size={24}/>} color="bg-emerald-500" />
-                        <StatCard title="My Total Profit" value={formatCurrency(stats.total_profit)} icon={<IndianRupee size={24}/>} color="bg-green-500" />
-                        <StatCard title="My Total Orders" value={stats.total_orders || 0} icon={<ShoppingBag size={24}/>} color="bg-blue-500" />
-                        <StatCard title="My Stock Units" value={stats.stock || 0} icon={<Box size={24}/>} color="bg-indigo-500" />
-                    </>
-                )}
-            </div>
+            <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-7xl mx-auto pb-12">
 
-            {/* Charts Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                    <h2 className="text-lg font-bold text-slate-800 mb-6">{isSuperAdmin ? 'Revenue Trend' : 'My Sales Trend'} (Last 7 Days)</h2>
-                    <div className="h-72">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={processedChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                                <defs>
-                                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
-                                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} tickFormatter={(value) => `₹${value}`} />
-                                <Tooltip 
-                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                    formatter={(value) => [`₹${value}`, 'Revenue']}
-                                />
-                                <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
-                            </AreaChart>
-                        </ResponsiveContainer>
+                {/* 🎯 SUPER ADMIN HEADER */}
+                <motion.div variants={fadeUp} className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <div>
+                        <div className="flex items-center gap-3 mb-3">
+                            <span className="bg-[#E94E3C] text-white text-[10px] font-black tracking-widest uppercase px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md shadow-[#E94E3C]/30">
+                                <Globe size={12} strokeWidth={2.5} /> Global Network
+                            </span>
+                            <span className="bg-[#1A1A2E] text-white text-[10px] font-black tracking-widest uppercase px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                                <ShieldAlert size={12} strokeWidth={2.5} /> Super Admin
+                            </span>
+                        </div>
+                        <h1 className="text-3xl md:text-4xl font-black text-[#1A1A2E] tracking-tighter uppercase">
+                            Command Center
+                        </h1>
+                        <p className="text-gray-500 mt-2 font-medium">
+                            Welcome back, <span className="text-[#E94E3C] font-bold">{user.name}</span>. Manage global inventory, monitor franchise performance, and approve requests.
+                        </p>
                     </div>
+                </motion.div>
+
+                {/* 🎯 QUICK ACTION POWERS (Super Admin Specific) */}
+                <motion.div variants={stagger} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                    <QuickActionCard href="/franchise-superadmin/franchises" icon={<Store size={20} />} label="Manage Franchises" alert={franchiseApps > 0} />
+                    <QuickActionCard href="/franchise-superadmin/master-stock" icon={<Box size={20} />} label="Master Catalog" />
+                    <QuickActionCard href="/franchise-superadmin/stock-requests" icon={<PackageOpen size={20} />} label="Stock Approvals" alert={lowStockCount > 0} />
+                    <QuickActionCard href="/franchise-superadmin/analytics" icon={<Activity size={20} />} label="Global Analytics" />
+                </motion.div>
+
+                {/* 🎯 GLOBAL STAT CARDS */}
+                <motion.div variants={stagger} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    <StatCard title="Total Network Revenue" value={formatCurrency(revenue)} icon={<TrendingUp size={22} />} isAccent />
+                    <StatCard title="Total Network Orders" value={totalOrders} icon={<ShoppingBag size={22} />} alert={pendingOrders > 0} />
+                    <StatCard title="Total Customers" value={customersCount} icon={<Users size={22} />} />
+                    <StatCard title="Master Low Stock" value={lowStockCount} icon={<AlertCircle size={22} />} isAlert={lowStockCount > 0} />
+                </motion.div>
+
+                {/* 🎯 ONLINE VS OFFLINE CHANNELS */}
+                <motion.div variants={stagger} className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                    <ChannelCard
+                        title="D2C Online Sales"
+                        value={formatCurrency(safeStats.online_sales || (revenue * 0.6))}
+                        subtitle="Direct customer orders via website"
+                        icon={<Globe size={22} />}
+                        accent="bg-[#E94E3C]"
+                    />
+                    <ChannelCard
+                        title="Franchise B2B Sales"
+                        value={formatCurrency(safeStats.offline_sales || (revenue * 0.4))}
+                        subtitle="Offline retail & franchise fulfillment"
+                        icon={<Store size={22} />}
+                        accent="bg-[#1A1A2E]"
+                    />
+                </motion.div>
+
+                {/* 🎯 GLOBAL CHARTS */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-10">
+                    <motion.div variants={fadeUp} className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 lift-card relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#E94E3C]/5 to-transparent rounded-full blur-3xl -z-10 -translate-y-1/2 translate-x-1/3"></div>
+                        <h2 className="text-sm font-black uppercase tracking-widest text-[#1A1A2E] mb-6 flex items-center justify-between">
+                            Network Revenue Flow
+                            <span className="text-[10px] text-gray-400 font-bold bg-gray-50 px-2 py-1 rounded-md">Last 7 Days</span>
+                        </h2>
+                        <div className="h-72 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={processedChartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                                    <defs>
+                                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#E94E3C" stopOpacity={0.4} />
+                                            <stop offset="95%" stopColor="#E94E3C" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 700 }} dy={10} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 700 }} tickFormatter={(value) => `₹${value >= 1000 ? (value / 1000) + 'k' : value}`} />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: '#1A1A2E', borderRadius: '12px', border: 'none', color: '#fff', fontWeight: 'bold', fontSize: '12px', boxShadow: '0 10px 25px -5px rgba(26, 26, 46, 0.5)' }}
+                                        itemStyle={{ color: '#E94E3C' }}
+                                        formatter={(value) => [`₹${value.toLocaleString('en-IN')}`, 'Revenue']}
+                                    />
+                                    <Area type="monotone" dataKey="revenue" stroke="#E94E3C" strokeWidth={4} fillOpacity={1} fill="url(#colorRevenue)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </motion.div>
+
+                    <motion.div variants={fadeUp} className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 lift-card relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#1A1A2E]/5 to-transparent rounded-full blur-3xl -z-10 -translate-y-1/2 translate-x-1/3"></div>
+                        <h2 className="text-sm font-black uppercase tracking-widest text-[#1A1A2E] mb-6 flex items-center justify-between">
+                            Global Order Volume
+                            <span className="text-[10px] text-gray-400 font-bold bg-gray-50 px-2 py-1 rounded-md">Last 7 Days</span>
+                        </h2>
+                        <div className="h-72 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={processedChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 700 }} dy={10} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 700 }} />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: '#1A1A2E', borderRadius: '12px', border: 'none', color: '#fff', fontWeight: 'bold', fontSize: '12px' }}
+                                        cursor={{ fill: 'rgba(26,26,46,0.05)' }}
+                                    />
+                                    <Bar dataKey="orders" radius={[6, 6, 0, 0]} barSize={28}>
+                                        {processedChartData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={index === processedChartData.length - 1 ? '#E94E3C' : '#1A1A2E'} />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </motion.div>
                 </div>
 
-                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                    <h2 className="text-lg font-bold text-slate-800 mb-6">{isSuperAdmin ? 'Orders Volume' : 'My Orders Volume'} (Last 7 Days)</h2>
-                    <div className="h-72">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={processedChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
-                                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                                <Tooltip 
-                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                    cursor={{fill: '#f1f5f9'}}
-                                />
-                                <Bar dataKey="orders" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={32} />
-                            </BarChart>
-                        </ResponsiveContainer>
+                {/* 🎯 GLOBAL LEDGER TABLE */}
+                <motion.div variants={fadeUp} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden lift-card">
+                    <div className="px-6 py-5 border-b border-gray-100 bg-white flex justify-between items-center">
+                        <h2 className="text-sm font-black tracking-widest text-[#1A1A2E] uppercase">Master Order Ledger</h2>
+                        <Link href="/franchise-superadmin/orders" className="text-xs font-bold tracking-widest text-[#E94E3C] uppercase hover:text-[#1A1A2E] transition-colors flex items-center gap-1 group">
+                            View All Network <ArrowUpRight size={14} className="group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
+                        </Link>
                     </div>
-                </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-10">
-                <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                    <h2 className="text-lg font-bold text-slate-800">Recent Orders</h2>
-                    <a href="/admin/orders" className="text-sm font-semibold text-blue-600 hover:text-blue-800">View All</a>
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-slate-50 text-slate-500 text-sm border-b border-slate-200">
-                            <tr>
-                                <th className="px-6 py-4 font-bold">Order ID</th>
-                                <th className="px-6 py-4 font-bold">Customer</th>
-                                <th className="px-6 py-4 font-bold">Pincode / Address</th>
-                                <th className="px-6 py-4 font-bold">Amount</th>
-                                <th className="px-6 py-4 font-bold">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                            {recent_orders?.length > 0 ? (
-                                recent_orders.map(order => (
-                                    <tr key={order.id} className="hover:bg-slate-50 transition group">
-                                        <td className="px-6 py-4 font-black text-blue-600">#{order.id}</td>
-                                        <td className="px-6 py-4 font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">{order.customer_name}</td>
-                                        <td className="px-6 py-4 text-slate-500 text-sm max-w-xs truncate">{order.shipping_address}</td>
-                                        <td className="px-6 py-4 font-black text-slate-900">{formatCurrency(order.total_amount)}</td>
-                                        <td className="px-6 py-4">
-                                            <span className={`text-xs px-3 py-1 rounded-full font-bold uppercase ${STATUS_BADGE[order.status] || 'bg-gray-100 text-gray-800'}`}>
-                                                {order.status}
-                                            </span>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead className="bg-gray-50/50 text-[10px] uppercase font-black tracking-[0.2em] text-gray-400 border-b border-gray-100">
+                                <tr>
+                                    <th className="px-6 py-4 whitespace-nowrap">Order ID</th>
+                                    <th className="px-6 py-4 whitespace-nowrap">Customer</th>
+                                    <th className="px-6 py-4 whitespace-nowrap">Fulfillment By</th>
+                                    <th className="px-6 py-4 whitespace-nowrap">Value</th>
+                                    <th className="px-6 py-4 whitespace-nowrap">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {safeOrders.length > 0 ? (
+                                    safeOrders.map((order, i) => (
+                                        <motion.tr
+                                            key={order.id || i}
+                                            initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
+                                            className="hover:bg-gray-50/80 transition-colors group"
+                                        >
+                                            <td className="px-6 py-4 font-black text-[#1A1A2E]">#{order.razorpay_order_id ? order.razorpay_order_id.slice(-6).toUpperCase() : order.id}</td>
+                                            <td className="px-6 py-4">
+                                                <p className="font-bold text-gray-700 group-hover:text-[#E94E3C] transition-colors">{order.customer_name || 'N/A'}</p>
+                                                <p className="text-xs text-gray-400 font-medium truncate max-w-[150px]">{order.city || 'India'}, {order.pincode}</p>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {order.fulfillment_type === 'master' ? (
+                                                    <span className="text-[10px] font-black tracking-widest text-[#E94E3C] uppercase flex items-center gap-1"><Box size={10} /> Master Whse</span>
+                                                ) : (
+                                                    <span className="text-[10px] font-black tracking-widest text-[#1A1A2E] uppercase flex items-center gap-1"><Store size={10} /> Franchise</span>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-4 font-black text-[#1A1A2E]">{formatCurrency(order.total_amount)}</td>
+                                            <td className="px-6 py-4">
+                                                <span className={`text-[10px] px-3 py-1.5 rounded-md font-black tracking-wider uppercase ${STATUS_BADGE[order.status] || 'bg-gray-100 text-gray-800'}`}>
+                                                    {order.status || 'Pending'}
+                                                </span>
+                                            </td>
+                                        </motion.tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="5" className="px-6 py-16 text-center">
+                                            <div className="flex flex-col items-center justify-center text-gray-400">
+                                                <ShoppingBag size={32} className="mb-3 opacity-20" />
+                                                <p className="text-sm font-bold uppercase tracking-widest">No network orders yet</p>
+                                            </div>
                                         </td>
                                     </tr>
-                                ))
-                            ) : (
-                                <tr><td colSpan="5" className="px-6 py-12 text-center text-slate-500 bg-slate-50/30 font-medium">No orders received yet.</td></tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </motion.div>
+            </motion.div>
         </AdminLayout>
     );
 }
 
-function StatCard({ title, value, icon, color }) {
+// 💎 Ultra Premium Quick Action Button
+function QuickActionCard({ label, icon, href, alert = false }) {
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center gap-5 hover:shadow-md hover:-translate-y-1 transition duration-300">
-            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-sm ${color}`}>
+        <Link href={href} className="group relative bg-white border border-gray-100 rounded-2xl p-4 flex items-center gap-4 hover:border-[#1A1A2E]/20 hover:shadow-lg transition-all overflow-hidden lift-card">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-50/50 group-hover:to-[#1A1A2E]/5 transition-colors -z-10"></div>
+            <div className={`size-10 rounded-xl flex items-center justify-center shadow-sm shrink-0 transition-transform group-hover:scale-110 ${alert ? 'bg-[#E94E3C]/10 text-[#E94E3C]' : 'bg-[#1A1A2E]/5 text-[#1A1A2E]'}`}>
                 {icon}
             </div>
-            <div>
-                <p className="text-sm font-bold text-slate-500 mb-1">{title}</p>
-                <h3 className="text-2xl font-black text-slate-900">{value}</h3>
+            <span className="text-xs font-black uppercase tracking-widest text-[#1A1A2E] group-hover:text-[#E94E3C] transition-colors leading-tight">
+                {label}
+            </span>
+            {alert && (
+                <span className="absolute top-3 right-3 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E94E3C] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#E94E3C]"></span>
+                </span>
+            )}
+        </Link>
+    );
+}
+
+// 💎 Ultra Premium Stat Card Component
+function StatCard({ title, value, icon, isAccent = false, isAlert = false }) {
+    return (
+        <motion.div variants={fadeUp} className="relative bg-white rounded-3xl shadow-sm border border-gray-100 p-6 overflow-hidden lift-card group">
+            <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${isAccent || isAlert ? 'bg-gradient-to-br from-[#E94E3C]/5 to-transparent' : 'bg-gradient-to-br from-[#1A1A2E]/5 to-transparent'}`}></div>
+
+            <div className="relative z-10 flex justify-between items-start">
+                <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-400 mb-2 flex items-center gap-1.5">
+                        {title}
+                        {isAlert && <span className="text-[#E94E3C] animate-pulse"><AlertCircle size={10} strokeWidth={3} /></span>}
+                    </p>
+                    <h3 className={`text-3xl font-black tracking-tighter ${isAlert ? 'text-[#E94E3C]' : 'text-[#1A1A2E]'}`}>
+                        {value}
+                    </h3>
+                </div>
+                <div className={`size-12 rounded-2xl flex items-center justify-center shadow-lg transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-3 ${isAccent ? 'bg-gradient-to-br from-[#E94E3C] to-[#c0392b] text-white shadow-[#E94E3C]/30' : isAlert ? 'bg-gradient-to-br from-red-500 to-red-700 text-white shadow-red-500/30' : 'bg-gradient-to-br from-[#1A1A2E] to-[#2d2d4d] text-white shadow-[#1A1A2E]/30'}`}>
+                    {icon}
+                </div>
             </div>
-        </div>
+
+            <div className={`absolute bottom-0 left-0 h-1.5 w-0 group-hover:w-full transition-all duration-500 ease-out ${isAccent || isAlert ? 'bg-[#E94E3C]' : 'bg-[#1A1A2E]'}`}></div>
+        </motion.div>
+    );
+}
+
+// 💎 Channel Split Cards (Online vs Offline)
+function ChannelCard({ title, value, subtitle, icon, accent }) {
+    return (
+        <motion.div variants={fadeUp} className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 lift-card group cursor-pointer relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10 flex items-center justify-between gap-4">
+                <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.16em] text-gray-400 mb-2">{title}</p>
+                    <h3 className="text-3xl font-black text-[#1A1A2E] tracking-tighter">{value}</h3>
+                    <p className="mt-2 text-[10px] font-bold tracking-widest uppercase text-gray-400">{subtitle}</p>
+                </div>
+                <div className={`size-14 rounded-2xl ${accent} text-white flex items-center justify-center shadow-lg shadow-black/10 shrink-0 group-hover:scale-110 transition-transform`}>
+                    {icon}
+                </div>
+            </div>
+        </motion.div>
     );
 }
