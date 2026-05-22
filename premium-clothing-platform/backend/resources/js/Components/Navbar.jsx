@@ -123,10 +123,10 @@ export default function Navbar({ admin = false, vertical = false }) {
                         </div>
 
                         <div className="flex flex-1 translate-x-4 flex-col opacity-0 transition-all duration-300 ease-out group-hover/sidebar:translate-x-0 group-hover/sidebar:opacity-100">
-                        <div className="px-4 pb-6 pt-6">
-                            <p className="text-lg font-black uppercase italic tracking-tight text-white">IHO Studio</p>
-                            <p className="mt-1 text-[8px] font-black uppercase tracking-[0.35em] text-white/35">Performance Store</p>
-                        </div>
+                            <div className="px-4 pb-6 pt-6">
+                                <p className="text-lg font-black uppercase italic tracking-tight text-white">IHO Studio</p>
+                                <p className="mt-1 text-[8px] font-black uppercase tracking-[0.35em] text-white/35">Performance Store</p>
+                            </div>
 
                             <nav className="flex flex-1 flex-col gap-2 px-0 pt-2">
                                 {[...navLinks, { name: user ? 'Account' : 'Login', href: user ? '/account' : '/login' }, { name: 'Wishlist', href: '/wishlist' }].map((link, index) => {
@@ -403,4 +403,4 @@ export default function Navbar({ admin = false, vertical = false }) {
             </AnimatePresence>
         </>
     );
-}
+} 
