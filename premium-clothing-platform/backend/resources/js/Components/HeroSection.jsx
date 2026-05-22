@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
+
 const fallbackOffers = [
     'Free shipping on prepaid orders',
     'New season essentials live',
@@ -9,10 +10,15 @@ const fallbackOffers = [
 ];
 
 export default function HeroSection({ offers = [] }) {
-    const offerTexts = (offers || [])
-        .map((offer) => offer?.title || offer?.subtitle || offer?.code)
-        .filter(Boolean);
-    const offerRail = [...(offerTexts.length ? offerTexts : fallbackOffers), ...(offerTexts.length ? offerTexts : fallbackOffers)];
+
+    // Optimized: Memoize the array processing so it only recalculates if 'offers' prop changes
+    const offerRail = useMemo(() => {
+        const offerTexts = (offers || [])
+            .map((offer) => offer?.title || offer?.subtitle || offer?.code)
+            .filter(Boolean);
+
+        return [...(offerTexts.length ? offerTexts : fallbackOffers), ...(offerTexts.length ? offerTexts : fallbackOffers)];
+    }, [offers]);
 
     return (
         <section className="overflow-hidden bg-white">

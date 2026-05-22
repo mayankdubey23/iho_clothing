@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingBag, ArrowUpRight } from 'lucide-react';
@@ -6,7 +6,6 @@ import { addCartItem, buildCartItemFromProduct, imageUrl } from '@/lib/cart';
 import { isWishlisted, toggleWishlistItem } from '@/lib/wishlist';
 
 export default function PremiumProductCard({ product }) {
-    // Safety checks for backend data
     if (!product) return null;
 
     const inStock = product.stock > 0 || product.in_stock;
@@ -27,7 +26,8 @@ export default function PremiumProductCard({ product }) {
         };
     }, [product.id]);
 
-    const handleQuickAdd = (event) => {
+    // Optimized: Memoized handler
+    const handleQuickAdd = useCallback((event) => {
         event.preventDefault();
         event.stopPropagation();
 
@@ -41,14 +41,15 @@ export default function PremiumProductCard({ product }) {
         addCartItem(cartItem);
         setQuickAddLabel('Added');
         window.setTimeout(() => setQuickAddLabel('Add'), 1400);
-    };
+    }, [product, inStock]);
 
-    const handleWishlist = (event) => {
+    // Optimized: Memoized handler
+    const handleWishlist = useCallback((event) => {
         event.preventDefault();
         event.stopPropagation();
         const nextItems = toggleWishlistItem(product);
         setSaved(nextItems.some((item) => String(item.id) === String(product.id)));
-    };
+    }, [product]);
 
     return (
         <motion.div
@@ -57,7 +58,6 @@ export default function PremiumProductCard({ product }) {
             viewport={{ once: true, margin: "-50px" }}
             className="group relative flex flex-col bg-white transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]"
         >
-            {/* 🚀 Image Container */}
             <div className="relative aspect-[4/5] w-full overflow-hidden bg-slate-50">
                 {product.badge && (
                     <div className="absolute left-4 top-4 z-20 bg-[#1A1A2E] px-3 py-1 text-[9px] font-black uppercase tracking-widest text-white">
@@ -65,7 +65,6 @@ export default function PremiumProductCard({ product }) {
                     </div>
                 )}
 
-                {/* Out of Stock Overlay */}
                 {!inStock && (
                     <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/70 backdrop-blur-[2px]">
                         <span className="border-2 border-[#1A1A2E] bg-white px-4 py-2 text-xs font-black uppercase tracking-widest text-[#1A1A2E]">
@@ -79,6 +78,8 @@ export default function PremiumProductCard({ product }) {
                         <img
                             src={mainImage}
                             alt={`Image of ${product.name}`}
+                            loading="lazy" // Optimized
+                            decoding="async" // Optimized
                             className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                         />
                     ) : (
@@ -88,10 +89,7 @@ export default function PremiumProductCard({ product }) {
                     )}
                 </Link>
 
-                {/* 🚀 Hover Quick Actions Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 z-30 translate-y-4 flex flex-col gap-3 p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-
-                    {/* Available Sizes & Colors Preview */}
                     {(product.available_sizes?.length > 0 || product.available_colors?.length > 0) && (
                         <div className="flex items-center justify-between bg-white/90 px-3 py-2 backdrop-blur-sm">
                             <div className="flex gap-1.5">
@@ -105,7 +103,6 @@ export default function PremiumProductCard({ product }) {
                         </div>
                     )}
 
-                    {/* Action Buttons */}
                     <div className="flex gap-2">
                         <button onClick={handleQuickAdd} disabled={!inStock} className="flex flex-1 items-center justify-center gap-2 bg-[#1A1A2E] py-3 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-[#E94E3C] disabled:bg-slate-300">
                             <ShoppingBag size={14} /> {quickAddLabel}
@@ -117,7 +114,6 @@ export default function PremiumProductCard({ product }) {
                 </div>
             </div>
 
-            {/* 🚀 Product Details (Always Visible) */}
             <div className="flex flex-col p-5">
                 <div className="mb-2 flex items-start justify-between gap-4">
                     <div>
