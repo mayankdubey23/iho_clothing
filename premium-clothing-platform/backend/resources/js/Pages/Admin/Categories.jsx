@@ -1,166 +1,205 @@
-import React, { useState } from 'react';
-import { Head, Link, useForm, router } from '@inertiajs/react';
+import React, { useMemo, useState } from 'react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Search, Plus, Image as ImageIcon, EyeOff, Eye,
-  MoreVertical, FolderTree, Package, LayoutGrid, X, Upload
+  ChevronRight,
+  Eye,
+  EyeOff,
+  FolderTree,
+  Layers3,
+  Package,
+  Plus,
+  RefreshCw,
+  Search,
+  X,
 } from 'lucide-react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
-export default function Categories({ categories, stats, filters }) {
+export default function Categories({ categories, parentCategories = [], stats, filters, capabilities = {} }) {
   const safeCategories = categories?.data || [];
   const [search, setSearch] = useState(filters?.search || '');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  // Form setup with file support
   const { data, setData, post, processing, errors, reset } = useForm({
-    name: '', description: '', image: null, banner: null
+    name: '',
+    parent_id: '',
+    description: '',
+    image: null,
+    banner: null,
   });
+
+  const groupedCategories = useMemo(() => {
+    const parents = safeCategories.filter((category) => !category.parent_id);
+    const children = safeCategories.filter((category) => category.parent_id);
+
+    return { parents, children };
+  }, [safeCategories]);
+
+  const submit = (e) => {
+    e.preventDefault();
+    post('/franchise-superadmin/categories', {
+      forceFormData: true,
+      onSuccess: () => {
+        setIsAddModalOpen(false);
+        reset();
+      },
+    });
+  };
 
   const toggleStatus = (id) => {
     router.post(`/franchise-superadmin/categories/${id}/toggle-status`, {}, { preserveScroll: true });
   };
 
-  const submit = (e) => {
-    e.preventDefault();
-    post('/franchise-superadmin/categories', {
-      onSuccess: () => { setIsAddModalOpen(false); reset(); }
-    });
+  const syncDefaults = () => {
+    router.post('/franchise-superadmin/categories/sync-defaults', {}, { preserveScroll: true });
+  };
+
+  const runSearch = () => {
+    router.get('/franchise-superadmin/categories', { search }, { preserveState: true, preserveScroll: true });
   };
 
   return (
-    <AdminLayout active="inventory">
+    <AdminLayout active="categories">
       <Head title="Categories | Super Admin" />
 
-      <div className="max-w-[1600px] mx-auto pb-20 pt-6 px-4 sm:px-6">
-
-        {/* 🚀 HEADER & STATS */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+      <div className="mx-auto max-w-[1600px] px-4 pb-20 pt-6 sm:px-6">
+        <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-              <LayoutGrid className="text-[#E94E3C]" /> Store Categories
+            <p className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-400">Storefront Taxonomy</p>
+            <h1 className="mt-2 flex items-center gap-3 text-3xl font-black uppercase tracking-tight text-[#1A1A2E]">
+              <Layers3 className="text-[#E94E3C]" /> Collections
             </h1>
-            <p className="text-gray-500 font-bold text-sm mt-1">Organize your catalog with parent categories and banners.</p>
+            <p className="mt-2 max-w-2xl text-sm font-bold text-slate-500">
+              These categories power the website navigation, shop filters, and product assignment in the super-admin product form.
+            </p>
           </div>
-          <button onClick={() => setIsAddModalOpen(true)} className="bg-[#1A1A2E] text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-all flex items-center gap-2 shadow-lg shadow-black/10">
-            <Plus size={18} /> New Category
-          </button>
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={syncDefaults}
+              className="flex items-center justify-center gap-2 border border-slate-200 bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest text-[#1A1A2E] transition-colors hover:border-[#1A1A2E]"
+            >
+              <RefreshCw size={15} /> Sync Storefront Defaults
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsAddModalOpen(true)}
+              className="flex items-center justify-center gap-2 bg-[#1A1A2E] px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-black/10 transition-colors hover:bg-[#E94E3C]"
+            >
+              <Plus size={16} /> New Collection
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-          <StatCard title="Parent Categories" value={stats?.total_categories} icon={LayoutGrid} color="text-blue-500" />
-          <StatCard title="Sub Categories" value={stats?.total_subcategories} icon={FolderTree} color="text-purple-500" />
-          <StatCard title="Active Collections" value={stats?.active_categories} icon={Eye} color="text-green-500" />
+        <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <StatCard title="Main Collections" value={stats?.total_categories} icon={Layers3} color="text-blue-500" />
+          <StatCard title="Sub Collections" value={stats?.total_subcategories} icon={FolderTree} color="text-purple-500" />
+          <StatCard title="Active Categories" value={stats?.active_categories} icon={Eye} color="text-green-500" />
         </div>
 
-        {/* 🚀 FILTERS BAR */}
-        <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 mb-8 flex items-center gap-4">
-          <div className="flex-1 relative">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+        <div className="mb-8 border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="relative">
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
-              type="text" placeholder="Search categories..."
-              value={search} onChange={e => setSearch(e.target.value)} onKeyPress={e => e.key === 'Enter' && router.get('/franchise-superadmin/categories', { search }, { preserveState: true })}
-              className="w-full bg-gray-50 border-none rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none"
+              type="text"
+              placeholder="Search categories..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && runSearch()}
+              className="w-full border-0 bg-slate-50 py-4 pl-12 pr-4 text-sm font-bold text-[#1A1A2E] outline-none ring-0 placeholder:text-slate-400 focus:ring-1 focus:ring-[#1A1A2E]"
             />
           </div>
         </div>
 
-        {/* 🚀 CATEGORY VISUAL GRID */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {safeCategories.length > 0 ? safeCategories.map((category) => (
-            <motion.div key={category.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-black/5 transition-all group flex flex-col h-full">
+        {safeCategories.length > 0 ? (
+          <div className="space-y-8">
+            <CategorySection
+              title="Main Website Collections"
+              description="Navbar and top-level shop filter groups."
+              categories={groupedCategories.parents}
+              onToggle={toggleStatus}
+            />
+            <CategorySection
+              title="Sub Collections"
+              description="Nested filters used under Men, Women, Gym Wear, Running Wear and other collections."
+              categories={groupedCategories.children}
+              onToggle={toggleStatus}
+            />
+          </div>
+        ) : (
+          <div className="border border-dashed border-slate-200 bg-white py-20 text-center">
+            <Layers3 size={42} className="mx-auto mb-4 text-slate-300" strokeWidth={1.5} />
+            <p className="text-lg font-black uppercase tracking-tight text-[#1A1A2E]">No Categories Found</p>
+            <p className="mt-2 text-xs font-bold uppercase tracking-widest text-slate-400">Sync defaults or create your first storefront collection.</p>
+          </div>
+        )}
+      </div>
 
-              {/* Banner & Image Section */}
-              <div className="h-32 bg-gray-100 relative shrink-0">
-                <img
-                  src={category.banner ? `/storage/${category.banner}` : 'https://placehold.co/600x200/1A1A2E/ffffff?text=No+Banner'}
-                  className="w-full h-full object-cover opacity-80" alt="Banner"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-
-                <div className="absolute -bottom-6 left-6 size-16 bg-white p-1 rounded-2xl shadow-lg">
-                  <img
-                    src={category.image ? `/storage/${category.image}` : 'https://placehold.co/100x100/f8fafc/94a3b8?text=Icon'}
-                    className="w-full h-full object-cover rounded-xl" alt={category.name}
-                  />
+      <AnimatePresence>
+        {isAddModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/70 p-4 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 18 }}
+              className="max-h-[90vh] w-full max-w-xl overflow-y-auto border border-slate-200 bg-white shadow-2xl"
+            >
+              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white/95 p-6 backdrop-blur">
+                <div>
+                  <p className="text-[9px] font-black uppercase tracking-[0.35em] text-slate-400">Storefront Category</p>
+                  <h3 className="mt-1 text-lg font-black uppercase tracking-tight text-[#1A1A2E]">Create Collection</h3>
                 </div>
-
-                <button onClick={() => toggleStatus(category.id)} className={`absolute top-4 right-4 p-2 rounded-xl backdrop-blur-md transition-all ${category.status === 'active' ? 'bg-white/20 text-white hover:bg-white hover:text-[#1A1A2E]' : 'bg-red-500/80 text-white'}`}>
-                  {category.status === 'active' ? <Eye size={16} /> : <EyeOff size={16} />}
+                <button type="button" onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-red-500">
+                  <X size={20} />
                 </button>
               </div>
 
-              {/* Content Section */}
-              <div className="p-6 pt-10 flex flex-col flex-1">
-                <h3 className="font-black text-[#1A1A2E] text-xl uppercase tracking-tight mb-1">{category.name}</h3>
-                <p className="text-xs font-bold text-gray-400 mb-6 line-clamp-2">{category.description || 'No description provided.'}</p>
+              <form onSubmit={submit} className="space-y-6 p-6">
+                <FormField label="Category Name" error={errors.name} required>
+                  <input
+                    type="text"
+                    required
+                    value={data.name}
+                    onChange={(e) => setData('name', e.target.value)}
+                    className="form-input"
+                    placeholder="e.g. Men Sportswear, Men T-Shirts"
+                  />
+                </FormField>
 
-                <div className="mt-auto flex items-center gap-2">
-                  <div className="flex-1 bg-gray-50 p-3 rounded-2xl flex items-center justify-between border border-gray-100">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 flex items-center gap-1.5"><FolderTree size={14} /> Subcats</span>
-                    <span className="font-black text-[#1A1A2E]">{category.sub_categories_count || 0}</span>
+                {capabilities.parent_id && (
+                  <FormField label="Parent Collection" error={errors.parent_id}>
+                    <select value={data.parent_id} onChange={(e) => setData('parent_id', e.target.value)} className="form-input cursor-pointer">
+                      <option value="">Main collection</option>
+                      {parentCategories.map((parent) => (
+                        <option key={parent.id} value={parent.id}>{parent.name}</option>
+                      ))}
+                    </select>
+                    <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                      Choose a parent only when creating a sub collection.
+                    </p>
+                  </FormField>
+                )}
+
+                {capabilities.description && (
+                  <FormField label="Description" error={errors.description}>
+                    <textarea value={data.description} onChange={(e) => setData('description', e.target.value)} rows="3" className="form-input resize-none" />
+                  </FormField>
+                )}
+
+                {(capabilities.image || capabilities.banner) && (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {capabilities.image && (
+                      <UploadField label="Square Icon" file={data.image} onChange={(file) => setData('image', file)} />
+                    )}
+                    {capabilities.banner && (
+                      <UploadField label="Wide Banner" file={data.banner} onChange={(file) => setData('banner', file)} />
+                    )}
                   </div>
-                  <div className="flex-1 bg-[#E94E3C]/5 p-3 rounded-2xl flex items-center justify-between border border-[#E94E3C]/10">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#E94E3C] flex items-center gap-1.5"><Package size={14} /> Products</span>
-                    <span className="font-black text-[#E94E3C]">{category.products_count || 0}</span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )) : (
-            <div className="col-span-full py-20 text-center">
-              <LayoutGrid size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} />
-              <p className="text-[#1A1A2E] font-black text-lg">No Categories Found</p>
-            </div>
-          )}
-        </div>
+                )}
 
-      </div>
-
-      {/* 🚀 MODAL: ADD NEW CATEGORY */}
-      <AnimatePresence>
-        {isAddModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A2E]/60 backdrop-blur-sm">
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden max-h-[90vh] overflow-y-auto custom-scrollbar">
-              <div className="sticky top-0 bg-white/90 backdrop-blur-md p-6 border-b border-gray-100 flex justify-between items-center z-10">
-                <h3 className="font-black text-[#1A1A2E] uppercase tracking-wider flex items-center gap-2"><Plus size={18} className="text-[#E94E3C]" /> Create Category</h3>
-                <button onClick={() => setIsAddModalOpen(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={20} /></button>
-              </div>
-
-              <form onSubmit={submit} className="p-6 space-y-6">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Category Name *</label>
-                  <input type="text" required value={data.name} onChange={e => setData('name', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none" placeholder="e.g. Men Sportswear, Yoga Wear..." />
-                  {errors.name && <p className="text-[10px] text-red-500 font-bold ml-1">{errors.name}</p>}
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Description (Optional)</label>
-                  <textarea value={data.description} onChange={e => setData('description', e.target.value)} rows="3" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none resize-none"></textarea>
-                </div>
-
-                {/* File Uploads */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Square Icon (Logo)</label>
-                    <div className="relative border-2 border-dashed border-gray-200 rounded-2xl p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer">
-                      <input type="file" accept="image/*" onChange={e => setData('image', e.target.files[0])} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                      <ImageIcon size={24} className="mx-auto text-gray-400 mb-2" />
-                      <span className="text-[10px] font-bold text-gray-500 block truncate">{data.image ? data.image.name : 'Upload Icon'}</span>
-                    </div>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Wide Banner</label>
-                    <div className="relative border-2 border-dashed border-gray-200 rounded-2xl p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer">
-                      <input type="file" accept="image/*" onChange={e => setData('banner', e.target.files[0])} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                      <Upload size={24} className="mx-auto text-gray-400 mb-2" />
-                      <span className="text-[10px] font-bold text-gray-500 block truncate">{data.banner ? data.banner.name : 'Upload Banner'}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <button disabled={processing} type="submit" className="w-full bg-[#1A1A2E] text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-colors disabled:opacity-50 mt-4 shadow-xl shadow-black/10">
-                  {processing ? 'Creating...' : 'Save Category'}
+                <button disabled={processing} type="submit" className="w-full bg-[#1A1A2E] py-4 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-[#E94E3C] disabled:opacity-50">
+                  {processing ? 'Saving...' : 'Save Category'}
                 </button>
               </form>
             </motion.div>
@@ -168,19 +207,144 @@ export default function Categories({ categories, stats, filters }) {
         )}
       </AnimatePresence>
 
+      <style>{`
+        .form-input {
+          width: 100%;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          padding: 0.9rem 1rem;
+          font-size: 0.875rem;
+          font-weight: 700;
+          color: #1A1A2E;
+          outline: none;
+        }
+        .form-input:focus {
+          border-color: #1A1A2E;
+          background: #ffffff;
+          box-shadow: 0 0 0 1px #1A1A2E;
+        }
+      `}</style>
     </AdminLayout>
   );
 }
 
-// 💎 Helper Component
+function CategorySection({ title, description, categories, onToggle }) {
+  return (
+    <section>
+      <div className="mb-4 flex flex-col gap-1 border-b border-slate-200 pb-4">
+        <h2 className="text-sm font-black uppercase tracking-widest text-[#1A1A2E]">{title}</h2>
+        <p className="text-xs font-bold text-slate-500">{description}</p>
+      </div>
+
+      {categories.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {categories.map((category) => (
+            <CategoryCard key={category.id} category={category} onToggle={onToggle} />
+          ))}
+        </div>
+      ) : (
+        <div className="border border-dashed border-slate-200 bg-white p-8 text-center text-[10px] font-black uppercase tracking-widest text-slate-400">
+          No records in this group.
+        </div>
+      )}
+    </section>
+  );
+}
+
+function CategoryCard({ category, onToggle }) {
+  const isActive = category.status === 'active' || category.is_active === true || category.is_active === 1;
+  const isSubCategory = Boolean(category.parent_id);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-[#1A1A2E]"
+    >
+      <div className="mb-5 flex items-start justify-between gap-4">
+        <div>
+          <p className="mb-2 text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">
+            {isSubCategory ? 'Sub Collection' : 'Main Collection'}
+          </p>
+          <h3 className="text-xl font-black uppercase tracking-tight text-[#1A1A2E]">{category.name}</h3>
+          {category.parent && (
+            <p className="mt-2 flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400">
+              {category.parent.name} <ChevronRight size={12} /> {category.name}
+            </p>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={() => onToggle(category.id)}
+          className={`grid size-10 place-items-center border transition-colors ${isActive ? 'border-emerald-100 bg-emerald-50 text-emerald-600' : 'border-red-100 bg-red-50 text-red-500'}`}
+          title={isActive ? 'Deactivate' : 'Activate'}
+        >
+          {isActive ? <Eye size={16} /> : <EyeOff size={16} />}
+        </button>
+      </div>
+
+      <div className="mb-5 flex flex-wrap gap-2">
+        <Link href={`/shop?category=${category.slug}`} className="border border-slate-200 px-3 py-2 text-[9px] font-black uppercase tracking-widest text-slate-500 transition-colors hover:border-[#1A1A2E] hover:text-[#1A1A2E]">
+          View on site
+        </Link>
+        <span className={`border px-3 py-2 text-[9px] font-black uppercase tracking-widest ${isActive ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-red-100 bg-red-50 text-red-600'}`}>
+          {isActive ? 'Active' : 'Inactive'}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 border-t border-slate-100 pt-4">
+        <CountPill icon={FolderTree} label="Subcats" value={category.sub_categories_count || category.children_count || 0} />
+        <CountPill icon={Package} label="Products" value={category.products_count || 0} accent />
+      </div>
+    </motion.div>
+  );
+}
+
+function CountPill({ icon: Icon, label, value, accent = false }) {
+  return (
+    <div className={`flex items-center justify-between border p-3 ${accent ? 'border-[#E94E3C]/10 bg-[#E94E3C]/5 text-[#E94E3C]' : 'border-slate-100 bg-slate-50 text-slate-500'}`}>
+      <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest">
+        <Icon size={13} /> {label}
+      </span>
+      <span className="font-black">{value}</span>
+    </div>
+  );
+}
+
+function FormField({ children, error, label, required = false }) {
+  return (
+    <div>
+      <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-slate-400">
+        {label} {required && '*'}
+      </label>
+      {children}
+      {error && <p className="mt-2 text-[10px] font-bold text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+function UploadField({ file, label, onChange }) {
+  return (
+    <div>
+      <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</label>
+      <div className="relative border border-dashed border-slate-300 bg-slate-50 p-5 text-center transition-colors hover:bg-white">
+        <input type="file" accept="image/*" onChange={(e) => onChange(e.target.files?.[0] || null)} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
+        <p className="truncate text-[10px] font-black uppercase tracking-widest text-slate-500">{file ? file.name : 'Upload Image'}</p>
+      </div>
+    </div>
+  );
+}
+
 function StatCard({ title, value, icon: Icon, color }) {
   return (
-    <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
+    <div className="flex items-center justify-between border border-slate-200 bg-white p-5 shadow-sm">
       <div>
-        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{title}</p>
-        <h4 className="text-2xl font-black text-[#1A1A2E]">{value?.toLocaleString() || 0}</h4>
+        <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-slate-400">{title}</p>
+        <h4 className="text-3xl font-black text-[#1A1A2E]">{Number(value || 0).toLocaleString('en-IN')}</h4>
       </div>
-      <div className={`size-12 rounded-2xl flex items-center justify-center bg-gray-50 ${color}`}><Icon size={20} strokeWidth={2.5} /></div>
+      <div className={`grid size-12 place-items-center bg-slate-50 ${color}`}>
+        <Icon size={20} strokeWidth={2.5} />
+      </div>
     </div>
   );
 }

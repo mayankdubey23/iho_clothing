@@ -13,6 +13,7 @@ class ProductImage extends Model
         return [
             'is_primary' => 'boolean',
             'sort_order' => 'integer',
+            'media_type' => 'string',
         ];
     }
 

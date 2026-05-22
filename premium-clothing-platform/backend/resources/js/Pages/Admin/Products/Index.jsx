@@ -3,12 +3,13 @@ import { Head, Link, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import {
     Plus, Search, Filter, MoreVertical, Package,
-    Tag, Layers, Star, TrendingUp, Edit3, Trash2, EyeOff, Eye
+    Tag, Layers, Star, TrendingUp, Edit3, Trash2, EyeOff, Eye, X
 } from 'lucide-react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
 export default function ProductIndex({ products, categories, filters }) {
     const [search, setSearch] = useState(filters.search || '');
+    const [previewProduct, setPreviewProduct] = useState(null);
 
     const toggleStatus = (id) => {
         router.post(`/franchise-superadmin/products/${id}/toggle-status`, {}, { preserveScroll: true });
@@ -76,8 +77,14 @@ export default function ProductIndex({ products, categories, filters }) {
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                                     <div className="flex gap-2 w-full">
                                         <Link href={`/franchise-superadmin/products/${product.id}/edit`} className="flex-1 bg-white text-[#1A1A2E] py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest text-center hover:bg-[#E94E3C] hover:text-white transition-colors">Edit</Link>
-                                        <button onClick={() => toggleStatus(product.id)} className="bg-white/20 backdrop-blur-md text-white p-2.5 rounded-xl hover:bg-white hover:text-[#1A1A2E] transition-all">
-                                            {product.status === 'active' ? <Eye size={18} /> : <EyeOff size={18} />}
+                                        <button
+                                            type="button"
+                                            onClick={() => setPreviewProduct(product)}
+                                            title="View product details"
+                                            aria-label={`View ${product.name}`}
+                                            className="bg-white/20 backdrop-blur-md text-white p-2.5 rounded-xl hover:bg-white hover:text-[#1A1A2E] transition-all"
+                                        >
+                                            <Eye size={18} />
                                         </button>
                                     </div>
                                 </div>
@@ -113,6 +120,18 @@ export default function ProductIndex({ products, categories, filters }) {
                                         </div>
                                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{product.variants?.length || 0} Variants</span>
                                     </div>
+                                    <div className="mt-4 grid grid-cols-2 gap-2">
+                                        <Link href={`/franchise-superadmin/products/${product.id}/edit`} className="bg-[#1A1A2E] px-3 py-3 text-center text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-[#E94E3C]">
+                                            Edit Stock
+                                        </Link>
+                                        <button
+                                            type="button"
+                                            onClick={() => toggleStatus(product.id)}
+                                            className="border border-slate-200 px-3 py-3 text-[10px] font-black uppercase tracking-widest text-[#1A1A2E] transition-colors hover:border-[#1A1A2E]"
+                                        >
+                                            {product.status === 'active' ? 'Hide' : 'Show'}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </motion.div>
@@ -129,6 +148,73 @@ export default function ProductIndex({ products, categories, filters }) {
                     ))}
                 </div>
             </div>
+
+            {previewProduct && (
+                <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#0F172A]/80 p-4 backdrop-blur-md" onClick={() => setPreviewProduct(null)}>
+                    <div className="w-full max-w-3xl overflow-hidden bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
+                            <div>
+                                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">Product Preview</p>
+                                <h2 className="text-xl font-black uppercase tracking-tight text-[#1E293B]">{previewProduct.name}</h2>
+                            </div>
+                            <button type="button" onClick={() => setPreviewProduct(null)} className="grid size-10 place-items-center bg-slate-50 text-slate-500 hover:bg-slate-100">
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+                            <div className="bg-slate-50 aspect-square">
+                                <img
+                                    src={previewProduct.main_image ? `/storage/${previewProduct.main_image}` : 'https://placehold.co/700x700/f8fafc/94a3b8?text=No+Image'}
+                                    onError={(e) => { e.target.src = 'https://placehold.co/700x700/f8fafc/ef4444?text=Missing'; }}
+                                    alt={previewProduct.name}
+                                    className="h-full w-full object-cover"
+                                />
+                            </div>
+
+                            <div className="p-8">
+                                <div className="mb-6">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-[#94A3B8]">{previewProduct.category?.name || 'Uncategorized'}</p>
+                                    <h3 className="mt-3 text-3xl font-black leading-tight text-[#1E293B]">{previewProduct.name}</h3>
+                                    <p className="mt-2 text-xs font-bold uppercase tracking-widest text-slate-400">SKU: {previewProduct.sku}</p>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 mb-6">
+                                    <InfoCard label="Selling Price" value={`₹${(Number(previewProduct.selling_price) || 0).toLocaleString()}`} />
+                                    <InfoCard label="MRP" value={`₹${(Number(previewProduct.mrp) || 0).toLocaleString()}`} />
+                                    <InfoCard label="Stock" value={`${previewProduct.total_stock || 0} units`} />
+                                    <InfoCard label="Variants" value={previewProduct.variants?.length || 0} />
+                                </div>
+
+                                <div className="flex gap-3">
+                                    <Link href={`/franchise-superadmin/products/${previewProduct.id}/edit`} className="flex-1 bg-black px-5 py-4 text-center text-[10px] font-black uppercase tracking-[0.3em] text-white hover:bg-[#1E293B]">
+                                        Edit Product
+                                    </Link>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            toggleStatus(previewProduct.id);
+                                            setPreviewProduct(null);
+                                        }}
+                                        className="px-5 py-4 border border-slate-200 text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B] hover:border-black"
+                                    >
+                                        {previewProduct.status === 'active' ? 'Hide' : 'Show'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AdminLayout>
+    );
+}
+
+function InfoCard({ label, value }) {
+    return (
+        <div className="bg-slate-50 p-4">
+            <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{label}</p>
+            <p className="mt-1 text-lg font-black text-[#1E293B]">{value}</p>
+        </div>
     );
 }

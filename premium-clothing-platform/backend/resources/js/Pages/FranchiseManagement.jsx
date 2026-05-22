@@ -1,193 +1,189 @@
 import React, { useState } from 'react';
-import { Head, Link, useForm, router } from '@inertiajs/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Head, Link, router } from '@inertiajs/react';
+import { motion } from 'framer-motion';
 import {
-    Users, Store, MapPin, TrendingUp, MoreVertical,
-    ShieldCheck, ShieldAlert, Plus, X, Search, Filter,
-    BarChart3, Wallet, Package
+    Users, Store, MapPin, Search, ShieldCheck, ShieldAlert,
+    FileText, TrendingUp, UserPlus, XCircle, Map, DollarSign
 } from 'lucide-react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
-export default function FranchiseManagement({ franchises, summary, filters }) {
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+export default function FranchiseManagement({ tabData, activeTab, stats, filters }) {
     const [search, setSearch] = useState(filters.search || '');
-    const [statusFilter, setStatusFilter] = useState(filters.status || '');
 
-    const { data, setData, post, processing, reset, errors } = useForm({
-        name: '', email: '', password: '', city: '', state: '', margin: 20, commission: 5
-    });
+    const tabs = [
+        { id: 'active', label: 'Active Franchises', icon: ShieldCheck, color: 'text-green-500' },
+        { id: 'pending_requests', label: 'Franchise Requests', icon: UserPlus, color: 'text-orange-500', count: stats.pending },
+        { id: 'rejected_requests', label: 'Rejected', icon: XCircle, color: 'text-red-400' },
+        { id: 'blocked', label: 'Blocked', icon: ShieldAlert, color: 'text-red-600', count: stats.blocked },
+        { id: 'service_areas', label: 'Service Areas', icon: Map, color: 'text-blue-500' },
+        { id: 'documents', label: 'Documents', icon: FileText, color: 'text-gray-500' },
+        { id: 'performance', label: 'Performance', icon: TrendingUp, color: 'text-purple-500' },
+    ];
 
-    const applyFilters = () => {
-        router.get('/franchise-superadmin/franchises', { search, status: statusFilter }, { preserveState: true });
+    const switchTab = (tabId) => {
+        setSearch(''); // Clear search on tab switch
+        router.get('/franchise-superadmin/franchises', { tab: tabId }, { preserveState: true, preserveScroll: true });
     };
 
-    const submit = (e) => {
-        e.preventDefault();
-        post('/franchise-superadmin/franchises', {
-            onSuccess: () => { setIsAddModalOpen(false); reset(); }
-        });
-    };
-
-    const toggleStatus = (id) => {
-        if (confirm("Change access status for this franchise?")) {
-            router.post(`/franchise-superadmin/franchises/${id}/toggle-status`);
+    const handleSearch = (e) => {
+        if (e.key === 'Enter') {
+            router.get('/franchise-superadmin/franchises', { tab: activeTab, search }, { preserveState: true });
         }
     };
 
     return (
         <AdminLayout active="franchises">
-            <Head title="Franchise Network | Super Admin" />
+            <Head title="Franchise Management | Super Admin" />
 
             <div className="max-w-[1600px] mx-auto pb-20 pt-6 px-4 sm:px-6">
 
-                {/* 🚀 HEADER & SUMMARY */}
+                {/* 🚀 HEADER */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                     <div>
                         <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                            <Store className="text-[#E94E3C]" /> Franchise Network
+                            <Store className="text-[#E94E3C]" /> Franchise Management
                         </h1>
-                        <p className="text-gray-500 font-bold text-sm mt-1">Manage and monitor global franchise partners.</p>
+                        <p className="text-gray-500 font-bold text-sm mt-1">Unified command center for global partners & requests.</p>
                     </div>
-                    <button onClick={() => setIsAddModalOpen(true)} className="bg-[#1A1A2E] text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-all flex items-center gap-2 shadow-lg shadow-black/10">
-                        <Plus size={18} /> Add New Franchise
-                    </button>
                 </div>
 
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-                    <SummaryCard title="Total Network" value={summary.total} icon={Users} color="text-blue-500" />
-                    <SummaryCard title="Active Partners" value={summary.active} icon={ShieldCheck} color="text-green-500" />
-                    <SummaryCard title="Pending Requests" value={summary.pending} icon={TrendingUp} color="text-orange-500" alert={summary.pending > 0} />
-                    <SummaryCard title="Network Revenue" value={`₹${(summary.total_revenue / 100000).toFixed(1)}L`} icon={Wallet} color="text-[#E94E3C]" />
-                </div>
-
-                {/* 🚀 FILTERS */}
-                <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 mb-6 flex flex-col md:flex-row items-center gap-4">
-                    <div className="flex-1 w-full relative">
-                        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input type="text" placeholder="Search by name or email..." value={search} onChange={e => setSearch(e.target.value)} onKeyPress={e => e.key === 'Enter' && applyFilters()} className="w-full bg-gray-50 border-none rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none" />
+                {/* 🚀 PREMIUM TAB NAVIGATION */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 mb-8 overflow-x-auto custom-scrollbar">
+                    <div className="flex items-center gap-2 min-w-max">
+                        {tabs.map((tab) => {
+                            const Icon = tab.icon;
+                            const isActive = activeTab === tab.id;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => switchTab(tab.id)}
+                                    className={`relative flex items-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${isActive ? 'text-[#1A1A2E] bg-gray-50' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-700'}`}
+                                >
+                                    <Icon size={16} className={isActive ? tab.color : ''} />
+                                    {tab.label}
+                                    {tab.count > 0 && (
+                                        <span className={`ml-2 px-2 py-0.5 rounded-md text-[10px] ${isActive ? 'bg-[#1A1A2E] text-white' : 'bg-gray-200 text-gray-600'}`}>
+                                            {tab.count}
+                                        </span>
+                                    )}
+                                    {isActive && (
+                                        <motion.div layoutId="activeTab" className="absolute bottom-0 left-4 right-4 h-0.5 bg-[#E94E3C] rounded-t-full" />
+                                    )}
+                                </button>
+                            );
+                        })}
                     </div>
-                    <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setTimeout(applyFilters, 100); }} className="bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-gray-600 focus:ring-2 focus:ring-[#E94E3C] outline-none cursor-pointer min-w-[150px]">
-                        <option value="">All Status</option>
-                        <option value="active">Active</option>
-                        <option value="blocked">Blocked</option>
-                        <option value="pending">Pending</option>
-                    </select>
                 </div>
 
-                {/* 🚀 FRANCHISE TABLE */}
-                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div className="overflow-x-auto min-h-[400px]">
-                        <table className="w-full text-left border-collapse">
-                            <thead className="bg-gray-50/50 text-[10px] uppercase font-black tracking-[0.2em] text-gray-400 border-b border-gray-100">
-                                <tr>
-                                    <th className="px-6 py-5">Franchise Details</th>
-                                    <th className="px-6 py-5">Location</th>
-                                    <th className="px-6 py-5">Margin/Comm.</th>
-                                    <th className="px-6 py-5">Performance</th>
-                                    <th className="px-6 py-5">Status</th>
-                                    <th className="px-6 py-5 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {franchises.data.map((f) => (
-                                    <tr key={f.id} className="hover:bg-gray-50/80 transition-colors group">
-                                        <td className="px-6 py-5">
-                                            <div className="flex items-center gap-3">
-                                                <div className="size-10 bg-[#1A1A2E] text-white rounded-xl flex items-center justify-center font-black text-xs">{f.name[0]}</div>
-                                                <div>
-                                                    <p className="font-black text-[#1A1A2E] text-sm">{f.name}</p>
-                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{f.email}</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-5">
-                                            <p className="text-xs font-black text-gray-600 flex items-center gap-1"><MapPin size={12} className="text-[#E94E3C]" /> {f.city}, {f.state}</p>
-                                        </td>
-                                        <td className="px-6 py-5">
-                                            <div className="flex gap-2">
-                                                <span className="text-[10px] font-black bg-blue-50 text-blue-600 px-2 py-1 rounded">M: {f.margin}%</span>
-                                                <span className="text-[10px] font-black bg-purple-50 text-purple-600 px-2 py-1 rounded">C: {f.commission}%</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-5">
-                                            <p className="text-sm font-black text-green-600">₹{(f.revenue / 1000).toFixed(1)}k</p>
-                                            <p className="text-[10px] font-bold text-gray-400 uppercase">{f.total_orders} Orders</p>
-                                        </td>
-                                        <td className="px-6 py-5">
-                                            <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${f.status === 'active' ? 'bg-green-50 text-green-600 border-green-200' : 'bg-red-50 text-red-600 border-red-200'}`}>
-                                                {f.status}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-5 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <Link href={`/franchise-superadmin/franchises/${f.id}`} className="p-2 text-gray-400 hover:text-blue-500 bg-gray-50 rounded-xl transition-colors"><BarChart3 size={18} /></Link>
-                                                <button onClick={() => toggleStatus(f.id)} className={`p-2 rounded-xl transition-colors ${f.status === 'active' ? 'text-red-500 bg-red-50 hover:bg-red-100' : 'text-green-500 bg-green-50 hover:bg-green-100'}`}>
-                                                    {f.status === 'active' ? <ShieldAlert size={18} /> : <ShieldCheck size={18} />}
-                                                </button>
-                                            </div>
-                                        </td>
+                {/* SEARCH BAR */}
+                <div className="relative mb-6">
+                    <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                        type="text" placeholder={`Search in ${tabs.find(t => t.id === activeTab)?.label}...`}
+                        value={search} onChange={e => setSearch(e.target.value)} onKeyPress={handleSearch}
+                        className="w-full bg-white shadow-sm border border-gray-100 rounded-2xl pl-12 pr-4 py-4 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none"
+                    />
+                </div>
+
+                {/* 🚀 DYNAMIC CONTENT AREA BASED ON TAB */}
+                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden min-h-[400px]">
+
+                    {/* TAB 1: ACTIVE FRANCHISES & BLOCKED */}
+                    {(activeTab === 'active' || activeTab === 'blocked') && (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead className="bg-gray-50/50 text-[10px] uppercase font-black tracking-[0.2em] text-gray-400 border-b border-gray-100">
+                                    <tr>
+                                        <th className="px-6 py-5">Franchise Account</th>
+                                        <th className="px-6 py-5">Assigned Location</th>
+                                        <th className="px-6 py-5 text-right">Actions</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {tabData.data?.length > 0 ? tabData.data.map((f) => (
+                                        <tr key={f.id} className="hover:bg-gray-50/80 transition-colors">
+                                            <td className="px-6 py-5">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="size-10 bg-[#1A1A2E] text-white rounded-xl flex items-center justify-center font-black text-xs">{f.name[0]}</div>
+                                                    <div>
+                                                        <p className="font-black text-[#1A1A2E] text-sm">{f.name}</p>
+                                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{f.email}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-5">
+                                                <p className="text-xs font-black text-gray-600 flex items-center gap-1"><MapPin size={12} className="text-[#E94E3C]" /> {f.franchise_detail?.city || 'Unassigned'}</p>
+                                            </td>
+                                            <td className="px-6 py-5 text-right">
+                                                <button onClick={() => router.post(`/franchise-superadmin/franchises/${f.id}/toggle-status`)} className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors ${f.status === 'active' ? 'text-red-500 bg-red-50 hover:bg-red-100' : 'text-green-600 bg-green-50 hover:bg-green-100'}`}>
+                                                    {f.status === 'active' ? 'Block Access' : 'Unblock Access'}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    )) : <EmptyState message="No franchises found in this list." />}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+
+                    {/* TAB 2: PENDING / REJECTED REQUESTS */}
+                    {(activeTab === 'pending_requests' || activeTab === 'rejected_requests') && (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead className="bg-gray-50/50 text-[10px] uppercase font-black tracking-[0.2em] text-gray-400 border-b border-gray-100">
+                                    <tr>
+                                        <th className="px-6 py-5">Applicant Info</th>
+                                        <th className="px-6 py-5">Interested Area</th>
+                                        <th className="px-6 py-5">Investment Budget</th>
+                                        <th className="px-6 py-5 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {tabData.data?.length > 0 ? tabData.data.map((req) => (
+                                        <tr key={req.id} className="hover:bg-gray-50/80 transition-colors">
+                                            <td className="px-6 py-5">
+                                                <p className="font-black text-[#1A1A2E] text-sm">{req.name}</p>
+                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{req.email} • {req.phone}</p>
+                                            </td>
+                                            <td className="px-6 py-5"><p className="text-xs font-bold text-gray-600">{req.city}, {req.state}</p></td>
+                                            <td className="px-6 py-5"><span className="text-[10px] font-black bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg border border-blue-100">₹{req.budget_range}</span></td>
+                                            <td className="px-6 py-5 text-right">
+                                                {activeTab === 'pending_requests' && (
+                                                    <div className="flex justify-end gap-2">
+                                                        <button className="px-4 py-2 bg-[#1A1A2E] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-colors">Review & Approve</button>
+                                                    </div>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    )) : <EmptyState message="No requests currently in this queue." />}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+
+                    {/* PLACEHOLDER FOR OTHER TABS */}
+                    {['service_areas', 'documents', 'performance'].includes(activeTab) && (
+                        <div className="flex flex-col items-center justify-center p-20 text-center">
+                            <Store size={48} className="text-gray-200 mb-4" strokeWidth={1} />
+                            <h3 className="font-black text-[#1A1A2E] text-xl uppercase tracking-widest mb-2">{tabs.find(t => t.id === activeTab)?.label} Module</h3>
+                            <p className="text-sm font-bold text-gray-400 max-w-md">Backend table connection is ready. The UI components for this specific tab will be rendered here.</p>
+                        </div>
+                    )}
+
                 </div>
             </div>
-
-            {/* 🚀 MODAL: ADD NEW FRANCHISE */}
-            <AnimatePresence>
-                {isAddModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A2E]/60 backdrop-blur-sm">
-                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden">
-                            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-[#1A1A2E]">
-                                <h3 className="font-black text-white uppercase tracking-wider">New Franchise Onboarding</h3>
-                                <button onClick={() => setIsAddModalOpen(false)} className="text-white/50 hover:text-white transition-colors"><X size={20} /></button>
-                            </div>
-                            <form onSubmit={submit} className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <InputField label="Full Name" value={data.name} onChange={e => setData('name', e.target.value)} error={errors.name} required />
-                                <InputField label="Email Address" type="email" value={data.email} onChange={e => setData('email', e.target.value)} error={errors.email} required />
-                                <InputField label="Initial Password" type="password" value={data.password} onChange={e => setData('password', e.target.value)} error={errors.password} required />
-                                <div className="grid grid-cols-2 gap-4">
-                                    <InputField label="City" value={data.city} onChange={e => setData('city', e.target.value)} error={errors.city} required />
-                                    <InputField label="State" value={data.state} onChange={e => setData('state', e.target.value)} error={errors.state} required />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <InputField label="Margin (%)" type="number" value={data.margin} onChange={e => setData('margin', e.target.value)} error={errors.margin} required />
-                                    <InputField label="Commission (%)" type="number" value={data.commission} onChange={e => setData('commission', e.target.value)} error={errors.commission} required />
-                                </div>
-                                <div className="md:col-span-2 pt-4">
-                                    <button disabled={processing} type="submit" className="w-full bg-[#E94E3C] text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-[#c0392b] transition-all disabled:opacity-50 shadow-xl shadow-[#E94E3C]/20">
-                                        {processing ? 'Creating Network Node...' : 'Activate Franchise'}
-                                    </button>
-                                </div>
-                            </form>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
         </AdminLayout>
     );
 }
 
-// 💎 Helper Components
-function SummaryCard({ title, value, icon: Icon, color, alert }) {
+// 💎 Helper Empty State Component
+function EmptyState({ message }) {
     return (
-        <div className={`bg-white p-5 rounded-3xl border ${alert ? 'border-orange-200' : 'border-gray-100'} shadow-sm flex items-center justify-between`}>
-            <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{title}</p>
-                <h4 className="text-2xl font-black text-[#1A1A2E]">{value}</h4>
-            </div>
-            <div className={`size-12 rounded-2xl flex items-center justify-center bg-gray-50 ${color}`}><Icon size={22} strokeWidth={2.5} /></div>
-        </div>
-    );
-}
-
-function InputField({ label, ...props }) {
-    return (
-        <div className="space-y-1.5">
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{label}</label>
-            <input {...props} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none transition-all" />
-            {props.error && <p className="text-[10px] text-red-500 font-bold ml-1">{props.error}</p>}
-        </div>
+        <tr>
+            <td colSpan="100%" className="px-6 py-16 text-center">
+                <Search size={32} className="mx-auto text-gray-300 mb-3" strokeWidth={1.5} />
+                <p className="text-[#1A1A2E] font-black text-sm uppercase tracking-widest">{message}</p>
+            </td>
+        </tr>
     );
 }

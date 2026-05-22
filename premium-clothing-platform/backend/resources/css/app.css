@@ -7,31 +7,37 @@
 @source '../**/*.jsx';
 
 @theme {
-    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
     --font-display: 'Playfair Display', ui-serif, Georgia, 'Times New Roman', serif;
-    --color-brand-dark: #1A1A2E;
-    --color-brand-navy: #16213E;
-    --color-brand-accent: #E94E3C;
-    --color-brand-secondary: #0F3460;
-    --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    --gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    --gradient-fluid: linear-gradient(-45deg, #1A1A2E, #16213E, #0F3460, #E94E3C);
+    --color-brand-dark: #000000;
+    --color-brand-navy: #1E293B;
+    --color-brand-accent: #94A3B8;
+    --color-brand-secondary: #475569;
+    --gradient-1: linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 100%);
+    --gradient-2: linear-gradient(135deg, #F8FAFC 0%, #CBD5E1 100%);
+    --gradient-3: linear-gradient(135deg, #FFFFFF 0%, #94A3B8 100%);
+    --gradient-4: linear-gradient(135deg, #F1F5F9 0%, #FFFFFF 100%);
+    --gradient-5: linear-gradient(135deg, #E2E8F0 0%, #FFFFFF 100%);
+    --gradient-fluid: linear-gradient(-45deg, #FFFFFF, #E2E8F0, #94A3B8, #1E293B);
 }
 
 @layer base {
+    :root {
+        --primary: #FFFFFF;
+        --secondary: #1E293B;
+        --accent: #94A3B8;
+        --cta: #000000;
+    }
+
     html {
         scroll-behavior: smooth;
     }
 
     body {
+        @apply bg-[var(--primary)] text-[var(--secondary)] antialiased;
         min-width: 320px;
         min-height: 100vh;
-        background: #f9f7f4;
-        color: #1c1917;
         font-family: var(--font-sans);
     }
 
@@ -54,7 +60,7 @@
         border: 1px solid #d6d3d1;
         background: #fff;
         padding: 0 0.875rem;
-        color: #1c1917;
+        color: var(--secondary);
         outline: none;
         border-radius: 0.5rem;
         transition:
@@ -64,7 +70,7 @@
 
     .input:focus {
         border-color: var(--color-brand-accent);
-        box-shadow: 0 0 0 3px rgba(233, 78, 60, 0.15);
+        box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.22);
     }
 
     .badge {
@@ -90,7 +96,21 @@
 
     .glass {
         backdrop-filter: blur(20px) saturate(180%);
-        background: rgba(249, 247, 244, 0.9);
+        background: rgba(255, 255, 255, 0.7);
+    }
+}
+
+@layer utilities {
+    .glass-card {
+        @apply bg-white/40 backdrop-blur-[20px] border border-white/20 shadow-xl;
+    }
+
+    .glass-nav {
+        @apply bg-white/70 backdrop-blur-[15px] border-b border-gray-100 sticky top-0 z-50;
+    }
+
+    .premium-button {
+        @apply bg-[var(--cta)] text-white px-8 py-3 rounded-none font-black uppercase tracking-[0.2em] hover:bg-gray-800 transition-all duration-500 hover:tracking-[0.3em];
     }
 }
 
@@ -110,7 +130,7 @@
 
 .lift-card:hover {
     transform: translateY(-6px);
-    border-color: rgba(233, 78, 60, 0.3);
+    border-color: rgba(148, 163, 184, 0.35);
     box-shadow:
         0 20px 44px rgba(26, 26, 46, 0.15),
         0 4px 12px rgba(26, 26, 46, 0.08);
@@ -215,7 +235,7 @@
 .gradient-orb-1 {
     width: 500px;
     height: 500px;
-    background: #667eea;
+    background: #e2e8f0;
     top: -100px;
     right: -100px;
 }
@@ -223,7 +243,7 @@
 .gradient-orb-2 {
     width: 400px;
     height: 400px;
-    background: #f5576c;
+    background: #94a3b8;
     bottom: -100px;
     left: -100px;
     animation-delay: -10s;
@@ -232,7 +252,7 @@
 .gradient-orb-3 {
     width: 300px;
     height: 300px;
-    background: #4facfe;
+    background: #1e293b;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -263,8 +283,8 @@
 }
 
 .hover-glow:hover {
-    box-shadow: 0 0 30px rgba(233, 78, 60, 0.3),
-                0 0 60px rgba(233, 78, 60, 0.1);
+    box-shadow: 0 0 30px rgba(148, 163, 184, 0.3),
+                0 0 60px rgba(148, 163, 184, 0.12);
 }
 
 /* ─── Shimmer Effect ─── */
@@ -366,8 +386,8 @@
 
 /* ─── Pulse Animation ─── */
 @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px rgba(233, 78, 60, 0.2); }
-    50% { box-shadow: 0 0 40px rgba(233, 78, 60, 0.4); }
+    0%, 100% { box-shadow: 0 0 20px rgba(148, 163, 184, 0.2); }
+    50% { box-shadow: 0 0 40px rgba(148, 163, 184, 0.4); }
 }
 
 .pulse-glow {

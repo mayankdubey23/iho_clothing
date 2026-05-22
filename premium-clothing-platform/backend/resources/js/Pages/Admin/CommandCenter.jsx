@@ -5,25 +5,26 @@ import {
     PackageSearch, CreditCard, PlusCircle, CheckCircle, Bell,
     Ticket, FileText, PackageCheck, XCircle, RefreshCcw, MousePointerClick, TrendingUp, Ban, LifeBuoy
 } from 'lucide-react';
+import AdminLayout from '@/Layouts/AdminLayout';
 
 export default function CommandCenter({ stats, top_products, top_franchises }) {
 
     // Quick Actions exactly as you requested
     const QUICK_ACTIONS = [
-        { label: "Add Product", icon: PlusCircle, href: "/admin/products/create" },
-        { label: "Approve Franchise", icon: CheckCircle, href: "/admin/franchise-requests" },
-        { label: "View Pending Orders", icon: Clock, href: "/admin/orders?status=pending" },
-        { label: "Update Stock", icon: PackageSearch, href: "/admin/inventory" },
-        { label: "Create Coupon", icon: Ticket, href: "/admin/coupons" },
-        { label: "Send Notification", icon: Bell, href: "/admin/notifications" },
-        { label: "View Reports", icon: FileText, href: "/admin/reports" },
+        { label: "Add Product", icon: PlusCircle, href: "/franchise-superadmin/products/create" },
+        { label: "Approve Franchise", icon: CheckCircle, href: "/franchise-superadmin/franchise-requests" },
+        { label: "View Pending Orders", icon: Clock, href: "/franchise-superadmin/orders?status=pending" },
+        { label: "Update Stock", icon: PackageSearch, href: "/franchise-superadmin/master-stock" },
+        { label: "Create Coupon", icon: Ticket, href: "/franchise-superadmin/coupons" },
+        { label: "Send Notification", icon: Bell, href: "/franchise-superadmin/notifications" },
+        { label: "View Reports", icon: FileText, href: "/franchise-superadmin/analytics" },
     ];
 
     // Helper to safely format currency
     const formatCurrency = (amount) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount || 0);
 
     return (
-        <div className="min-h-screen bg-[#f9f8f6] font-sans pb-20">
+        <AdminLayout active="dashboard">
             <Head title="Command Center | Super Admin" />
 
             <div className="bg-[#1A1A2E] text-white pt-8 pb-24 px-6 relative overflow-hidden">
@@ -134,7 +135,7 @@ export default function CommandCenter({ stats, top_products, top_franchises }) {
                 </div>
 
             </div>
-        </div>
+        </AdminLayout>
     );
 }
 

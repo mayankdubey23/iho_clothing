@@ -1,0 +1,188 @@
+Base API
+BASE_URL = https://yourdomain.com/api
+Use authentication header:
+Authorization: Bearer YOUR_TOKENAccept: application/jsonContent-Type: application/json
+
+1. Auth APIs
+POST   /auth/loginPOST   /auth/logoutGET    /auth/mePOST   /auth/forgot-passwordPOST   /auth/reset-passwordPOST   /auth/change-password
+Login Payload
+{  "email": "admin@example.com",  "password": "password123"}
+
+2. Super Admin APIs
+Prefix:
+/api/superadmin
+Middleware:
+auth:sanctumrole:superadmin
+
+Command Center / Dashboard
+GET /superadmin/dashboard/statsGET /superadmin/dashboard/sales-graphGET /superadmin/dashboard/orders-graphGET /superadmin/dashboard/top-productsGET /superadmin/dashboard/top-franchisesGET /superadmin/dashboard/stock-overviewGET /superadmin/dashboard/payment-overviewGET /superadmin/dashboard/recent-ordersGET /superadmin/dashboard/recent-franchise-requestsGET /superadmin/dashboard/recent-stock-requestsGET /superadmin/dashboard/support-summary
+
+Network Orders
+GET    /superadmin/ordersGET    /superadmin/orders/{id}PUT    /superadmin/orders/{id}/statusPUT    /superadmin/orders/{id}/assign-franchisePUT    /superadmin/orders/{id}/reassign-franchisePOST   /superadmin/orders/{id}/cancelPOST   /superadmin/orders/{id}/refundGET    /superadmin/orders/{id}/invoice
+Update Order Status Payload
+{  "status": "shipped",  "tracking_id": "TRK123456",  "courier_partner": "Delhivery"}
+
+Master Stock
+GET    /superadmin/master-stockGET    /superadmin/master-stock/low-stockPOST   /superadmin/master-stock/addPOST   /superadmin/master-stock/reducePOST   /superadmin/master-stock/adjustGET    /superadmin/master-stock/transactionsGET    /superadmin/master-stock/product/{product_id}
+Add Stock Payload
+{  "product_id": 1,  "variant_id": 3,  "quantity": 50,  "note": "New stock added"}
+
+Franchises
+GET    /superadmin/franchisesPOST   /superadmin/franchisesGET    /superadmin/franchises/{id}PUT    /superadmin/franchises/{id}DELETE /superadmin/franchises/{id}PUT    /superadmin/franchises/{id}/blockPUT    /superadmin/franchises/{id}/unblockGET    /superadmin/franchises/{id}/ordersGET    /superadmin/franchises/{id}/inventoryGET    /superadmin/franchises/{id}/paymentsGET    /superadmin/franchises/{id}/customersGET    /superadmin/franchises/{id}/performance
+
+Franchise Requests
+If you merge this inside Franchises, APIs can still stay separate.
+GET    /superadmin/franchise-requestsGET    /superadmin/franchise-requests/{id}PUT    /superadmin/franchise-requests/{id}/approvePUT    /superadmin/franchise-requests/{id}/rejectPOST   /superadmin/franchise-requests/{id}/convert-to-franchiseGET    /superadmin/franchise-requests/{id}/documents
+Approve Franchise Request Payload
+{  "assigned_state": "Uttar Pradesh",  "assigned_city": "Ghaziabad",  "assigned_pincodes": ["201001", "201002"],  "commission_type": "percentage",  "commission_value": 10}
+
+Customers
+GET    /superadmin/customersGET    /superadmin/customers/{id}GET    /superadmin/customers/{id}/ordersGET    /superadmin/customers/{id}/addressesPUT    /superadmin/customers/{id}/blockPUT    /superadmin/customers/{id}/unblock
+
+Products
+GET    /superadmin/productsPOST   /superadmin/productsGET    /superadmin/products/{id}PUT    /superadmin/products/{id}DELETE /superadmin/products/{id}POST   /superadmin/products/{id}/imagesDELETE /superadmin/products/{id}/images/{image_id}PUT    /superadmin/products/{id}/statusPUT    /superadmin/products/{id}/featuredPUT    /superadmin/products/{id}/best-seller
+Product Payload
+{  "name": "Men Sports T-Shirt",  "category_id": 1,  "subcategory_id": 2,  "sku": "MST-001",  "mrp": 1299,  "selling_price": 999,  "franchise_price": 700,  "description": "Premium dry-fit sports t-shirt",  "status": "active"}
+
+Product Variants
+GET    /superadmin/products/{product_id}/variantsPOST   /superadmin/products/{product_id}/variantsPUT    /superadmin/products/{product_id}/variants/{variant_id}DELETE /superadmin/products/{product_id}/variants/{variant_id}
+Variant Payload
+{  "size": "M",  "color": "Black",  "fabric": "Dry Fit",  "sku": "MST-001-BLK-M",  "stock": 100}
+
+Categories
+GET    /superadmin/categoriesPOST   /superadmin/categoriesGET    /superadmin/categories/{id}PUT    /superadmin/categories/{id}DELETE /superadmin/categories/{id}GET    /superadmin/subcategoriesPOST   /superadmin/subcategoriesPUT    /superadmin/subcategories/{id}DELETE /superadmin/subcategories/{id}
+
+Stock Requests
+GET    /superadmin/stock-requestsGET    /superadmin/stock-requests/{id}PUT    /superadmin/stock-requests/{id}/approvePUT    /superadmin/stock-requests/{id}/rejectPUT    /superadmin/stock-requests/{id}/mark-paidPUT    /superadmin/stock-requests/{id}/dispatchPUT    /superadmin/stock-requests/{id}/complete
+
+Franchise Inventory
+GET    /superadmin/franchise-inventoryGET    /superadmin/franchise-inventory/{franchise_id}GET    /superadmin/franchise-inventory/{franchise_id}/low-stockPOST   /superadmin/franchise-inventory/adjustGET    /superadmin/franchise-inventory/transactions
+
+Service Areas
+GET    /superadmin/service-areasPOST   /superadmin/service-areasGET    /superadmin/service-areas/{id}PUT    /superadmin/service-areas/{id}DELETE /superadmin/service-areas/{id}POST   /superadmin/service-areas/assign-franchisePOST   /superadmin/service-areas/transfer-franchise
+Assign Area Payload
+{  "franchise_id": 5,  "state": "Uttar Pradesh",  "city": "Ghaziabad",  "area": "Raj Nagar Extension",  "pincode": "201017"}
+
+Payments
+GET    /superadmin/paymentsGET    /superadmin/payments/{id}GET    /superadmin/payments/customer-paymentsGET    /superadmin/payments/franchise-paymentsGET    /superadmin/payments/pendingGET    /superadmin/payments/refundsPOST   /superadmin/payments/{id}/verifyPOST   /superadmin/payments/{id}/reject
+
+Coupons & Offers
+GET    /superadmin/couponsPOST   /superadmin/couponsGET    /superadmin/coupons/{id}PUT    /superadmin/coupons/{id}DELETE /superadmin/coupons/{id}PUT    /superadmin/coupons/{id}/enablePUT    /superadmin/coupons/{id}/disableGET    /superadmin/coupons/{id}/usage
+
+Returns & Refunds
+GET    /superadmin/returnsGET    /superadmin/returns/{id}PUT    /superadmin/returns/{id}/approvePUT    /superadmin/returns/{id}/rejectPUT    /superadmin/returns/{id}/pickup-scheduledPUT    /superadmin/returns/{id}/receivedPOST   /superadmin/refunds/{return_id}/approvePOST   /superadmin/refunds/{return_id}/reject
+
+Reports & Analytics
+GET /superadmin/reports/salesGET /superadmin/reports/ordersGET /superadmin/reports/productsGET /superadmin/reports/customersGET /superadmin/reports/franchisesGET /superadmin/reports/inventoryGET /superadmin/reports/paymentsGET /superadmin/reports/profitGET /superadmin/reports/returnsGET /superadmin/reports/coupons
+Example query:
+GET /superadmin/reports/sales?from=2026-05-01&to=2026-05-10&franchise_id=5
+
+Website Content
+GET    /superadmin/bannersPOST   /superadmin/bannersPUT    /superadmin/banners/{id}DELETE /superadmin/banners/{id}GET    /superadmin/pagesPOST   /superadmin/pagesPUT    /superadmin/pages/{id}DELETE /superadmin/pages/{id}GET    /superadmin/homepage-sectionsPOST   /superadmin/homepage-sectionsPUT    /superadmin/homepage-sections/{id}DELETE /superadmin/homepage-sections/{id}
+
+Notifications
+GET    /superadmin/notificationsPOST   /superadmin/notifications/sendPOST   /superadmin/notifications/send-to-customersPOST   /superadmin/notifications/send-to-franchisesGET    /superadmin/notifications/logs
+
+Support Tickets
+GET    /superadmin/support-ticketsGET    /superadmin/support-tickets/{id}POST   /superadmin/support-tickets/{id}/replyPUT    /superadmin/support-tickets/{id}/assignPUT    /superadmin/support-tickets/{id}/statusPUT    /superadmin/support-tickets/{id}/close
+
+Staff & Permissions
+GET    /superadmin/staffPOST   /superadmin/staffGET    /superadmin/staff/{id}PUT    /superadmin/staff/{id}DELETE /superadmin/staff/{id}GET    /superadmin/rolesPOST   /superadmin/rolesPUT    /superadmin/roles/{id}DELETE /superadmin/roles/{id}GET    /superadmin/permissionsPOST   /superadmin/roles/{id}/permissions
+
+Invoice & GST
+GET    /superadmin/invoicesGET    /superadmin/invoices/{id}GET    /superadmin/invoices/{id}/downloadPOST   /superadmin/invoices/{id}/send-emailGET    /superadmin/gst-settingsPUT    /superadmin/gst-settingsGET    /superadmin/tax-settingsPUT    /superadmin/tax-settings
+
+Delivery Settings
+GET    /superadmin/delivery/settingsPUT    /superadmin/delivery/settingsGET    /superadmin/shipping-zonesPOST   /superadmin/shipping-zonesPUT    /superadmin/shipping-zones/{id}DELETE /superadmin/shipping-zones/{id}GET    /superadmin/courier-partnersPOST   /superadmin/courier-partnersPUT    /superadmin/courier-partners/{id}DELETE /superadmin/courier-partners/{id}GET    /superadmin/pincode-serviceabilityPOST   /superadmin/pincode-serviceabilityDELETE /superadmin/pincode-serviceability/{id}
+
+Website Settings
+GET /superadmin/settingsPUT /superadmin/settingsGET /superadmin/payment-gatewaysPUT /superadmin/payment-gatewaysGET /superadmin/seo-settingsPUT /superadmin/seo-settingsPUT /superadmin/settings/maintenance-mode
+
+Activity Logs
+GET /superadmin/activity-logsGET /superadmin/activity-logs/{id}
+
+3. Franchise Admin APIs
+Prefix:
+/api/franchise
+Middleware:
+auth:sanctumrole:franchise_admin
+Important rule:
+Every franchise API must use logged_in_franchise_id.Franchise admin should not pass franchise_id manually for security.Backend should get franchise_id from authenticated user.
+
+Franchise Dashboard
+GET /franchise/dashboard/statsGET /franchise/dashboard/sales-graphGET /franchise/dashboard/orders-graphGET /franchise/dashboard/stock-overviewGET /franchise/dashboard/top-productsGET /franchise/dashboard/payment-overviewGET /franchise/dashboard/recent-ordersGET /franchise/dashboard/recent-stock-requests
+
+My Orders
+GET  /franchise/ordersGET  /franchise/orders/{id}PUT  /franchise/orders/{id}/statusPOST /franchise/orders/{id}/cancel-requestGET  /franchise/orders/{id}/invoice
+Update Order Status Payload
+{  "status": "packed",  "note": "Order packed by franchise"}
+
+Assigned Products
+GET /franchise/productsGET /franchise/products/{id}PUT /franchise/products/{id}/local-pricePUT /franchise/products/{id}/enablePUT /franchise/products/{id}/disable
+Local Price Payload
+{  "selling_price": 999}
+Only allow this if Super Admin gives permission.
+
+Buy Stock / Stock Requests
+GET  /franchise/stock-requestsPOST /franchise/stock-requestsGET  /franchise/stock-requests/{id}POST /franchise/stock-requests/{id}/upload-payment-proofPOST /franchise/stock-requests/{id}/cancel
+Create Stock Request Payload
+{  "items": [    {      "product_id": 1,      "variant_id": 3,      "quantity": 20    },    {      "product_id": 2,      "variant_id": 5,      "quantity": 10    }  ],  "payment_method": "bank_transfer",  "note": "Need stock urgently"}
+
+My Inventory
+GET /franchise/inventoryGET /franchise/inventory/{product_id}GET /franchise/inventory/low-stockGET /franchise/inventory/transactionsPOST /franchise/inventory/report-damaged
+Report Damaged Stock Payload
+{  "product_id": 1,  "variant_id": 3,  "quantity": 2,  "reason": "Damaged during delivery"}
+
+My Customers
+GET /franchise/customersGET /franchise/customers/{id}GET /franchise/customers/{id}/orders
+
+Returns & Refunds
+GET /franchise/returnsGET /franchise/returns/{id}PUT /franchise/returns/{id}/pickup-statusPUT /franchise/returns/{id}/receivedPOST /franchise/returns/{id}/condition-report
+Product Condition Payload
+{  "condition": "sellable",  "note": "Product received in good condition"}
+
+Payments / Wallet
+GET /franchise/walletGET /franchise/wallet/transactionsGET /franchise/paymentsGET /franchise/payments/{id}GET /franchise/invoicesGET /franchise/invoices/{id}/download
+
+Reports & Analytics
+GET /franchise/reports/salesGET /franchise/reports/ordersGET /franchise/reports/inventoryGET /franchise/reports/stock-requestsGET /franchise/reports/paymentsGET /franchise/reports/profitGET /franchise/reports/customersGET /franchise/reports/returnsGET /franchise/reports/top-products
+Example:
+GET /franchise/reports/sales?from=2026-05-01&to=2026-05-10
+
+Service Area
+GET  /franchise/service-areaPOST /franchise/service-area/change-requestGET  /franchise/service-area/change-requestsGET  /franchise/service-area/change-requests/{id}
+Area Change Request Payload
+{  "requested_state": "Uttar Pradesh",  "requested_city": "Noida",  "requested_area": "Sector 62",  "requested_pincode": "201309",  "reason": "Want to expand delivery area"}
+
+Notifications
+GET /franchise/notificationsPUT /franchise/notifications/{id}/readPUT /franchise/notifications/read-all
+
+Support Tickets
+GET  /franchise/support-ticketsPOST /franchise/support-ticketsGET  /franchise/support-tickets/{id}POST /franchise/support-tickets/{id}/replyPUT  /franchise/support-tickets/{id}/close
+Create Ticket Payload
+{  "category": "Stock Issue",  "subject": "Stock request not approved",  "message": "Please check my pending stock request."}
+
+Business Profile
+GET /franchise/profilePUT /franchise/profilePOST /franchise/profile/upload-documentGET /franchise/profile/documents
+Update Profile Payload
+{  "franchise_name": "FitWear Ghaziabad",  "owner_name": "Rahul Sharma",  "mobile": "9876543210",  "whatsapp": "9876543210",  "email": "rahul@example.com",  "gst_number": "09ABCDE1234F1Z5",  "pan_number": "ABCDE1234F",  "address": "Raj Nagar Extension",  "city": "Ghaziabad",  "state": "Uttar Pradesh",  "pincode": "201017"}
+
+Franchise Activity Logs
+GET /franchise/activity-logsGET /franchise/activity-logs/{id}
+
+4. Public Franchise Enquiry APIs
+These are for users who want to buy your franchise.
+POST /franchise-enquiryGET  /statesGET  /states/{state_id}/citiesGET  /cities/{city_id}/pincodes
+Franchise Enquiry Payload
+{  "full_name": "Rahul Sharma",  "mobile": "9876543210",  "whatsapp": "9876543210",  "email": "rahul@example.com",  "preferred_state": "Uttar Pradesh",  "preferred_city": "Ghaziabad",  "investment_budget": "5 lakh to 10 lakh",  "business_experience": "3 years",  "has_shop": true,  "message": "I want to buy a sportswear franchise."}
+
+5. Suggested Laravel Route Group
+Route::prefix('superadmin')    ->middleware(['auth:sanctum', 'role:superadmin'])    ->group(function () {        Route::get('/dashboard/stats', [SuperAdminDashboardController::class, 'stats']);        Route::apiResource('/products', ProductController::class);        Route::apiResource('/categories', CategoryController::class);        Route::apiResource('/orders', SuperAdminOrderController::class);        Route::apiResource('/franchises', FranchiseController::class);        Route::get('/stock-requests', [StockRequestController::class, 'index']);    });Route::prefix('franchise')    ->middleware(['auth:sanctum', 'role:franchise_admin'])    ->group(function () {        Route::get('/dashboard/stats', [FranchiseDashboardController::class, 'stats']);        Route::get('/orders', [FranchiseOrderController::class, 'index']);        Route::put('/orders/{id}/status', [FranchiseOrderController::class, 'updateStatus']);        Route::get('/products', [FranchiseProductController::class, 'index']);        Route::get('/inventory', [FranchiseInventoryController::class, 'index']);        Route::post('/stock-requests', [FranchiseStockRequestController::class, 'store']);    });
+
+6. Most Important Backend Security Rule
+For Franchise Admin APIs, never trust frontend franchise_id.
+Use this backend logic:
+$franchiseId = auth()->user()->franchise->id;
+Then filter everything:
+Order::where('franchise_id', $franchiseId)->get();
+This prevents one franchise admin from accessing another franchise’s orders, customers, inventory, and payments.

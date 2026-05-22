@@ -12,6 +12,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        
+        // 🚀 Register Middleware Aliases
+        $middleware->alias([
+            'franchise' => \App\Http\Middleware\EnsureIsFranchise::class,
+            'super_admin' => \App\Http\Middleware\SuperAdminMiddleware::class, // 👈 Yeh line add ki hai
+        ]);
+
         // 🚀 CSRF Bypass for Postman Testing
         $middleware->validateCsrfTokens(except: [
             'login',

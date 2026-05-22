@@ -1,193 +1,400 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Link, useForm } from '@inertiajs/react';
-import { ArrowRight, BadgeCheck, Dumbbell, Store, AlertCircle, ChevronLeft } from 'lucide-react';
+import React, { useState } from 'react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { AlertCircle, ArrowRight, ChevronLeft, Dumbbell, Eye, EyeOff, Globe, ShieldCheck, Smartphone } from 'lucide-react';
 
 const brandFeatures = [
-  { icon: Store, text: 'Retail & franchise platform in one place' },
-  { icon: Dumbbell, text: 'Premium sportswear collections' },
-  { icon: BadgeCheck, text: 'Live SKU inventory & smart checkout' },
+  { icon: Globe, text: 'Track orders and wishlist faster' },
+  { icon: Dumbbell, text: 'Access performance collections' },
+  { icon: ShieldCheck, text: 'Protected checkout and account security' },
 ];
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
-};
+export default function Login({ otpMode = false, status = null }) {
+  const { data, setData, post, processing, errors } = useForm({
+    email: '',
+    password: '',
+    remember: false,
+    captcha_token: '',
+    otp: '',
+  });
 
-const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
-};
+  const [loginStatus, setLoginStatus] = useState('Login');
+  const [showPassword, setShowPassword] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotIdentifier, setForgotIdentifier] = useState('');
+  const [helperMessage, setHelperMessage] = useState(status || '');
+  const [mobileOtpOpen, setMobileOtpOpen] = useState(false);
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [mobileOtp, setMobileOtp] = useState('');
+  const [mobileStep, setMobileStep] = useState('request');
+  const [mobileProcessing, setMobileProcessing] = useState(false);
+  const [googleProcessing, setGoogleProcessing] = useState(false);
 
-export default function Login() {
-  const { data, setData, post, processing, errors } = useForm({ email: '', password: '' });
+  const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+  const jsonHeaders = () => ({
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'X-CSRF-TOKEN': csrfToken(),
+    'X-Requested-With': 'XMLHttpRequest',
+  });
 
-  function submit(event) {
+  const submit = (event) => {
     event.preventDefault();
-    post('/login', { preserveScroll: true });
-  }
+    setLoginStatus(otpMode ? 'Verifying OTP...' : 'Authenticating...');
+
+    post(otpMode ? '/login/otp' : '/login', {
+      preserveScroll: true,
+      onSuccess: () => setLoginStatus('Securing your workspace...'),
+      onError: () => setLoginStatus('Login'),
+    });
+  };
+
+  const requestForgotPassword = async () => {
+    if (!forgotIdentifier) {
+      setHelperMessage('Enter your email or mobile number first.');
+      return;
+    }
+
+    const response = await fetch('/api/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ identifier: forgotIdentifier }),
+    });
+    const payload = await response.json();
+    setHelperMessage(payload.message || 'If this account exists, reset instructions have been sent.');
+  };
+
+  const requestMobileOtp = async () => {
+    if (!/^[6-9][0-9]{9}$/.test(mobileNumber)) {
+      setHelperMessage('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+
+    setMobileProcessing(true);
+    const response = await fetch('/login/mobile-otp', {
+      method: 'POST',
+      headers: jsonHeaders(),
+      body: JSON.stringify({ mobile_number: mobileNumber }),
+    });
+    const payload = await response.json();
+    setMobileProcessing(false);
+    if (response.ok) {
+      setMobileStep('verify');
+    }
+    setHelperMessage(payload.message || 'If this mobile number exists, an OTP has been sent.');
+  };
+
+  const verifyMobileOtp = async () => {
+    if (!/^[0-9]{6}$/.test(mobileOtp)) {
+      setHelperMessage('Please enter the 6-digit OTP.');
+      return;
+    }
+
+    setMobileProcessing(true);
+    const response = await fetch('/login/mobile-otp/verify', {
+      method: 'POST',
+      headers: jsonHeaders(),
+      body: JSON.stringify({ mobile_number: mobileNumber, otp: mobileOtp }),
+    });
+    const payload = await response.json();
+    setMobileProcessing(false);
+    setHelperMessage(payload.message || (response.ok ? 'OTP verified.' : 'Invalid OTP.'));
+
+    if (response.ok && payload.redirect) {
+      window.location.href = payload.redirect;
+    }
+  };
+
+  const continueWithGoogle = async () => {
+    setGoogleProcessing(true);
+    const response = await fetch('/auth/google/status', { headers: { Accept: 'application/json' } });
+    const payload = await response.json();
+    setGoogleProcessing(false);
+
+    if (payload.configured && payload.redirect) {
+      window.location.href = payload.redirect;
+      return;
+    }
+
+    setHelperMessage(payload.message || 'Google login is not available right now.');
+  };
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-[1fr_480px] xl:grid-cols-[1fr_540px] bg-[#f9f8f6] font-sans">
+    <div className="grid min-h-screen bg-white font-sans selection:bg-[#1E293B] selection:text-white lg:grid-cols-[1fr_540px] xl:grid-cols-[1fr_620px]">
+      <Head title={otpMode ? 'Verify OTP | IHO Studio' : 'Login | IHO Studio'} />
 
-      {/* 🚀 Premium Brand Panel (Left Side) */}
-      <div className="relative hidden overflow-hidden bg-[#1A1A2E] lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(233,78,60,0.15),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(26,26,46,0.8),transparent_60%)]" />
-
-        {/* Logo */}
-        <motion.div
-          className="relative flex items-center gap-3 z-10"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <span className="grid size-11 place-items-center bg-gradient-to-tr from-[#E94E3C] to-[#c0392b] text-[11px] font-black tracking-widest text-white shadow-lg shadow-[#E94E3C]/20 rounded-xl">
-            IHO
-          </span>
+      <aside className="relative hidden overflow-hidden bg-[#0F172A] p-16 text-white lg:flex lg:flex-col lg:justify-between">
+        <div className="absolute left-0 top-0 h-[720px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/5 blur-[120px]" />
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="grid size-12 place-items-center bg-white text-xs font-black tracking-widest text-[#0F172A]">IHO</div>
           <div>
-            <p className="font-black text-white text-xl tracking-tighter uppercase leading-none">IHO<span className="font-light text-slate-400">CLOTHING</span></p>
-            <p className="text-[9px] font-black tracking-[0.2em] text-[#E94E3C] uppercase mt-0.5">Retail & Franchise Platform</p>
+            <p className="text-2xl font-black uppercase italic leading-none tracking-tighter">IHO<span className="font-light text-slate-400">STUDIO</span></p>
+            <p className="mt-1 text-[8px] font-black uppercase tracking-[0.4em] text-[#94A3B8]">Retail & Franchise Network</p>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Main Content */}
-        <motion.div className="relative z-10" variants={stagger} initial="hidden" animate="visible">
-          <motion.p className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-[#E94E3C]" variants={fadeUp}>
-            Welcome back
-          </motion.p>
-          <motion.h1 className="text-5xl font-black leading-[1.1] text-white xl:text-6xl tracking-tighter uppercase" variants={fadeUp}>
-            Sign in to <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">your account</span>
-          </motion.h1>
-          <motion.p className="mt-6 max-w-sm text-sm font-medium leading-relaxed text-gray-400" variants={fadeUp}>
-            Access your profile, shop premium sportswear, and manage your IHO partnerships securely.
-          </motion.p>
-
-          <motion.ul className="mt-10 grid gap-4" variants={stagger}>
+        <div className="relative z-10">
+          <p className="mb-6 text-[10px] font-black uppercase tracking-[0.4em] text-[#94A3B8]">Customer and partner access</p>
+          <h1 className="text-5xl font-black uppercase leading-[1.05] tracking-tighter xl:text-7xl">
+            Login to <br />
+            <span className="italic text-slate-400">IHO Studio</span>
+          </h1>
+          <p className="mt-8 max-w-sm text-xs font-bold uppercase leading-loose tracking-widest text-slate-400">
+            Track orders, manage wishlist, checkout faster, and access secure franchise operations.
+          </p>
+          <ul className="mt-12 grid gap-5">
             {brandFeatures.map(({ icon: Icon, text }) => (
-              <motion.li key={text} className="flex items-center gap-4 group" variants={fadeUp}>
-                <div className="grid size-10 place-items-center rounded-xl bg-white/5 border border-white/10 group-hover:bg-[#E94E3C]/20 group-hover:border-[#E94E3C]/30 transition-all">
-                  <Icon size={18} className="text-gray-400 group-hover:text-[#E94E3C] transition-colors" />
+              <li key={text} className="flex items-center gap-4">
+                <div className="grid size-11 place-items-center border border-slate-700 bg-white/5">
+                  <Icon size={17} className="text-slate-300" />
                 </div>
-                <span className="text-sm font-bold text-gray-300 group-hover:text-white transition-colors">{text}</span>
-              </motion.li>
+                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-300">{text}</span>
+              </li>
             ))}
-          </motion.ul>
-        </motion.div>
+          </ul>
+        </div>
 
-        {/* Bottom */}
-        <motion.p className="relative z-10 text-[10px] font-black tracking-widest uppercase text-gray-500" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
-          © {new Date().getFullYear()} IHO Clothing. All rights reserved.
-        </motion.p>
-      </div>
+        <p className="relative z-10 text-[9px] font-black uppercase tracking-[0.3em] text-slate-500">
+          © {new Date().getFullYear()} IHO Studio. All rights reserved.
+        </p>
+      </aside>
 
-      {/* 🚀 Form Panel (Right Side) */}
-      <div className="flex items-center justify-center p-6 sm:p-12 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#E94E3C]/5 to-transparent rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/3"></div>
+      <main className="relative flex items-center justify-center overflow-hidden bg-white p-8 sm:p-14">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: 'linear-gradient(#1E293B 1px, transparent 1px), linear-gradient(90deg, #1E293B 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+          }}
+        />
 
-        <motion.div
-          className="w-full max-w-sm"
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-        >
-          {/* Mobile Logo */}
-          <Link href="/" className="mb-10 flex items-center gap-3 lg:hidden">
-            <span className="grid size-10 place-items-center bg-gradient-to-tr from-[#E94E3C] to-[#c0392b] text-[10px] font-black tracking-widest text-white shadow-lg shadow-[#E94E3C]/20 rounded-xl">
-              IHO
-            </span>
-            <span className="font-black text-[#1A1A2E] text-xl tracking-tighter uppercase leading-none">IHO<span className="font-light text-gray-400">CLOTHING</span></span>
+        <div className="relative z-10 w-full max-w-sm">
+          <Link href="/" className="mb-10 flex items-center gap-4 lg:hidden">
+            <div className="grid size-10 place-items-center bg-[#0F172A] text-xs font-black tracking-widest text-white">IHO</div>
+            <span className="text-2xl font-black uppercase italic tracking-tighter text-[#1E293B]">Studio</span>
           </Link>
 
           <div className="mb-10">
-            <h2 className="text-3xl font-black text-[#1A1A2E] tracking-tighter uppercase">
-              Secure Login
+            <h2 className="border-l-4 border-black pl-4 text-3xl font-black uppercase italic tracking-tighter text-[#1E293B]">
+              {otpMode ? 'OTP Verification' : 'Login to Your Account'}
             </h2>
-            <p className="mt-2 text-sm font-bold text-gray-400">
-              Enter your credentials to access the platform.
+            <p className="mt-3 text-[10px] font-black uppercase tracking-[0.2em] text-[#94A3B8]">
+              {otpMode ? 'Enter the code sent to your registered contact.' : 'Track orders, manage wishlist, and checkout faster.'}
             </p>
           </div>
 
-          <form onSubmit={submit} className="grid gap-5">
-            <FormField label="Email Address" error={errors.email}>
-              <input
-                className={`w-full bg-white border ${errors.email ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-200'} rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-[#E94E3C] focus:border-transparent transition-all outline-none font-bold text-[#1A1A2E] shadow-sm`}
-                type="email"
-                name="email"
-                value={data.email}
-                autoComplete="username"
-                placeholder="customer@example.com"
-                onChange={(e) => setData('email', e.target.value)}
-                required
-              />
-            </FormField>
+          {helperMessage && (
+            <div className="mb-6 border border-slate-200 bg-slate-50 p-4 text-[10px] font-bold uppercase tracking-widest text-[#1E293B]">
+              {helperMessage}
+            </div>
+          )}
 
-            <FormField label="Password" error={errors.password}>
-              <input
-                className={`w-full bg-white border ${errors.password ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-200'} rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-[#E94E3C] focus:border-transparent transition-all outline-none font-bold text-[#1A1A2E] shadow-sm tracking-widest`}
-                type="password"
-                name="password"
-                value={data.password}
-                autoComplete="current-password"
-                placeholder="••••••••"
-                onChange={(e) => setData('password', e.target.value)}
-                required
-              />
-            </FormField>
+          <form onSubmit={submit} className="grid gap-6">
+            {otpMode ? (
+              <FormField label="Security OTP" error={errors.otp}>
+                <input
+                  className={`form-input tracking-[0.35em] ${errors.otp ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'}`}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={data.otp}
+                  placeholder="000000"
+                  onChange={(e) => setData('otp', e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  required
+                />
+              </FormField>
+            ) : (
+              <>
+                <FormField label="Email Address" error={errors.email}>
+                  <input
+                    className={`form-input ${errors.email ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'}`}
+                    type="email"
+                    value={data.email}
+                    autoComplete="username"
+                    placeholder="customer@ihostudio.com"
+                    onChange={(e) => setData('email', e.target.value)}
+                    required
+                  />
+                </FormField>
+
+                <FormField label="Password" error={errors.password}>
+                  <div className="relative">
+                    <input
+                      className={`form-input pr-14 ${errors.password ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'}`}
+                      type={showPassword ? 'text' : 'password'}
+                      value={data.password}
+                      autoComplete="current-password"
+                      placeholder="Password"
+                      onChange={(e) => setData('password', e.target.value)}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 grid w-12 place-items-center text-slate-400 hover:text-[#1E293B]"
+                      title={showPassword ? 'Hide Password' : 'Show Password'}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </FormField>
+
+                <div className="flex items-center justify-between gap-4">
+                  <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    <input
+                      type="checkbox"
+                      checked={data.remember}
+                      onChange={(e) => setData('remember', e.target.checked)}
+                      className="size-4 rounded-none border-slate-300 text-[#1E293B] focus:ring-[#1E293B]"
+                    />
+                    Remember Me
+                  </label>
+                  <button type="button" onClick={() => setForgotOpen(!forgotOpen)} className="text-[10px] font-black uppercase tracking-widest text-[#1E293B] underline decoration-dotted">
+                    Forgot Password?
+                  </button>
+                </div>
+
+                {errors.captcha && (
+                  <label className="flex items-center gap-2 border border-amber-200 bg-amber-50 p-4 text-[10px] font-black uppercase tracking-widest text-amber-700">
+                    <input
+                      type="checkbox"
+                      checked={data.captcha_token === 'confirmed'}
+                      onChange={(e) => setData('captcha_token', e.target.checked ? 'confirmed' : '')}
+                      className="size-4"
+                    />
+                    I am not a robot
+                  </label>
+                )}
+              </>
+            )}
 
             <button
               disabled={processing}
-              className="button-glow mt-2 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-[#1A1A2E] px-5 text-xs font-black tracking-widest uppercase text-white transition-all hover:bg-[#E94E3C] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#E94E3C]/30 disabled:opacity-60 disabled:hover:transform-none"
+              className="mt-2 flex min-h-[56px] w-full items-center justify-center gap-3 bg-[#000000] px-6 text-[10px] font-black uppercase tracking-[0.3em] text-white shadow-2xl shadow-black/10 transition-all duration-500 hover:bg-[#1E293B] disabled:opacity-50"
               type="submit"
             >
-              {processing ? 'Authenticating…' : 'Access Account'}
-              {!processing && <ArrowRight size={16} strokeWidth={2.5} />}
+              {processing ? loginStatus : otpMode ? 'Verify OTP' : 'Login'}
+              {!processing && <ArrowRight size={16} strokeWidth={2} />}
             </button>
           </form>
 
-          {/* 🟢 CUSTOMER REGISTRATION LINK */}
-          <p className="mt-6 text-center text-sm font-bold text-gray-500">
-            New customer?{' '}
-            <Link href="/register" className="font-black text-[#1A1A2E] hover:text-[#E94E3C] transition-colors hover:underline">
-              Create an account
-            </Link>
-          </p>
+          {!otpMode && forgotOpen && (
+            <div className="mt-6 border border-slate-200 bg-white p-5">
+              <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-[#1E293B]">Forgot Password</p>
+              <p className="mb-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Enter email/mobile, receive OTP or reset link, create a new password, then login again.</p>
+              <div className="flex gap-2">
+                <input
+                  value={forgotIdentifier}
+                  onChange={(e) => setForgotIdentifier(e.target.value)}
+                  placeholder="Email or mobile"
+                  className="min-w-0 flex-1 border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold outline-none focus:border-black"
+                />
+                <button type="button" onClick={requestForgotPassword} className="bg-[#1E293B] px-4 py-3 text-[9px] font-black uppercase tracking-widest text-white">
+                  Send
+                </button>
+              </div>
+            </div>
+          )}
 
-          <div className="mt-8 flex items-center gap-3 opacity-60">
-            <div className="h-px flex-1 bg-gray-300" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">OR</span>
-            <div className="h-px flex-1 bg-gray-300" />
+          {!otpMode && (
+            <div className="mt-6 grid gap-3">
+              <button type="button" onClick={() => setMobileOtpOpen(!mobileOtpOpen)} className="flex items-center justify-center gap-3 border border-slate-200 bg-white px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#1E293B] hover:border-[#1E293B]">
+                <Smartphone size={14} /> Login with Mobile OTP
+              </button>
+              <button type="button" onClick={continueWithGoogle} disabled={googleProcessing} className="flex items-center justify-center gap-3 border border-slate-200 bg-white px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#1E293B] hover:border-[#1E293B] disabled:opacity-50">
+                {googleProcessing ? 'Checking Google...' : 'Continue with Google'}
+              </button>
+            </div>
+          )}
+
+          {!otpMode && mobileOtpOpen && (
+            <div className="mt-6 border border-slate-200 bg-white p-5">
+              <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-[#1E293B]">Mobile OTP Login</p>
+              <div className="grid gap-3">
+                <input
+                  value={mobileNumber}
+                  onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  placeholder="10-digit mobile number"
+                  className="border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold outline-none focus:border-black"
+                />
+                {mobileStep === 'verify' && (
+                  <input
+                    value={mobileOtp}
+                    onChange={(e) => setMobileOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="Enter OTP"
+                    className="border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold tracking-[0.35em] outline-none focus:border-black"
+                  />
+                )}
+                <button
+                  type="button"
+                  onClick={mobileStep === 'verify' ? verifyMobileOtp : requestMobileOtp}
+                  disabled={mobileProcessing}
+                  className="bg-[#1E293B] px-4 py-3 text-[9px] font-black uppercase tracking-widest text-white disabled:opacity-50"
+                >
+                  {mobileProcessing ? 'Please wait...' : mobileStep === 'verify' ? 'Verify OTP' : 'Send OTP'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-8 text-center">
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8]">
+              New customer?{' '}
+              <Link href="/register" className="ml-1 border-b border-[#1E293B] pb-0.5 text-[#1E293B] hover:text-slate-500">
+                Create Account
+              </Link>
+            </p>
           </div>
 
-          {/* 🟢 FRANCHISE APPLICATION HIGHLIGHT BOX */}
-          <div className="mt-8 rounded-2xl bg-[#E94E3C]/5 border border-[#E94E3C]/20 p-5 text-center group hover:bg-[#E94E3C]/10 transition-colors">
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">Business Opportunity</p>
-            <p className="text-sm font-bold text-[#1A1A2E] mb-3">Want to start your own IHO store?</p>
-            <Link href="/franchise/apply" className="inline-flex items-center gap-2 text-xs font-black tracking-widest text-white uppercase bg-[#E94E3C] px-6 py-2.5 rounded-full hover:bg-[#c0392b] hover:shadow-lg hover:shadow-[#E94E3C]/30 transition-all hover:-translate-y-0.5">
-              Apply for Franchise <ArrowRight size={14} strokeWidth={2.5} />
+          <div className="mt-10 border border-slate-200 bg-slate-50/50 p-7 text-center transition-colors duration-500 hover:border-[#1E293B]">
+            <p className="mb-2 text-[9px] font-black uppercase tracking-[0.4em] text-[#94A3B8]">Partner Program</p>
+            <p className="mb-2 text-sm font-black uppercase tracking-wide text-[#1E293B]">Want to become a franchise partner?</p>
+            <p className="mb-6 text-[10px] font-bold uppercase tracking-widest text-slate-400">After approval, Super Admin will create or approve your franchise admin login.</p>
+            <Link href="/franchise-enquiry" className="inline-flex w-full items-center justify-center border border-[#1E293B] px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B] transition-all hover:bg-[#1E293B] hover:text-white">
+              Apply for Franchise
             </Link>
           </div>
 
-          <p className="mt-8 text-center text-[10px] font-black uppercase tracking-widest text-gray-400">
-            <Link href="/" className="hover:text-[#1A1A2E] transition-colors flex items-center justify-center gap-1">
-              <ChevronLeft size={12} /> Back to storefront
+          <p className="mt-10 text-center">
+            <Link href="/" className="inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] text-[#94A3B8] transition-colors hover:text-[#1E293B]">
+              <ChevronLeft size={14} strokeWidth={2.5} /> Return to Storefront
             </Link>
           </p>
-        </motion.div>
-      </div>
+        </div>
+      </main>
+
+      <style>{`
+        .form-input {
+          width: 100%;
+          background: #F8FAFC;
+          border-width: 1px;
+          padding: 1rem 1.25rem;
+          font-size: 0.875rem;
+          font-weight: 700;
+          color: #1E293B;
+          outline: none;
+          transition: all 0.2s ease;
+        }
+        .form-input:focus {
+          border-color: #000;
+          background: #fff;
+          box-shadow: 0 0 0 1px #000;
+        }
+        .form-input::placeholder {
+          color: #CBD5E1;
+        }
+      `}</style>
     </div>
   );
 }
 
 function FormField({ label, error, children }) {
   return (
-    <label className="grid gap-2">
-      <span className="text-xs font-black uppercase tracking-widest text-gray-500">{label}</span>
+    <label className="relative grid gap-2.5">
+      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B]">{label}</span>
       {children}
       {error && (
-        <span className="text-[10px] font-bold tracking-wide text-red-500 flex items-center gap-1 uppercase mt-0.5">
-          <AlertCircle size={12} strokeWidth={2.5} /> {error}
+        <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-red-500">
+          <AlertCircle size={10} strokeWidth={3} /> {error}
         </span>
       )}
     </label>

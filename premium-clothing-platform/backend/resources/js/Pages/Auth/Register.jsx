@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useForm } from '@inertiajs/react';
-import { ArrowRight, BadgeCheck, Dumbbell, Store, AlertCircle, ChevronLeft } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Dumbbell, Globe, AlertCircle, ChevronLeft } from 'lucide-react';
 
 const brandFeatures = [
-  { icon: Store, text: 'Apply for IHO franchise partnership' },
-  { icon: Dumbbell, text: 'Shop premium sportswear collections' },
-  { icon: BadgeCheck, text: 'Track orders with live inventory data' },
+  { icon: Globe, text: 'Unified Global Retail Platform' },
+  { icon: Dumbbell, text: 'Exclusive Performance Collections' },
+  { icon: ShieldCheck, text: 'Secure Studio Profile & Vault' },
 ];
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.36, 1] } },
 };
 
 const stagger = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.15, delayChildren: 0.2 } },
 };
 
 export default function Register() {
@@ -37,10 +37,10 @@ export default function Register() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
     const phoneRegex = /^[6-9]\d{9}$/;
 
-    if (!data.name.trim() || data.name.length < 3) errs.name = "Enter a valid full name (min 3 chars).";
-    if (!data.email || !emailRegex.test(data.email)) errs.email = "Enter a valid email address.";
-    if (!data.mobile_number || !phoneRegex.test(data.mobile_number)) errs.mobile_number = "Enter a valid 10-digit mobile number starting with 6-9.";
-    if (data.password.length < 8) errs.password = "Password must be at least 8 characters.";
+    if (!data.name.trim() || data.name.length < 3) errs.name = "Valid full name required.";
+    if (!data.email || !emailRegex.test(data.email)) errs.email = "Valid email address required.";
+    if (!data.mobile_number || !phoneRegex.test(data.mobile_number)) errs.mobile_number = "Valid 10-digit mobile required.";
+    if (data.password.length < 8) errs.password = "Minimum 8 characters required.";
     if (data.password !== data.password_confirmation) errs.password_confirmation = "Passwords do not match.";
 
     setLocalErrors(errs);
@@ -54,104 +54,140 @@ export default function Register() {
     }
   }
 
-  // Strict Handlers to prevent garbage typing
+  // 🚀 Strict Handlers with Real-time Error Clearing
   const handleNameChange = (e) => {
-    const value = e.target.value.replace(/[^a-zA-Z\s]/g, ''); // Only letters and spaces
+    const value = e.target.value.replace(/[^a-zA-Z\s]/g, '');
     setData('name', value);
+    if (localErrors.name) setLocalErrors({ ...localErrors, name: null });
   };
 
   const handleMobileChange = (e) => {
-    const value = e.target.value.replace(/\D/g, '').slice(0, 10); // Only numbers, max 10
+    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
     setData('mobile_number', value);
+    if (localErrors.mobile_number) setLocalErrors({ ...localErrors, mobile_number: null });
+  };
+
+  const handleGeneralChange = (field, value) => {
+    setData(field, value);
+    if (localErrors[field]) setLocalErrors({ ...localErrors, [field]: null });
   };
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-[1fr_480px] xl:grid-cols-[1fr_540px] bg-[#f9f8f6] font-sans">
+    <div className="grid min-h-screen lg:grid-cols-[1fr_500px] xl:grid-cols-[1fr_600px] bg-white font-sans selection:bg-[#1E293B] selection:text-white">
 
-      {/* 🚀 Premium Brand Panel (Left Side) */}
-      <div className="relative hidden overflow-hidden bg-[#1A1A2E] lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(233,78,60,0.15),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(26,26,46,0.8),transparent_60%)]" />
+      {/* 🚀 Premium Brand Panel (Left Side - Deep Slate) */}
+      <div className="relative hidden overflow-hidden bg-[#0F172A] lg:flex lg:flex-col lg:justify-between lg:p-16 border-r border-slate-800">
 
+        {/* ❄️ Subtle Metallic Background Glow */}
+        <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-white/5 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-slate-600/10 rounded-full blur-[100px] translate-x-1/3 translate-y-1/3 pointer-events-none" />
+
+        {/* Ghost Typography Background */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden opacity-[0.03]">
+          <h2 className="text-[25vw] font-black text-white uppercase tracking-tighter leading-none">
+            STUDIO
+          </h2>
+        </div>
+
+        {/* Logo */}
         <motion.div
-          className="relative flex items-center gap-3 z-10"
+          className="relative flex items-center gap-4 z-10"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <span className="grid size-11 place-items-center bg-gradient-to-tr from-[#E94E3C] to-[#c0392b] text-[11px] font-black tracking-widest text-white shadow-lg shadow-[#E94E3C]/20 rounded-xl">
+          <div className="grid size-12 place-items-center bg-white text-[#0F172A] font-black text-xs tracking-widest shadow-xl">
             IHO
-          </span>
+          </div>
           <div>
-            <p className="font-black text-white text-xl tracking-tighter uppercase leading-none">IHO<span className="font-light text-slate-400">CLOTHING</span></p>
-            <p className="text-[9px] font-black tracking-[0.2em] text-[#E94E3C] uppercase mt-0.5">Retail & Franchise Platform</p>
+            <p className="font-black text-white text-2xl tracking-tighter uppercase leading-none italic">
+              IHO<span className="font-light text-slate-400">STUDIO</span>
+            </p>
+            <p className="text-[8px] font-black tracking-[0.4em] text-[#94A3B8] uppercase mt-1">Retail & Franchise Network</p>
           </div>
         </motion.div>
 
+        {/* Main Content */}
         <motion.div className="relative z-10" variants={stagger} initial="hidden" animate="visible">
-          <motion.p className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-[#E94E3C]" variants={fadeUp}>
-            Get started
-          </motion.p>
-          <motion.h1 className="text-5xl font-black leading-[1.1] text-white xl:text-6xl tracking-tighter uppercase" variants={fadeUp}>
-            Join the <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">IHO Family</span>
-          </motion.h1>
-          <motion.p className="mt-6 max-w-sm text-sm font-medium leading-relaxed text-gray-400" variants={fadeUp}>
-            One master account for shopping premium activewear and tracking your franchise applications.
+          <motion.p className="mb-6 text-[10px] font-black uppercase tracking-[0.4em] text-[#94A3B8]" variants={fadeUp}>
+            Initiation Protocol
           </motion.p>
 
-          <motion.ul className="mt-10 grid gap-4" variants={stagger}>
+          <motion.h1 className="text-5xl font-black leading-[1.1] text-white xl:text-7xl tracking-tighter uppercase" variants={fadeUp}>
+            JOIN <br />
+            <span className="text-transparent italic opacity-50" style={{ WebkitTextStroke: '2px white' }}>THE STUDIO</span>
+          </motion.h1>
+
+          <motion.p className="mt-8 max-w-sm text-xs font-bold uppercase tracking-widest leading-loose text-slate-400" variants={fadeUp}>
+            Create your master profile to acquire premium activewear and track your franchise operations from a unified command center.
+          </motion.p>
+
+          <motion.ul className="mt-14 grid gap-6" variants={stagger}>
             {brandFeatures.map(({ icon: Icon, text }) => (
-              <motion.li key={text} className="flex items-center gap-4 group" variants={fadeUp}>
-                <div className="grid size-10 place-items-center rounded-xl bg-white/5 border border-white/10 group-hover:bg-[#E94E3C]/20 group-hover:border-[#E94E3C]/30 transition-all">
-                  <Icon size={18} className="text-gray-400 group-hover:text-[#E94E3C] transition-colors" />
+              <motion.li key={text} className="flex items-center gap-5 group" variants={fadeUp}>
+                <div className="grid size-12 place-items-center border border-slate-700 bg-white/5 group-hover:bg-white group-hover:border-white transition-all duration-500">
+                  <Icon size={18} className="text-slate-400 group-hover:text-[#0F172A] transition-colors duration-500" strokeWidth={1.5} />
                 </div>
-                <span className="text-sm font-bold text-gray-300 group-hover:text-white transition-colors">{text}</span>
+                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-300 group-hover:text-white transition-colors duration-500">{text}</span>
               </motion.li>
             ))}
           </motion.ul>
         </motion.div>
 
-        <motion.p className="relative z-10 text-[10px] font-black tracking-widest uppercase text-gray-500" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
-          © {new Date().getFullYear()} IHO Clothing. All rights reserved.
-        </motion.p>
+        {/* Bottom */}
+        <motion.div className="relative z-10 flex items-center gap-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}>
+          <div className="h-[1px] w-12 bg-slate-700" />
+          <p className="text-[9px] font-black tracking-[0.3em] uppercase text-slate-500">
+            © {new Date().getFullYear()} IHO STUDIO. ALL RIGHTS RESERVED.
+          </p>
+        </motion.div>
       </div>
 
-      {/* 🚀 Form Panel (Right Side) */}
-      <div className="flex items-center justify-center p-6 sm:p-12 relative overflow-hidden h-screen overflow-y-auto custom-scrollbar">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#E94E3C]/5 to-transparent rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/3"></div>
+      {/* 🚀 Form Panel (Right Side - Light Theme) */}
+      <div className="flex items-start justify-center p-8 sm:p-16 relative overflow-hidden bg-white h-screen overflow-y-auto custom-scrollbar">
+
+        {/* Subtle background geometric pattern */}
+        <div className="absolute inset-0 z-[0] pointer-events-none opacity-[0.03]"
+          style={{
+            backgroundImage: `linear-gradient(#1E293B 1px, transparent 1px), linear-gradient(90deg, #1E293B 1px, transparent 1px)`,
+            backgroundSize: '40px 40px'
+          }}
+        />
 
         <motion.div
-          className="w-full max-w-sm py-10"
-          initial={{ opacity: 0, y: 24 }}
+          className="w-full max-w-sm relative z-10 py-10"
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
         >
-          <Link href="/" className="mb-10 flex items-center gap-3 lg:hidden">
-            <span className="grid size-10 place-items-center bg-gradient-to-tr from-[#E94E3C] to-[#c0392b] text-[10px] font-black tracking-widest text-white shadow-lg shadow-[#E94E3C]/20 rounded-xl">
+          {/* Mobile Logo */}
+          <Link href="/" className="mb-12 flex items-center gap-4 lg:hidden">
+            <div className="grid size-10 place-items-center bg-[#0F172A] text-white font-black text-xs tracking-widest shadow-xl">
               IHO
+            </div>
+            <span className="font-black text-[#1E293B] text-2xl tracking-tighter uppercase leading-none italic">
+              STUDIO
             </span>
-            <span className="font-black text-[#1A1A2E] text-xl tracking-tighter uppercase leading-none">IHO<span className="font-light text-gray-400">CLOTHING</span></span>
           </Link>
 
-          <div className="mb-10">
-            <h2 className="text-3xl font-black text-[#1A1A2E] tracking-tighter uppercase">
-              Create Account
+          <div className="mb-12">
+            <h2 className="text-3xl font-black text-[#1E293B] tracking-tighter uppercase italic border-l-4 border-black pl-4">
+              Registration
             </h2>
-            <p className="mt-2 text-sm font-bold text-gray-400">
-              Register securely to start your journey.
+            <p className="mt-3 text-[10px] font-black uppercase tracking-[0.2em] text-[#94A3B8]">
+              Establish your digital identity
             </p>
           </div>
 
-          <form onSubmit={submit} className="grid gap-5">
+          <form onSubmit={submit} className="grid gap-7">
             <FormField label="Full Name" error={errors.name}>
               <input
-                className={`w-full bg-white border ${errors.name ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-200'} rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-[#E94E3C] focus:border-transparent transition-all outline-none font-bold text-[#1A1A2E] shadow-sm placeholder:text-gray-300`}
+                className={`w-full bg-slate-50 border ${errors.name ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} rounded-none px-5 py-3.5 focus:ring-1 focus:ring-black focus:border-black transition-all outline-none font-bold text-[#1E293B] placeholder:text-slate-300 text-sm`}
                 type="text"
                 name="name"
                 value={data.name}
                 autoComplete="name"
-                placeholder="E.g. Rahul Sharma"
+                placeholder="E.g. Vikram Singh"
                 onChange={handleNameChange}
                 required
               />
@@ -159,25 +195,25 @@ export default function Register() {
 
             <FormField label="Email Address" error={errors.email}>
               <input
-                className={`w-full bg-white border ${errors.email ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-200'} rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-[#E94E3C] focus:border-transparent transition-all outline-none font-bold text-[#1A1A2E] shadow-sm placeholder:text-gray-300`}
+                className={`w-full bg-slate-50 border ${errors.email ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} rounded-none px-5 py-3.5 focus:ring-1 focus:ring-black focus:border-black transition-all outline-none font-bold text-[#1E293B] placeholder:text-slate-300 text-sm`}
                 type="email"
                 name="email"
                 value={data.email}
                 autoComplete="email"
-                placeholder="name@example.com"
-                onChange={(e) => setData('email', e.target.value.trim())}
+                placeholder="client@ihostudio.com"
+                onChange={(e) => handleGeneralChange('email', e.target.value.trim())}
                 required
               />
             </FormField>
 
             <FormField label="Mobile Number" error={errors.mobile_number}>
               <input
-                className={`w-full bg-white border ${errors.mobile_number ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-200'} rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-[#E94E3C] focus:border-transparent transition-all outline-none font-bold text-[#1A1A2E] shadow-sm placeholder:text-gray-300`}
+                className={`w-full bg-slate-50 border ${errors.mobile_number ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} rounded-none px-5 py-3.5 focus:ring-1 focus:ring-black focus:border-black transition-all outline-none font-bold text-[#1E293B] placeholder:text-slate-300 text-sm tracking-widest`}
                 type="tel"
                 name="mobile_number"
                 value={data.mobile_number}
                 autoComplete="tel"
-                placeholder="10-digit mobile number"
+                placeholder="10-DIGIT NUMBER"
                 onChange={handleMobileChange}
                 required
               />
@@ -185,84 +221,94 @@ export default function Register() {
 
             <FormField label="Password" error={errors.password}>
               <input
-                className={`w-full bg-white border ${errors.password ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-200'} rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-[#E94E3C] focus:border-transparent transition-all outline-none font-bold text-[#1A1A2E] shadow-sm tracking-widest placeholder:text-gray-300 placeholder:tracking-normal`}
+                className={`w-full bg-slate-50 border ${errors.password ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} rounded-none px-5 py-3.5 focus:ring-1 focus:ring-black focus:border-black transition-all outline-none font-black text-[#1E293B] placeholder:text-slate-300 tracking-[0.3em] text-sm`}
                 type="password"
                 name="password"
                 value={data.password}
                 autoComplete="new-password"
                 placeholder="••••••••"
-                onChange={(e) => setData('password', e.target.value)}
+                onChange={(e) => handleGeneralChange('password', e.target.value)}
                 required
               />
-              <p className="text-[10px] font-bold text-gray-400 mt-1">Use at least 8 characters (letters & numbers).</p>
             </FormField>
 
             <FormField label="Confirm Password" error={errors.password_confirmation}>
               <input
-                className={`w-full bg-white border ${errors.password_confirmation ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-200'} rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-[#E94E3C] focus:border-transparent transition-all outline-none font-bold text-[#1A1A2E] shadow-sm tracking-widest placeholder:text-gray-300 placeholder:tracking-normal`}
+                className={`w-full bg-slate-50 border ${errors.password_confirmation ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} rounded-none px-5 py-3.5 focus:ring-1 focus:ring-black focus:border-black transition-all outline-none font-black text-[#1E293B] placeholder:text-slate-300 tracking-[0.3em] text-sm`}
                 type="password"
                 name="password_confirmation"
                 value={data.password_confirmation}
                 autoComplete="new-password"
                 placeholder="••••••••"
-                onChange={(e) => setData('password_confirmation', e.target.value)}
+                onChange={(e) => handleGeneralChange('password_confirmation', e.target.value)}
                 required
               />
             </FormField>
 
             <button
               disabled={processing}
-              className="button-glow mt-4 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-[#1A1A2E] px-5 text-xs font-black tracking-widest uppercase text-white transition-all hover:bg-[#E94E3C] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#E94E3C]/30 disabled:opacity-60 disabled:hover:transform-none"
+              className="mt-4 flex min-h-[56px] w-full items-center justify-center gap-3 rounded-none bg-[#000000] px-6 text-[10px] font-black tracking-[0.3em] uppercase text-white transition-all duration-500 hover:bg-[#1E293B] disabled:opacity-50 shadow-2xl shadow-black/10 group"
               type="submit"
             >
-              {processing ? 'Creating account…' : 'Create Account'}
-              {!processing && <ArrowRight size={16} strokeWidth={2.5} />}
+              {processing ? 'Establishing Identity…' : 'Create Profile'}
+              {!processing && <ArrowRight size={16} strokeWidth={2} className="group-hover:translate-x-1 transition-transform" />}
             </button>
           </form>
 
           {/* 🟢 ALREADY REGISTERED */}
-          <p className="mt-8 text-center text-sm font-bold text-gray-500">
-            Already registered?{' '}
-            <Link href="/login" className="font-black text-[#1A1A2E] hover:text-[#E94E3C] transition-colors hover:underline">
-              Sign in
-            </Link>
-          </p>
-
-          <div className="mt-8 flex items-center gap-3 opacity-60">
-            <div className="h-px flex-1 bg-gray-300" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">OR</span>
-            <div className="h-px flex-1 bg-gray-300" />
+          <div className="mt-10 text-center">
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8]">
+              Existing Client?{' '}
+              <Link href="/login" className="text-[#1E293B] hover:text-slate-500 transition-colors border-b border-[#1E293B] hover:border-slate-500 pb-0.5 ml-1">
+                Authenticate Here
+              </Link>
+            </p>
           </div>
 
-          {/* 🟢 FRANCHISE APPLICATION HIGHLIGHT BOX */}
-          <div className="mt-8 rounded-2xl bg-[#E94E3C]/5 border border-[#E94E3C]/20 p-5 text-center group hover:bg-[#E94E3C]/10 transition-colors">
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">Business Opportunity</p>
-            <p className="text-sm font-bold text-[#1A1A2E] mb-3">Want to start your own IHO store?</p>
-            <Link href="/franchise/apply" className="inline-flex items-center gap-2 text-xs font-black tracking-widest text-white uppercase bg-[#E94E3C] px-6 py-2.5 rounded-full hover:bg-[#c0392b] hover:shadow-lg hover:shadow-[#E94E3C]/30 transition-all hover:-translate-y-0.5">
-              Apply for Franchise <ArrowRight size={14} strokeWidth={2.5} />
+          <div className="mt-10 flex items-center gap-4 opacity-40">
+            <div className="h-px flex-1 bg-slate-400" />
+            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-500">OR</span>
+            <div className="h-px flex-1 bg-slate-400" />
+          </div>
+
+          {/* 🟢 FRANCHISE APPLICATION HIGHLIGHT BOX (Boutique Style) */}
+          <div className="mt-10 border border-slate-200 bg-slate-50/50 p-8 text-center group hover:border-[#1E293B] transition-colors duration-500">
+            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#94A3B8] mb-2">Partner Program</p>
+            <p className="text-sm font-black text-[#1E293B] uppercase tracking-wide mb-6">Operate an IHO Studio</p>
+            <Link href="/franchise/apply" className="inline-flex items-center justify-center gap-3 text-[10px] font-black tracking-[0.2em] text-[#1E293B] uppercase border border-[#1E293B] px-8 py-3.5 hover:bg-[#1E293B] hover:text-white transition-all w-full">
+              Submit Application
             </Link>
           </div>
 
-          <p className="mt-8 text-center text-[10px] font-black uppercase tracking-widest text-gray-400">
-            <Link href="/" className="hover:text-[#1A1A2E] transition-colors flex items-center justify-center gap-1">
-              <ChevronLeft size={12} /> Back to storefront
+          <p className="mt-12 text-center pb-10">
+            <Link href="/" className="inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] text-[#94A3B8] hover:text-[#1E293B] transition-colors">
+              <ChevronLeft size={14} strokeWidth={2.5} /> Return to Storefront
             </Link>
           </p>
         </motion.div>
       </div>
+
+      {/* CSS for custom scrollbar so the form area scrolls smoothly */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+      `}} />
     </div>
   );
 }
 
-// 💎 Enhanced Form Field with Strict Error Styling
+// 💎 HELPER COMPONENT: Strict Minimalist Form Field with Absolute Error
 function FormField({ label, error, children }) {
   return (
-    <label className="grid gap-2">
-      <span className="text-xs font-black uppercase tracking-widest text-gray-500">{label}</span>
+    <label className="grid gap-2.5 relative">
+      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B]">{label}</span>
       {children}
       {error && (
-        <span className="text-[10px] font-bold tracking-wide text-red-500 flex items-center gap-1 uppercase mt-0.5">
-          <AlertCircle size={12} strokeWidth={2.5} /> {error}
+        <span className="absolute -bottom-5 left-0 text-[9px] font-black tracking-widest text-red-500 flex items-center gap-1.5 uppercase">
+          <AlertCircle size={10} strokeWidth={3} /> {error}
         </span>
       )}
     </label>

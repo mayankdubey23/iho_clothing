@@ -4,12 +4,18 @@ import { Head, Link } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Heart, Share2, Ruler, ChevronDown, ChevronUp, Star } from 'lucide-react';
 import { addCartItem } from '@/lib/cart';
+import { isWishlisted, toggleWishlistItem } from '@/lib/wishlist';
 
 export default function Product({ product }) {
     const productSkus = product?.skus || [];
     const colorOptions = [...new Set(productSkus.map((sku) => sku.color).filter(Boolean))];
     const sizeOptions = [...new Set(productSkus.map((sku) => sku.size).filter(Boolean))];
-    const productImages = product?.images?.length ? product.images.map((image) => image.image_path) : null;
+    const imageUrl = (path) => {
+        if (!path) return null;
+        if (String(path).startsWith('http') || String(path).startsWith('/storage/')) return path;
+        return `/storage/${String(path).replace(/^\/+/, '')}`;
+    };
+    const productImages = product?.images?.length ? product.images.map((image) => imageUrl(image.image_path)) : null;
 
     const displayProduct = product ? {
         id: product.id,
@@ -19,8 +25,8 @@ export default function Product({ product }) {
         description: product.description || 'Premium IHO Clothing product with clean construction and live SKU inventory.',
         features: ['Premium construction', 'Live SKU stock tracking', 'Fast fulfillment'],
         images: productImages || ['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1200&auto=format&fit=crop'],
-        colors: (colorOptions.length ? colorOptions : ['Default']).map((name) => ({ name, hex: name.toLowerCase().includes('black') ? '#1A1A1A' : '#F9F8F6' })),
-        sizes: sizeOptions.length ? sizeOptions : ['Default'],
+        colors: colorOptions.map((name) => ({ name, hex: name.toLowerCase().includes('black') ? '#1A1A1A' : '#F9F8F6' })),
+        sizes: sizeOptions,
     } : {
         id: 1,
         name: 'Essential Heavyweight Boxy Tee',
@@ -41,25 +47,34 @@ export default function Product({ product }) {
         sizes: ['S', 'M', 'L', 'XL', 'XXL']
     };
 
-    const [selectedColor, setSelectedColor] = useState(displayProduct.colors[0].name);
-    const [selectedSize, setSelectedSize] = useState(displayProduct.sizes.includes('L') ? 'L' : displayProduct.sizes[0]);
+    const initialSku = productSkus[0] || {};
+    const [selectedColor, setSelectedColor] = useState(initialSku.color || displayProduct.colors[0]?.name || '');
+    const [selectedSize, setSelectedSize] = useState(initialSku.size || displayProduct.sizes[0] || '');
     const [openAccordion, setOpenAccordion] = useState('details');
-    const selectedSku = productSkus.find((sku) => (sku.color || 'Default') === selectedColor && (sku.size || 'Default') === selectedSize) || productSkus[0];
+    const [saved, setSaved] = useState(Boolean(product?.id && isWishlisted(product.id)));
+    const selectedSku = productSkus.find((sku) => sku.color === selectedColor && sku.size === selectedSize);
 
     const addToBag = () => {
-        if (!product?.id || !selectedSku?.id) return;
+        if (!product?.id || !selectedSku?.id || !selectedSku.size || !selectedSku.color) return;
 
         addCartItem({
             id: selectedSku.id,
             product_id: product.id,
             sku_id: selectedSku.id,
             name: product.name,
+            slug: product.slug,
             size: selectedSku.size || selectedSize,
             color: selectedSku.color || selectedColor,
             price: Number(product.base_price || 0),
             quantity: 1,
             image: displayProduct.images[0],
         });
+    };
+
+    const toggleSaved = () => {
+        if (!product?.id) return;
+        const nextItems = toggleWishlistItem(product);
+        setSaved(nextItems.some((item) => String(item.id) === String(product.id)));
     };
 
     const staggerContainer = {
@@ -96,7 +111,7 @@ export default function Product({ product }) {
                     >
                         {displayProduct.images.map((img, index) => (
                             <motion.div key={index} variants={fadeUp} className="w-full bg-[#F3F0EA] aspect-[4/5] rounded-sm overflow-hidden">
-                                <img src={img} alt={`${displayProduct.name} view ${index + 1}`} className="w-full h-full object-cover" />
+                                <img src={img} onError={(e) => { e.currentTarget.src = 'https://placehold.co/900x1100/f8fafc/94a3b8?text=No+Image'; }} alt={`${displayProduct.name} view ${index + 1}`} className="w-full h-full object-cover" />
                             </motion.div>
                         ))}
                     </motion.div>
@@ -173,11 +188,11 @@ export default function Product({ product }) {
 
                             {/* Action Buttons */}
                             <div className="flex gap-3 mt-4">
-                                <button onClick={addToBag} disabled={Boolean(product) && !selectedSku} className="flex-1 bg-[#1A1A1A] text-[#F9F8F6] py-4 md:py-5 text-sm font-bold uppercase tracking-widest hover:bg-[#4A001F] transition-all flex items-center justify-center gap-2 rounded-sm shadow-xl hover:shadow-2xl hover:-translate-y-0.5 disabled:opacity-60">
-                                    <ShoppingBag size={18} strokeWidth={2} /> Add to Bag
+                                <button onClick={addToBag} disabled={!selectedSku} className="flex-1 bg-[#1A1A1A] text-[#F9F8F6] py-4 md:py-5 text-sm font-bold uppercase tracking-widest hover:bg-[#4A001F] transition-all flex items-center justify-center gap-2 rounded-sm shadow-xl hover:shadow-2xl hover:-translate-y-0.5 disabled:opacity-60">
+                                    <ShoppingBag size={18} strokeWidth={2} /> {selectedSku ? 'Add to Bag' : 'Unavailable'}
                                 </button>
-                                <button className="w-14 md:w-16 bg-[#F3F0EA] text-[#1A1A1A] flex items-center justify-center border border-[#E8E4D9] hover:bg-[#E8E4D9] hover:text-[#4A001F] transition-all rounded-sm">
-                                    <Heart size={20} strokeWidth={1.5} />
+                                <button type="button" onClick={toggleSaved} className={`w-14 md:w-16 bg-[#F3F0EA] flex items-center justify-center border border-[#E8E4D9] hover:bg-[#E8E4D9] hover:text-[#4A001F] transition-all rounded-sm ${saved ? 'text-red-500' : 'text-[#1A1A1A]'}`}>
+                                    <Heart size={20} strokeWidth={1.5} fill={saved ? 'currentColor' : 'none'} />
                                 </button>
                             </div>
 

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\UserFranchise;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
@@ -13,173 +15,231 @@ class UserFranchiseController extends Controller
 {
     public function index(Request $request)
     {
-        $hasStatus = Schema::hasColumn('users', 'status');
+        $tab = $request->input('tab', 'active');
+        $search = $request->input('search', '');
 
-        $franchises = User::where('role', 'franchise')
-            ->when($request->search, function ($query, $search) {
-                $query->where(function ($sub) use ($search) {
-                    $sub->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                });
-            })
-            ->when($hasStatus && $request->status, fn ($query, $status) => $query->where('status', $status))
-            ->latest()
-            ->paginate(10)
-            ->withQueryString()
-            ->through(function (User $user) use ($hasStatus) {
-                $stats = DB::table('orders')
-                    ->where('franchise_id', $user->id)
-                    ->selectRaw('COUNT(id) as total_orders, COALESCE(SUM(total_amount), 0) as total_revenue')
-                    ->first();
-
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'status' => $hasStatus ? ($user->status ?? 'active') : 'active',
-                    'city' => $user->city ?? 'N/A',
-                    'state' => $user->state ?? 'N/A',
-                    'margin' => 0,
-                    'commission' => 0,
-                    'total_orders' => (int) ($stats->total_orders ?? 0),
-                    'revenue' => (float) ($stats->total_revenue ?? 0),
-                    'joined_at' => optional($user->created_at)->format('d M Y'),
-                ];
-            });
-
-        $totalFranchises = User::where('role', 'franchise')->count();
-        $pendingApplications = Schema::hasTable('franchise_applications')
-            ? DB::table('franchise_applications')->where('status', 'pending')->count()
-            : DB::table('user_franchises')->where('status', 'pending')->count();
-
-        $summary = [
-            'total' => $totalFranchises,
-            'active' => $hasStatus
-                ? User::where('role', 'franchise')->where('status', 'active')->count()
-                : $totalFranchises,
-            'pending' => $pendingApplications,
-            'total_revenue' => DB::table('orders')->whereNotNull('franchise_id')->sum('total_amount'),
-        ];
+        $data = match (true) {
+            in_array($tab, ['active', 'blocked'], true) => $this->franchiseUsers($tab, $search),
+            in_array($tab, ['pending_requests', 'rejected_requests'], true) => $this->franchiseRequests($tab, $search),
+            $tab === 'service_areas' => $this->serviceAreas($search),
+            default => $this->emptyPaginator(),
+        };
 
         return Inertia::render('FranchiseManagement', [
-            'franchises' => $franchises,
-            'summary' => $summary,
-            'filters' => $request->only(['search', 'status']),
+            'tabData' => $data,
+            'activeTab' => $tab,
+            'stats' => [
+                'active' => $this->franchiseCount('active'),
+                'pending' => $this->pendingRequestsCount(),
+                'blocked' => $this->franchiseCount('blocked'),
+            ],
+            'filters' => ['search' => $search],
         ]);
+    }
+
+    public function toggleStatus($id)
+    {
+        $user = User::findOrFail($id);
+
+        if (! Schema::hasColumn('users', 'status')) {
+            return back()->with('success', 'Franchise status column is not enabled for this install.');
+        }
+
+        $user->status = ($user->status === 'active') ? 'blocked' : 'active';
+        $user->save();
+
+        return back()->with('success', 'Franchise status updated.');
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8',
-            'city' => 'required|string|max:100',
-            'state' => 'required|string|max:100',
-            'margin' => 'nullable|numeric|min:0|max:100',
-            'commission' => 'nullable|numeric|min:0|max:100',
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['nullable', 'string', 'min:8'],
+            'mobile_number' => ['nullable', 'string', 'max:20'],
+            'city' => ['nullable', 'string', 'max:100'],
+            'state' => ['nullable', 'string', 'max:100'],
+            'pincode' => ['nullable', 'string', 'max:20'],
         ]);
 
-        DB::transaction(function () use ($validated) {
-            $userData = [
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
-                'role' => 'franchise',
-            ];
+        $userData = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password'] ?? 'password123'),
+            'role' => 'franchise',
+        ];
 
-            foreach (['city', 'state'] as $column) {
-                if (Schema::hasColumn('users', $column)) {
-                    $userData[$column] = $validated[$column];
-                }
+        foreach (['mobile_number', 'city', 'state', 'pincode'] as $column) {
+            if (Schema::hasColumn('users', $column)) {
+                $userData[$column] = $validated[$column] ?? null;
             }
-
-            if (Schema::hasColumn('users', 'status')) {
-                $userData['status'] = 'active';
-            }
-
-            $user = User::create($userData);
-
-            if (Schema::hasTable('wallets')) {
-                DB::table('wallets')->updateOrInsert(
-                    ['franchise_id' => $user->id],
-                    [
-                        'balance' => 0,
-                        'total_earned' => 0,
-                        'pending_dues' => 0,
-                        'updated_at' => now(),
-                        'created_at' => now(),
-                    ]
-                );
-            }
-        });
-
-        return back()->with('success', 'New franchise created and activated!');
-    }
-
-    public function toggleStatus($id)
-    {
-        if (!Schema::hasColumn('users', 'status')) {
-            return back()->withErrors([
-                'status' => 'Franchise status column is not available in the users table.',
-            ]);
         }
 
-        $user = User::where('role', 'franchise')->findOrFail($id);
-        $user->status = ($user->status === 'active') ? 'blocked' : 'active';
-        $user->save();
-
-        return back()->with('success', 'Franchise status updated successfully.');
-    }
-
-    public function updateStatus(Request $request, $application)
-    {
-        $validated = $request->validate([
-            'status' => 'required|in:pending,approved,rejected',
-        ]);
-
-        if (!Schema::hasTable('user_franchises')) {
-            return back()->withErrors(['status' => 'Franchise applications table is not available.']);
+        if (Schema::hasColumn('users', 'status')) {
+            $userData['status'] = 'active';
         }
 
-        DB::table('user_franchises')
-            ->where('id', $application)
-            ->update([
-                'status' => $validated['status'],
-                'updated_at' => now(),
-            ]);
+        User::create($userData);
 
-        return back()->with('success', 'Application status updated successfully.');
+        return back()->with('success', 'Franchise created successfully.');
     }
 
     public function show($id)
     {
         $franchise = User::where('role', 'franchise')->findOrFail($id);
 
+        $franchise->franchise_detail = [
+            'city' => $franchise->city,
+            'state' => $franchise->state,
+            'pincode' => $franchise->pincode,
+        ];
+
         return Inertia::render('FranchiseManagement', [
-            'franchises' => User::where('role', 'franchise')
-                ->where('id', $franchise->id)
-                ->paginate(10)
-                ->through(fn (User $user) => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'status' => Schema::hasColumn('users', 'status') ? ($user->status ?? 'active') : 'active',
-                    'city' => $user->city ?? 'N/A',
-                    'state' => $user->state ?? 'N/A',
-                    'margin' => 0,
-                    'commission' => 0,
-                    'total_orders' => DB::table('orders')->where('franchise_id', $user->id)->count(),
-                    'revenue' => (float) DB::table('orders')->where('franchise_id', $user->id)->sum('total_amount'),
-                    'joined_at' => optional($user->created_at)->format('d M Y'),
-                ]),
-            'summary' => [
-                'total' => 1,
-                'active' => 1,
-                'pending' => 0,
-                'total_revenue' => DB::table('orders')->where('franchise_id', $franchise->id)->sum('total_amount'),
+            'tabData' => new LengthAwarePaginator([$franchise], 1, 10),
+            'activeTab' => 'active',
+            'stats' => [
+                'active' => $this->franchiseCount('active'),
+                'pending' => $this->pendingRequestsCount(),
+                'blocked' => $this->franchiseCount('blocked'),
             ],
-            'filters' => [],
+            'filters' => ['search' => ''],
         ]);
+    }
+
+    public function updateStatus(Request $request, $application)
+    {
+        $validated = $request->validate([
+            'status' => ['required', 'string', 'in:pending,reviewed,approved,rejected'],
+        ]);
+
+        if (Schema::hasTable('franchise_applications')) {
+            DB::table('franchise_applications')
+                ->where('id', $application)
+                ->update(['status' => $validated['status']]);
+
+            return back()->with('success', 'Franchise application updated.');
+        }
+
+        if (Schema::hasTable('user_franchises')) {
+            $status = $validated['status'] === 'reviewed' ? 'pending' : $validated['status'];
+            UserFranchise::findOrFail($application)->update(['status' => $status]);
+
+            return back()->with('success', 'Franchise application updated.');
+        }
+
+        return back()->with('success', 'No franchise application table is enabled for this install.');
+    }
+
+    private function franchiseUsers(string $tab, string $search): LengthAwarePaginator
+    {
+        $hasStatus = Schema::hasColumn('users', 'status');
+
+        if ($tab === 'blocked' && ! $hasStatus) {
+            return $this->emptyPaginator();
+        }
+
+        $franchises = User::query()
+            ->where('role', 'franchise')
+            ->when($hasStatus, fn ($query) => $query->where('status', $tab))
+            ->when($search, fn ($query) => $query->where('name', 'like', "%{$search}%"))
+            ->paginate(10)
+            ->withQueryString();
+
+        $franchises->getCollection()->transform(function (User $user) use ($hasStatus) {
+            if (! $hasStatus) {
+                $user->status = 'active';
+            }
+
+            $user->franchise_detail = [
+                'city' => $user->city,
+                'state' => $user->state,
+                'pincode' => $user->pincode,
+            ];
+
+            return $user;
+        });
+
+        return $franchises;
+    }
+
+    private function franchiseRequests(string $tab, string $search): LengthAwarePaginator
+    {
+        $status = $tab === 'pending_requests' ? 'pending' : 'rejected';
+
+        if (Schema::hasTable('franchise_applications')) {
+            return DB::table('franchise_applications')
+                ->select([
+                    'id',
+                    'full_name as name',
+                    'email',
+                    'mobile_number as phone',
+                    'preferred_city as city',
+                    'preferred_state as state',
+                    'investment_budget as budget_range',
+                    'status',
+                    'created_at',
+                ])
+                ->where('status', $status)
+                ->when($search, fn ($query) => $query->where('full_name', 'like', "%{$search}%"))
+                ->orderByDesc('created_at')
+                ->paginate(10)
+                ->withQueryString();
+        }
+
+        if (Schema::hasTable('franchise_enquiries')) {
+            return DB::table('franchise_enquiries')
+                ->where('status', $status)
+                ->when($search, fn ($query) => $query->where('name', 'like', "%{$search}%"))
+                ->orderByDesc('created_at')
+                ->paginate(10)
+                ->withQueryString();
+        }
+
+        return $this->emptyPaginator();
+    }
+
+    private function serviceAreas(string $search): LengthAwarePaginator
+    {
+        if (! Schema::hasTable('franchise_service_areas')) {
+            return $this->emptyPaginator();
+        }
+
+        return DB::table('franchise_service_areas')
+            ->join('users', 'franchise_service_areas.franchise_id', '=', 'users.id')
+            ->select('franchise_service_areas.*', 'users.name as franchise_name')
+            ->when($search, fn ($query) => $query->where('pincode', 'like', "%{$search}%"))
+            ->paginate(10)
+            ->withQueryString();
+    }
+
+    private function franchiseCount(string $status): int
+    {
+        if ($status === 'blocked' && ! Schema::hasColumn('users', 'status')) {
+            return 0;
+        }
+
+        return User::query()
+            ->where('role', 'franchise')
+            ->when(Schema::hasColumn('users', 'status'), fn ($query) => $query->where('status', $status))
+            ->count();
+    }
+
+    private function pendingRequestsCount(): int
+    {
+        if (Schema::hasTable('franchise_applications')) {
+            return DB::table('franchise_applications')->where('status', 'pending')->count();
+        }
+
+        if (Schema::hasTable('franchise_enquiries')) {
+            return DB::table('franchise_enquiries')->where('status', 'pending')->count();
+        }
+
+        return 0;
+    }
+
+    private function emptyPaginator(): LengthAwarePaginator
+    {
+        return new LengthAwarePaginator([], 0, 10);
     }
 }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\StockRequest;
 use App\Models\Inventory;
-use App\Models\Sku;
 use App\Models\StockTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,37 +17,6 @@ class StockController extends Controller
         return Inertia::render('Admin/StockRequests', [
             'requests' => StockRequest::with(['franchise', 'sku.product'])->latest()->get()
         ]);
-    }
-
-    // 🏢 FRANCHISE: View their own requests
-    public function myRequests()
-    {
-        return Inertia::render('Franchise/StockRequests', [
-            'requests' => StockRequest::with('sku.product')->where('franchise_id', auth()->id())->latest()->get()
-        ]);
-    }
-
-    // 🏢 FRANCHISE: Request new stock
-    public function store(Request $request)
-    {
-    $request->validate([
-        'sku_id' => 'required|exists:skus,id',
-        'quantity' => 'required|integer|min:1'
-    ]);
-
-    // Total amount nikalne ke liye product price fetch karein
-    $sku = Sku::with('product')->findOrFail($request->sku_id);
-    $totalAmount = $sku->product->franchise_price * $request->quantity;
-
-    StockRequest::create([
-        'franchise_id' => auth()->id(),
-        'sku_id' => $request->sku_id,
-        'quantity' => $request->quantity,
-        'total_amount' => $totalAmount,
-        'status' => 'pending'
-    ]);
-
-    return back()->with('success', 'Stock request sent successfully!');
     }
 
     // 👑 SUPER ADMIN: Approve Stock & Update Ledger + Wallet

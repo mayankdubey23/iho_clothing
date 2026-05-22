@@ -3,13 +3,55 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Schema;
 
 
 class AccountController extends Controller
 {
+    public function updateProfile(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'min:3', 'max:255', 'regex:/^[A-Za-z\s]+$/'],
+            'email' => ['required', 'email', 'max:255'],
+            'mobile_number' => ['nullable', 'regex:/^[6-9]\d{9}$/'],
+            'gender' => ['nullable', 'string', 'max:30'],
+            'dob' => ['nullable', 'date'],
+        ]);
+
+        $user = $request->user();
+        $payload = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ];
+
+        foreach (['mobile_number', 'gender', 'dob'] as $column) {
+            if (Schema::hasColumn('users', $column)) {
+                $payload[$column] = $validated[$column] ?? null;
+            }
+        }
+
+        $user->forceFill($payload)->save();
+
+        return back()->with('success', 'Profile updated successfully.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $request->user()->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return back()->with('success', 'Password updated securely.');
+    }
+
     // 1. Update Notification Preferences
     public function updateNotifications(Request $request)
     {
@@ -25,10 +67,34 @@ class AccountController extends Controller
             'whatsapp_notif' => 'boolean',
         ]);
 
-        DB::table('user_settings')->updateOrInsert(
-            ['user_id' => $user->id],
-            array_merge($validated, ['updated_at' => now()])
-        );
+        if (Schema::hasTable('user_settings')) {
+            $payload = ['updated_at' => now()];
+            $columnMap = [
+                'order_updates' => 'notify_orders',
+                'delivery_updates' => 'notify_delivery',
+                'offer_alerts' => 'notify_offers',
+                'email_notif' => 'notify_email',
+                'sms_notif' => 'notify_sms',
+                'whatsapp_notif' => 'notify_whatsapp',
+            ];
+
+            foreach ($validated as $key => $value) {
+                if (Schema::hasColumn('user_settings', $key)) {
+                    $payload[$key] = $value;
+                    continue;
+                }
+
+                $legacyColumn = $columnMap[$key] ?? null;
+                if ($legacyColumn && Schema::hasColumn('user_settings', $legacyColumn)) {
+                    $payload[$legacyColumn] = $value;
+                }
+            }
+
+            DB::table('user_settings')->updateOrInsert(
+                ['user_id' => $user->id],
+                $payload
+            );
+        }
 
         return back()->with('success', 'Notification preferences updated.');
     }
@@ -73,10 +139,12 @@ class AccountController extends Controller
     // 3. Remove Saved Payment Card
     public function removePaymentMethod($id)
     {
-        DB::table('user_payment_methods')
-            ->where('id', $id)
-            ->where('user_id', auth()->id())
-            ->delete();
+        if (Schema::hasTable('user_payment_methods')) {
+            DB::table('user_payment_methods')
+                ->where('id', $id)
+                ->where('user_id', auth()->id())
+                ->delete();
+        }
 
         return back()->with('success', 'Payment method removed.');
     }
@@ -95,12 +163,52 @@ class AccountController extends Controller
             'is_default' => 'boolean',
         ]);
 
-        // If this is set to default, make other addresses non-default
+        if (! Schema::hasTable('user_addresses')) {
+            return back()->with('error', 'Address book is not available yet.');
+        }
+
         if ($request->is_default) {
             DB::table('user_addresses')->where('user_id', auth()->id())->update(['is_default' => false]);
         }
 
-        auth()->user()->addresses()->create($validated);
+        $addressData = [
+            'user_id' => auth()->id(),
+            'full_name' => $validated['full_name'],
+            'pincode' => $validated['pincode'],
+            'city' => $validated['city'],
+            'state' => $validated['state'],
+            'is_default' => (bool) ($validated['is_default'] ?? false),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+        if (Schema::hasColumn('user_addresses', 'mobile_number')) {
+            $addressData['mobile_number'] = $validated['mobile_number'];
+        } elseif (Schema::hasColumn('user_addresses', 'phone')) {
+            $addressData['phone'] = $validated['mobile_number'];
+        }
+
+        if (Schema::hasColumn('user_addresses', 'house_no')) {
+            $addressData['house_no'] = $validated['house_no'];
+        }
+
+        if (Schema::hasColumn('user_addresses', 'area_locality')) {
+            $addressData['area_locality'] = $validated['area_locality'];
+        }
+
+        if (Schema::hasColumn('user_addresses', 'landmark')) {
+            $addressData['landmark'] = $request->landmark;
+        }
+
+        if (Schema::hasColumn('user_addresses', 'address_line')) {
+            $addressData['address_line'] = trim($validated['house_no'] . ', ' . $validated['area_locality']);
+        }
+
+        if (Schema::hasColumn('user_addresses', 'type')) {
+            $addressData['type'] = 'Home';
+        }
+
+        DB::table('user_addresses')->insert($addressData);
 
         return back()->with('success', 'Address saved successfully.');
     }

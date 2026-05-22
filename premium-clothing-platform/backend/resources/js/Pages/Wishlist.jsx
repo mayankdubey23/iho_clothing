@@ -1,17 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { Heart } from 'lucide-react';
+import { Heart, X } from 'lucide-react';
 import PremiumProductCard from '@/Components/PremiumProductCard';
+import { getWishlistItems, removeWishlistItem } from '@/lib/wishlist';
 
-export default function Wishlist({ wishlistItems = [] }) {
-    
-    // Premium placeholder data so you can see the layout before adding real database items
-    const displayItems = wishlistItems.length > 0 ? wishlistItems : [
-        { id: 'w1', name: 'Essential Heavyweight Boxy Tee', base_price: '2,499', category_name: 'T-Shirts', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop' },
-        { id: 'w2', name: 'Oversized Knit Sweater', base_price: '5,499', category_name: 'Knitwear', image: 'https://images.unsplash.com/photo-1614083321526-0e1cb2d74483?q=80&w=800&auto=format&fit=crop' }
-    ];
+export default function Wishlist() {
+    const [displayItems, setDisplayItems] = useState([]);
+
+    useEffect(() => {
+        setDisplayItems(getWishlistItems());
+        const syncWishlist = () => setDisplayItems(getWishlistItems());
+        window.addEventListener('wishlist-updated', syncWishlist);
+        window.addEventListener('storage', syncWishlist);
+        return () => {
+            window.removeEventListener('wishlist-updated', syncWishlist);
+            window.removeEventListener('storage', syncWishlist);
+        };
+    }, []);
+
+    const removeItem = (id) => {
+        setDisplayItems(removeWishlistItem(id));
+    };
 
     return (
         <AppLayout>
@@ -49,7 +60,7 @@ export default function Wishlist({ wishlistItems = [] }) {
                         {displayItems.map((product, index) => (
                             <div key={product.id} className="relative">
                                 {/* Delete button absolute positioned over the card */}
-                                <button className="absolute top-4 right-4 z-20 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#1A1A1A] hover:bg-red-50 hover:text-red-600 transition-colors shadow-sm">
+                                <button onClick={() => removeItem(product.id)} className="absolute top-4 right-4 z-30 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#1A1A1A] hover:bg-red-50 hover:text-red-600 transition-colors shadow-sm">
                                     <X size={14} strokeWidth={2} />
                                 </button>
                                 

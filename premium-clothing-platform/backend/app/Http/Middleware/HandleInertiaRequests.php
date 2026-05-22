@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -35,29 +37,37 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        $sharedUser = $user ? $user->only([
+            'id',
+            'name',
+            'email',
+            'mobile_number',
+            'role',
+            'address_line',
+            'city',
+            'state',
+            'pincode',
+            'country',
+            'store_name',
+            'store_address',
+            'store_contact',
+            'business_hours',
+            'serviceable_pincodes',
+            'created_at',
+        ]) : null;
+
+        if ($user && $sharedUser) {
+            $sharedUser['addresses'] = $this->accountAddresses($user->id);
+            $sharedUser['settings'] = $this->accountSettings($user->id);
+            $sharedUser['payment_methods'] = $this->paymentMethods($user->id);
+        }
+
         return [
             ...parent::share($request),
             
             'auth' => [
-                // Direct evaluation (Removed fn() =>) to ensure React gets data instantly on first load
-                'user' => $request->user() ? $request->user()->only([
-                    'id',
-                    'name',
-                    'email',
-                    'mobile_number',
-                    'role',
-                    'address_line',
-                    'city',
-                    'state',
-                    'pincode',
-                    'country',
-                    'store_name',
-                    'store_address',
-                    'store_contact',
-                    'business_hours',
-                    'serviceable_pincodes',
-                    'created_at'
-                ]) : null,
+                'user' => $sharedUser,
             ],
             
             'flash' => [
@@ -65,5 +75,64 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
             ],
         ];
+    }
+
+    private function accountAddresses(int $userId)
+    {
+        if (! Schema::hasTable('user_addresses')) {
+            return [];
+        }
+
+        return DB::table('user_addresses')
+            ->where('user_id', $userId)
+            ->latest()
+            ->get()
+            ->map(fn ($address) => [
+                'id' => $address->id,
+                'full_name' => $address->full_name ?? '',
+                'mobile_number' => $address->mobile_number ?? $address->phone ?? '',
+                'house_no' => $address->house_no ?? $address->address_line ?? '',
+                'area_locality' => $address->area_locality ?? '',
+                'landmark' => $address->landmark ?? '',
+                'pincode' => $address->pincode ?? '',
+                'city' => $address->city ?? '',
+                'state' => $address->state ?? '',
+                'is_default' => (bool) ($address->is_default ?? false),
+            ]);
+    }
+
+    private function accountSettings(int $userId)
+    {
+        if (! Schema::hasTable('user_settings')) {
+            return [];
+        }
+
+        $settings = DB::table('user_settings')->where('user_id', $userId)->first();
+
+        if (! $settings) {
+            return [];
+        }
+
+        return [
+            'order_updates' => (bool) ($settings->order_updates ?? $settings->notify_orders ?? true),
+            'delivery_updates' => (bool) ($settings->delivery_updates ?? $settings->notify_delivery ?? true),
+            'offer_alerts' => (bool) ($settings->offer_alerts ?? $settings->notify_offers ?? false),
+            'new_products' => (bool) ($settings->new_products ?? true),
+            'email_notif' => (bool) ($settings->email_notif ?? $settings->notify_email ?? true),
+            'sms_notif' => (bool) ($settings->sms_notif ?? $settings->notify_sms ?? true),
+            'whatsapp_notif' => (bool) ($settings->whatsapp_notif ?? $settings->notify_whatsapp ?? false),
+        ];
+    }
+
+    private function paymentMethods(int $userId)
+    {
+        if (! Schema::hasTable('user_payment_methods')) {
+            return [];
+        }
+
+        return DB::table('user_payment_methods')
+            ->where('user_id', $userId)
+            ->latest()
+            ->get();
     }
 }

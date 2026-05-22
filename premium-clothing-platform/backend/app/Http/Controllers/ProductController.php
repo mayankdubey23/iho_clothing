@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Sku;
 use App\Models\Inventory;
+use App\Models\Color;
+use App\Models\Size;
+use App\Models\Brand;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Schema;
 
 class ProductController extends Controller
 {
@@ -18,6 +22,10 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'category' => ['nullable', 'string', 'max:255'],
+            'gender' => ['nullable', 'string', 'max:50'],
+            'subcategory' => ['nullable', 'string', 'max:255'],
+            'featured' => ['nullable'],
+            'sort' => ['nullable', 'string', 'max:50'],
             'size' => ['nullable', 'string', 'max:50'],
             'color' => ['nullable', 'string', 'max:100'],
             'search' => ['nullable', 'string', 'max:255'],
@@ -34,9 +42,35 @@ class ProductController extends Controller
                 'skus.inventory',
                 'images' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('sort_order'),
             ])
-            ->where('is_active', true)
+            ->when(Schema::hasColumn('products', 'is_active'), fn ($query) => $query->where(fn ($activeQuery) => $activeQuery->where('is_active', true)->orWhereNull('is_active')))
             ->when($validated['category'] ?? null, function ($query, $category) {
                 $query->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('slug', $category));
+            })
+            ->when($validated['gender'] ?? null, function ($query, $gender) {
+                $query->where(function ($genderQuery) use ($gender) {
+                    if (Schema::hasColumn('products', 'gender')) {
+                        $genderQuery->where('gender', $gender);
+                    }
+
+                    $genderQuery->orWhereHas('category', fn ($categoryQuery) => $categoryQuery
+                        ->where('slug', 'like', "%{$gender}%")
+                        ->orWhere('name', 'like', "%{$gender}%"));
+                });
+            })
+            ->when($validated['subcategory'] ?? null, function ($query, $subcategory) {
+                $query->where(function ($subQuery) use ($subcategory) {
+                    if (Schema::hasColumn('products', 'subcategory_slug')) {
+                        $subQuery->where('subcategory_slug', $subcategory);
+                    }
+
+                    $readable = str_replace('-', ' ', $subcategory);
+                    $subQuery->orWhereHas('category', fn ($categoryQuery) => $categoryQuery
+                        ->where('slug', 'like', "%{$subcategory}%")
+                        ->orWhere('name', 'like', "%{$readable}%"));
+                });
+            })
+            ->when(($validated['featured'] ?? null) && Schema::hasColumn('products', 'is_featured'), function ($query) {
+                $query->where('is_featured', true);
             })
             ->when($validated['size'] ?? null, function ($query, $size) {
                 $query->whereHas('skus', fn ($skuQuery) => $skuQuery->where('size', $size));
@@ -57,6 +91,9 @@ class ProductController extends Controller
             ->when($validated['max_price'] ?? null, function ($query, $maxPrice) {
                 $query->where('base_price', '<=', $maxPrice);
             })
+            ->when(($validated['sort'] ?? null) === 'price_asc', fn ($query) => $query->orderBy('base_price'))
+            ->when(($validated['sort'] ?? null) === 'price_desc', fn ($query) => $query->orderByDesc('base_price'))
+            ->when(($validated['sort'] ?? null) === 'popular' && Schema::hasColumn('products', 'is_best_seller'), fn ($query) => $query->orderByDesc('is_best_seller'))
             ->latest()
             ->paginate($perPage);
 
@@ -71,7 +108,12 @@ class ProductController extends Controller
      */
     public function create()
     {
-        //
+        return \Inertia\Inertia::render('Admin/Products/Create', [
+            'categories' => Category::whereNull('parent_id')->get(),
+            'brands' => Brand::where('is_active', true)->get(),
+            'colors' => Color::where('is_active', true)->get(),
+            'sizes' => Size::where('is_active', true)->get(),
+        ]);
     }
 
     /**
@@ -150,32 +192,133 @@ class ProductController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource for frontend and API.
      */
-    public function show(Product $product)
+    public function show($slug)
     {
-        abort_unless($product->is_active, 404);
-
-        $product->load([
+        $product = Product::with([
+            'images' => fn ($query) => $query->orderBy('sort_order'),
+            'skus' => fn ($query) => $query
+                ->when(Schema::hasColumn('skus', 'is_active'), fn ($skuQuery) => $skuQuery->where('is_active', true))
+                ->with('inventories'),
+            'brand',
             'category',
-            'skus.inventory',
-            'images' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('sort_order'),
-        ]);
+            'reviews' => fn ($query) => $query->where('is_approved', true)->latest(),
+        ])
+            ->where('slug', $slug)
+            ->when(Schema::hasColumn('products', 'is_active'), fn ($query) => $query->where(fn ($activeQuery) => $activeQuery->where('is_active', true)->orWhereNull('is_active')))
+            ->firstOrFail();
 
-        return response()->json([
-            'success' => true,
-            'data' => $product,
+        $availableSizes = $product->skus
+            ->pluck('size')
+            ->filter()
+            ->unique()
+            ->values();
+
+        $availableColors = $product->skus
+            ->pluck('color')
+            ->filter()
+            ->unique()
+            ->values();
+
+        $productData = $product->toArray();
+        $productData['available_sizes'] = $availableSizes->map(fn ($size) => ['id' => $size, 'code' => $size]);
+        $productData['available_colors'] = $availableColors->map(fn ($color) => ['id' => $color, 'name' => $color]);
+        $productData['image_path'] = $this->normalizeStoragePath($product->images->firstWhere('is_primary', true)->image_path ?? $product->image_path);
+        $productData['price'] = $product->base_price;
+        $productData['compare_at_price'] = $product->mrp;
+        $productData['stock'] = (int) $product->skus->sum(function ($sku) {
+            return $sku->inventories
+                ->whereNull('franchise_id')
+                ->sum('stock_quantity');
+        });
+        $productData['in_stock'] = $productData['stock'] > 0;
+        $productData['images'] = $product->images->map(fn ($image) => [
+            'id' => $image->id,
+            'image_path' => $this->normalizeStoragePath($image->image_path),
+            'media_type' => $image->media_type ?? 'image',
+            'is_primary' => (bool) $image->is_primary,
+        ])->values();
+
+        $reviewCount = $product->reviews->count();
+        $avgRating = $reviewCount > 0 ? round($product->reviews->avg('rating'), 1) : 0;
+        $ratingBreakdown = collect([5, 4, 3, 2, 1])->mapWithKeys(function ($rating) use ($product) {
+            return [$rating => $product->reviews->where('rating', $rating)->count()];
+        });
+        $reviewInsights = [
+            ['label' => 'Fit', 'value' => 'Just Right', 'percent' => 77],
+            ['label' => 'Length', 'value' => 'Just Right', 'percent' => 82],
+        ];
+        $currentUser = auth()->user();
+        $canReview = $currentUser
+            ? $this->customerHasPurchasedProduct((int) $currentUser->id, (int) $product->id)
+            : false;
+        $reviewEligibilityMessage = $currentUser
+            ? ($canReview ? 'Verified purchase. You can write a review.' : 'Only customers who bought this product can write a review.')
+            : 'Please login after purchase to write a review.';
+
+        if (request()->expectsJson() || request()->is('api/*')) {
+            return response()->json([
+                'success' => true,
+                'data' => $productData,
+            ]);
+        }
+
+        $relatedProducts = Product::with([
+                'skus.inventories',
+                'images' => fn ($query) => $query->orderBy('sort_order')->orderByDesc('is_primary'),
+            ])
+            ->where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->when(Schema::hasColumn('products', 'is_active'), fn ($query) => $query->where(fn ($activeQuery) => $activeQuery->where('is_active', true)->orWhereNull('is_active')))
+            ->inRandomOrder()
+            ->take(4)
+            ->get()
+            ->map(function ($relatedProduct) {
+                $imagePath = $relatedProduct->images->firstWhere('is_primary', true)->image_path ?? $relatedProduct->image_path;
+                $stock = (int) $relatedProduct->skus->sum(function ($sku) {
+                    return $sku->inventories
+                        ->whereNull('franchise_id')
+                        ->sum('stock_quantity');
+                });
+                $relatedData = $relatedProduct->toArray();
+                $relatedData['image_path'] = $this->normalizeStoragePath($imagePath);
+                $relatedData['price'] = $relatedProduct->base_price;
+                $relatedData['compare_at_price'] = $relatedProduct->mrp;
+                $relatedData['stock'] = $stock;
+                $relatedData['in_stock'] = $stock > 0;
+                return $relatedData;
+            });
+
+        return \Inertia\Inertia::render('Storefront/ProductDetail', [
+            'product' => $productData,
+            'availableSizes' => $availableSizes,
+            'availableColors' => $availableColors,
+            'relatedProducts' => $relatedProducts,
+            'reviewCount' => $reviewCount,
+            'avgRating' => $avgRating,
+            'ratingBreakdown' => $ratingBreakdown,
+            'reviewInsights' => $reviewInsights,
+            'canReview' => $canReview,
+            'reviewEligibilityMessage' => $reviewEligibilityMessage,
         ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Product $product)
+    public function edit($id)
     {
-        //
-    }
+        $product = Product::with(['skus.inventory', 'images'])->findOrFail($id);
 
+        return \Inertia\Inertia::render('Admin/EditProduct', [
+            'product' => $product,
+            'categories' => Category::whereNull('parent_id')->get(),
+            'brands' => Brand::where('is_active', true)->get(),
+            'colors' => Color::where('is_active', true)->get(),
+            'sizes' => Size::where('is_active', true)->get(),
+        ]);
+    }
     /**
      * Update the specified resource in storage.
      */
@@ -192,15 +335,33 @@ class ProductController extends Controller
         //
     }
 
-    public function franchiseCatalog()
+    private function normalizeStoragePath(?string $path): ?string
     {
-        abort_unless(in_array(auth()->user()->role, ['admin', 'franchise', 'franchise_admin']), 403);
+        if (! $path) {
+            return null;
+        }
 
-        return Inertia::render('Franchise/BuyStock', [
-            'products' => Product::with(['category', 'skus.inventory'])
-                ->where('is_active', true)
-                ->latest()
-                ->get(),
-        ]);
+        return preg_replace('#^/?storage/#', '', ltrim($path, '/'));
     }
+
+    private function customerHasPurchasedProduct(int $userId, int $productId): bool
+    {
+        if (! Schema::hasTable('orders') || ! Schema::hasTable('order_items')) {
+            return false;
+        }
+
+        if (! Schema::hasColumn('orders', 'user_id') || ! Schema::hasColumn('order_items', 'product_id')) {
+            return false;
+        }
+
+        return DB::table('orders')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->where('orders.user_id', $userId)
+            ->where('order_items.product_id', $productId)
+            ->when(Schema::hasColumn('orders', 'status'), function ($query) {
+                $query->whereNotIn(DB::raw('LOWER(orders.status)'), ['cancelled', 'canceled']);
+            })
+            ->exists();
+    }
+
 }

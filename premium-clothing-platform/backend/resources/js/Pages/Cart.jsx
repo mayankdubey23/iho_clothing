@@ -3,7 +3,7 @@ import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { ShoppingBag, ArrowRight, Trash2, Plus, Minus } from 'lucide-react';
-import { getCartItems, removeCartItem, updateCartItemQuantity } from '@/lib/cart';
+import { clearCart, getCartItems, removeCartItem, updateCartItemQuantity } from '@/lib/cart';
 
 export default function Cart() {
     const [items, setItems] = useState([]);
@@ -30,6 +30,11 @@ export default function Cart() {
         setItems(removeCartItem(skuId));
     };
 
+    const emptyCart = () => {
+        clearCart();
+        setItems([]);
+    };
+
     return (
         <AppLayout>
             <Head title="Shopping Cart | IHO Clothing" />
@@ -37,10 +42,17 @@ export default function Cart() {
             <div className="max-w-6xl mx-auto px-6 lg:px-8 py-24 md:py-32">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-                    className="mb-12 border-b border-[#E8E4D9] pb-6"
+                    className="mb-12 flex flex-col gap-4 border-b border-[#E8E4D9] pb-6 sm:flex-row sm:items-end sm:justify-between"
                 >
-                    <h1 className="text-4xl font-black tracking-tight text-[#1A1A1A] uppercase">Your Bag</h1>
-                    <p className="mt-2 text-[#7A756B] text-sm font-bold uppercase tracking-widest">{items.length} Items</p>
+                    <div>
+                        <h1 className="text-4xl font-black tracking-tight text-[#1A1A1A] uppercase">Your Bag</h1>
+                        <p className="mt-2 text-[#7A756B] text-sm font-bold uppercase tracking-widest">{items.length} Items</p>
+                    </div>
+                    {items.length > 0 && (
+                        <button type="button" onClick={emptyCart} className="w-fit border border-red-200 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-red-600 transition-colors hover:bg-red-50">
+                            Clear All
+                        </button>
+                    )}
                 </motion.div>
 
                 {items.length === 0 ? (

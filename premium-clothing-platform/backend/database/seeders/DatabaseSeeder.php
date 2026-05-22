@@ -7,11 +7,9 @@ use App\Models\User;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Sku;
-use App\Models\FranchisePincode;
 use App\Models\Inventory;
 use App\Models\FranchisePlan;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -28,7 +26,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // 2. 🏬 Ek Franchise Banayein
-        $franchise = User::updateOrCreate(
+        User::updateOrCreate(
             ['email' => 'noida@ihoclothing.com'],
             [
                 'name' => 'Noida Franchise (Sector 62)',
@@ -37,19 +35,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // ✅ NEW: Initialize Wallet for Franchise
-        DB::table('wallets')->updateOrInsert(
-            ['franchise_id' => $franchise->id],
-            ['balance' => 0, 'total_earned' => 0, 'pending_dues' => 0]
-        );
-
-        // 3. 📍 Franchise ko Pincode assign karein
-        FranchisePincode::updateOrCreate(
-            ['pincode' => '201309'],
-            ['franchise_id' => $franchise->id]
-        );
-
-        // 4. 📝 ✅ NEW: Franchise Plans Banayein
+        // 3. 📝 ✅ NEW: Franchise Plans Banayein
         $plans = [
             [
                 'name' => 'Basic Franchise', 
@@ -71,7 +57,7 @@ class DatabaseSeeder extends Seeder
             FranchisePlan::updateOrCreate(['name' => $plan['name']], $plan);
         }
 
-        // 5. 👕 Ek Category aur Product banayein
+        // 4. 👕 Ek Category aur Product banayein
         $category = Category::updateOrCreate(
             ['slug' => 'premium-hoodies'],
             ['name' => 'Premium Hoodies', 'is_active' => true]
@@ -90,7 +76,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 6. 📏 Product ka ek SKU (Size/Color) banayein
+        // 5. 📏 Product ka ek SKU (Size/Color) banayein
         $sku = Sku::updateOrCreate(
             ['code' => 'HOOD-BLK-M'],
             [
@@ -101,7 +87,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 7. 📦 Inventory / Stock Baantein
+        // 6. 📦 Master inventory
         
         // Super Admin (Main Warehouse) ko 100 piece
         Inventory::updateOrCreate(
@@ -109,12 +95,13 @@ class DatabaseSeeder extends Seeder
             ['stock_quantity' => 100]
         );
 
-        // Noida Franchise ko 10 piece
-        Inventory::updateOrCreate(
-            ['franchise_id' => $franchise->id, 'sku_id' => $sku->id],
-            ['stock_quantity' => 10]
-        );
+        $this->call([
+            CategorySeeder::class,
+            ProductAttributeSeeder::class,
 
-        $this->command->info('✅ Database seeded successfully with Super Admin, Franchise Plans, Wallets, and Test Products! 🚀');
+        ]);
+
+
+        $this->command->info('✅ Database seeded successfully with Super Admin, Franchise Plans, and Test Products! 🚀');
     }
 }
