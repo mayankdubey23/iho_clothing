@@ -189,23 +189,45 @@
 
 /* ─── Keyframes ─── */
 @keyframes hero-ken-burns {
-    from { transform: scale(1); }
-    to { transform: scale(1.08); }
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.08);
+    }
 }
 
 @keyframes float-icon {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-7px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-7px);
+    }
 }
 
 @keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
 }
 
 @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
 }
 
 /* ─── Fluid Gradient Background ─── */
@@ -216,9 +238,17 @@
 }
 
 @keyframes gradient-flow {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 /* ─── Gradient Orbs for Background ─── */
@@ -260,22 +290,35 @@
 }
 
 @keyframes orb-float {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    25% { transform: translate(50px, -50px) scale(1.1); }
-    50% { transform: translate(-30px, 30px) scale(0.9); }
-    75% { transform: translate(40px, 40px) scale(1.05); }
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    25% {
+        transform: translate(50px, -50px) scale(1.1);
+    }
+
+    50% {
+        transform: translate(-30px, 30px) scale(0.9);
+    }
+
+    75% {
+        transform: translate(40px, 40px) scale(1.05);
+    }
 }
 
 /* ─── Premium Hover States ─── */
 .hover-lift {
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .hover-lift:hover {
     transform: translateY(-8px);
     box-shadow: 0 20px 40px rgba(26, 26, 46, 0.15),
-                0 8px 16px rgba(26, 26, 46, 0.1);
+        0 8px 16px rgba(26, 26, 46, 0.1);
 }
 
 .hover-glow {
@@ -284,7 +327,7 @@
 
 .hover-glow:hover {
     box-shadow: 0 0 30px rgba(148, 163, 184, 0.3),
-                0 0 60px rgba(148, 163, 184, 0.12);
+        0 0 60px rgba(148, 163, 184, 0.12);
 }
 
 /* ─── Shimmer Effect ─── */
@@ -300,12 +343,10 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.1),
-        transparent
-    );
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.1),
+            transparent);
     transition: left 0.6s ease;
 }
 
@@ -386,8 +427,15 @@
 
 /* ─── Pulse Animation ─── */
 @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px rgba(148, 163, 184, 0.2); }
-    50% { box-shadow: 0 0 40px rgba(148, 163, 184, 0.4); }
+
+    0%,
+    100% {
+        box-shadow: 0 0 20px rgba(148, 163, 184, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 0 40px rgba(148, 163, 184, 0.4);
+    }
 }
 
 .pulse-glow {
@@ -400,6 +448,7 @@
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -416,6 +465,7 @@
         opacity: 0;
         transform: scale(0.9);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -428,7 +478,10 @@
 
 /* ─── Reduced Motion ─── */
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+
+    *,
+    *::before,
+    *::after {
         scroll-behavior: auto !important;
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
