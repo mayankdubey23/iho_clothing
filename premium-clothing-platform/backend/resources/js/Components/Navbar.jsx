@@ -4,7 +4,7 @@ import { Link, usePage, router } from '@inertiajs/react';
 import {
     Search, ShoppingBag, User, Menu, X, LogOut, Heart,
     ChevronDown, Package, MapPin, Ticket, RefreshCcw, HelpCircle,
-    Home, Activity, Dumbbell, Flame, Tag
+    Home, Activity, Dumbbell, Flame, Tag, ArrowRight
 } from 'lucide-react';
 import CartDrawer from '@/Components/CartDrawer';
 import { getCartItems } from '@/lib/cart';
@@ -12,9 +12,13 @@ import { getWishlistItems } from '@/lib/wishlist';
 
 export default function Navbar({ admin = false, vertical = false }) {
     const page = usePage();
-    const { auth } = page.props;
+    const { auth, site = {} } = page.props;
     const user = auth?.user;
     const currentUrl = page.url || '/';
+    const logoUrl = site.site_logo ? `/storage/${site.site_logo}` : null;
+    const logoMark = site.site_logo_mark || 'IHO';
+    const brandName = site.site_brand_name || 'STUDIO';
+    const brandTagline = site.site_tagline || 'Performance Store';
 
     const [isScrolled, setIsScrolled] = useState(false);
 
@@ -30,16 +34,19 @@ export default function Navbar({ admin = false, vertical = false }) {
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const userMenuRef = useRef(null);
 
-    // Dynamic Navigation Links
-    const navLinks = [
+    const defaultNavLinks = [
         { name: 'Home', href: '/', icon: Home },
-        { name: 'Men', href: '/shop?category=men-sportswear', icon: User },
-        { name: 'Women', href: '/shop?category=women-sportswear', icon: Heart },
+        { name: 'Men', href: '/shop?gender=men', icon: User },
+        { name: 'Women', href: '/shop?gender=women', icon: Heart },
         { name: 'Gym Wear', href: '/shop?category=gym-wear', icon: Dumbbell },
         { name: 'Running Wear', href: '/shop?category=running-wear', icon: Activity },
         { name: 'New Arrivals', href: '/shop?sort=newest', highlight: true, icon: Flame },
         { name: 'Offers', href: '/shop?offers=1', sale: true, icon: Tag },
     ];
+    const navLinks = parseJsonList(site.nav_links_json, defaultNavLinks).map((link, index) => ({
+        ...defaultNavLinks[index],
+        ...link,
+    }));
 
     const USER_MENU_ITEMS = [
         { label: 'Studio Profile', href: '/account?tab=profile', icon: User },
@@ -50,6 +57,33 @@ export default function Navbar({ admin = false, vertical = false }) {
         { label: 'Returns', href: '/account?tab=returns', icon: RefreshCcw },
         { label: 'Concierge Support', href: '/support', icon: HelpCircle },
     ];
+
+    const defaultMegaMenus = {
+        Men: [
+            { title: 'Topwear', links: [['T-Shirts', '/shop?gender=men&subcategory=t-shirts'], ['Hoodies', '/shop?gender=men&subcategory=hoodies'], ['Jackets', '/shop?gender=men&subcategory=jackets'], ['Training Tanks', '/shop?gender=men&subcategory=tanks']] },
+            { title: 'Bottomwear', links: [['Joggers', '/shop?gender=men&subcategory=joggers'], ['Shorts', '/shop?gender=men&subcategory=shorts'], ['Track Pants', '/shop?gender=men&subcategory=track-pants']] },
+            { title: 'Shop By Sport', links: [['Gym Wear', '/shop?category=gym-wear'], ['Running Wear', '/shop?category=running-wear'], ['Activewear', '/shop?gender=men']] },
+        ],
+        Women: [
+            { title: 'Topwear', links: [['Sports Bras', '/shop?gender=women&subcategory=sports-bras'], ['T-Shirts', '/shop?gender=women&subcategory=t-shirts'], ['Tanks', '/shop?gender=women&subcategory=tanks'], ['Jackets', '/shop?gender=women&subcategory=jackets']] },
+            { title: 'Bottomwear', links: [['Tights', '/shop?gender=women&subcategory=tights'], ['Joggers', '/shop?gender=women&subcategory=joggers'], ['Shorts', '/shop?gender=women&subcategory=shorts']] },
+            { title: 'Shop By Sport', links: [['Gym Wear', '/shop?category=gym-wear'], ['Running Wear', '/shop?category=running-wear'], ['Activewear', '/shop?gender=women']] },
+        ],
+        'Gym Wear': [
+            { title: 'Training', links: [['Compression', '/shop?category=gym-wear&subcategory=compression'], ['Oversized Tees', '/shop?category=gym-wear&subcategory=oversized'], ['Lifting Gear', '/shop?category=gym-wear&subcategory=lifting']] },
+            { title: 'Intensity', links: [['Light Training', '/shop?category=gym-wear&discount=20'], ['High Performance', '/shop?category=gym-wear&sort=popular'], ['New Gym Drops', '/shop?category=gym-wear&sort=newest']] },
+        ],
+        'Running Wear': [
+            { title: 'Run Essentials', links: [['Running Tees', '/shop?category=running-wear&subcategory=t-shirts'], ['Shorts', '/shop?category=running-wear&subcategory=shorts'], ['Track Pants', '/shop?category=running-wear&subcategory=track-pants']] },
+            { title: 'Pace Picks', links: [['Lightweight', '/shop?category=running-wear&sort=newest'], ['Best Sellers', '/shop?category=running-wear&sort=popular'], ['Deals', '/shop?category=running-wear&discount=30']] },
+        ],
+        Offers: [
+            { title: 'Deals', links: [['All Offers', '/shop?offers=1'], ['Under Rs 999', '/shop?max_price=999'], ['40% Off And More', '/shop?discount=40'], ['Best Seller Deals', '/shop?sort=popular']] },
+        ],
+    };
+    const megaMenus = parseJsonObject(site.nav_mega_menu_json, defaultMegaMenus);
+
+    const trendingSearches = parseJsonList(site.nav_trending_searches_json, ['oversized t-shirts', 'gym joggers', 'running shorts', 'black hoodie', 'compression wear', 'new arrivals']);
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 40);
@@ -114,8 +148,8 @@ export default function Navbar({ admin = false, vertical = false }) {
                     className="group/sidebar fixed inset-y-0 left-0 z-50 hidden w-20 overflow-hidden border-r border-white/10 bg-[#1F1F1F] text-white shadow-[10px_0_30px_rgba(15,23,42,0.12)] transition-[width] duration-300 ease-out hover:w-72 lg:flex lg:flex-col"
                 >
                     <div className="flex h-full w-72 flex-col py-5">
-                        <Link href="/" className="ml-[18px] grid size-11 place-items-center bg-[#0F172A] text-[9px] font-black tracking-widest text-white" title="IHO Studio">
-                            IHO
+                        <Link href="/" className="ml-[18px] grid size-11 place-items-center overflow-hidden bg-[#0F172A] text-[9px] font-black tracking-widest text-white" title={brandName}>
+                            {logoUrl ? <img src={logoUrl} alt={brandName} className="h-full w-full object-contain p-1" /> : logoMark}
                         </Link>
 
                         <div className="pointer-events-none absolute left-0 top-1/2 flex w-20 -translate-y-1/2 justify-center transition-opacity duration-200 group-hover/sidebar:opacity-0">
@@ -124,8 +158,8 @@ export default function Navbar({ admin = false, vertical = false }) {
 
                         <div className="flex flex-1 translate-x-4 flex-col opacity-0 transition-all duration-300 ease-out group-hover/sidebar:translate-x-0 group-hover/sidebar:opacity-100">
                             <div className="px-4 pb-6 pt-6">
-                                <p className="text-lg font-black uppercase italic tracking-tight text-white">IHO Studio</p>
-                                <p className="mt-1 text-[8px] font-black uppercase tracking-[0.35em] text-white/35">Performance Store</p>
+                                <p className="text-lg font-black uppercase italic tracking-tight text-white">{brandName}</p>
+                                <p className="mt-1 text-[8px] font-black uppercase tracking-[0.35em] text-white/35">{brandTagline}</p>
                             </div>
 
                             <nav className="flex flex-1 flex-col gap-2 px-0 pt-2">
@@ -172,7 +206,7 @@ export default function Navbar({ admin = false, vertical = false }) {
                             <input
                                 type="text"
                                 autoFocus
-                                placeholder="SEARCH PERFORMANCE GEAR..."
+                                placeholder={site.nav_search_placeholder || 'SEARCH PERFORMANCE GEAR...'}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="min-w-0 flex-1 border-none bg-transparent p-0 text-xs font-black uppercase tracking-widest text-[#1E293B] outline-none placeholder:text-slate-300 focus:ring-0"
@@ -208,11 +242,11 @@ export default function Navbar({ admin = false, vertical = false }) {
                     {/* ❄️ Logo */}
                     <div className="flex-shrink-0 flex items-center justify-center lg:justify-start lg:w-48 z-20">
                         <Link href={admin ? '/franchise-superadmin' : '/'} className="flex items-center gap-3">
-                            <div className="grid size-8 place-items-center bg-[#1E293B] text-white text-[10px] font-black tracking-widest">
-                                IHO
+                            <div className="grid size-8 place-items-center overflow-hidden bg-[#1E293B] text-white text-[10px] font-black tracking-widest">
+                                {logoUrl ? <img src={logoUrl} alt={brandName} className="h-full w-full object-contain p-1" /> : logoMark}
                             </div>
                             <span className="hidden md:block text-2xl font-black tracking-tighter uppercase leading-none text-[#1E293B] italic">
-                                STUDIO
+                                {brandName}
                             </span>
                         </Link>
                     </div>
@@ -245,6 +279,41 @@ export default function Navbar({ admin = false, vertical = false }) {
                             </Link>
                         ))}
                     </nav>
+
+                    <AnimatePresence>
+                        {!admin && hoveredLink && megaMenus[hoveredLink] && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 12 }}
+                                onMouseEnter={() => setHoveredLink(hoveredLink)}
+                                onMouseLeave={() => setHoveredLink(null)}
+                                className="absolute left-1/2 top-full z-[90] hidden w-[min(920px,calc(100vw-4rem))] -translate-x-1/2 border border-slate-100 bg-white p-7 shadow-2xl lg:block"
+                            >
+                                <div className="grid gap-8 md:grid-cols-[1fr_1fr_1fr_220px]">
+                                    {megaMenus[hoveredLink].map((column) => (
+                                        <div key={column.title}>
+                                            <p className="mb-4 text-[10px] font-black uppercase tracking-[0.25em] text-[#ff3f6c]">{column.title}</p>
+                                            <div className="flex flex-col gap-3">
+                                                {column.links.map(([label, href]) => (
+                                                    <Link key={href} href={href} className="text-xs font-bold uppercase tracking-widest text-slate-500 transition hover:text-[#282c3f]">
+                                                        {label}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <div className="bg-gradient-to-br from-[#fff0f4] to-[#fff6df] p-5">
+                                        <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#ff3f6c]">{site.nav_promo_eyebrow || 'IHO Style Days'}</p>
+                                        <h3 className="mt-3 text-2xl font-black uppercase leading-tight text-[#282c3f]">{site.nav_promo_title || 'Fresh drops, sharper deals'}</h3>
+                                        <Link href={site.nav_promo_link || '/shop?sort=newest'} className="mt-5 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#282c3f]">
+                                            {site.nav_promo_cta || 'Explore'} <ArrowRight size={14} />
+                                        </Link>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
                     {/* 🛒 Actions (Right Side) */}
                     <div className="flex-1 flex justify-end items-center gap-4 lg:gap-6 lg:w-48">
@@ -340,7 +409,7 @@ export default function Navbar({ admin = false, vertical = false }) {
                                 <form onSubmit={handleSearchSubmit} className="flex items-center gap-4">
                                     <Search size={24} className="text-slate-300" strokeWidth={1.5} />
                                     <input
-                                        type="text" autoFocus placeholder="SEARCH FOR RUNNING GEAR, GYM WEAR..."
+                                        type="text" autoFocus placeholder={site.nav_search_placeholder || 'SEARCH FOR RUNNING GEAR, GYM WEAR...'}
                                         value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                                         className="flex-1 bg-transparent border-none outline-none text-sm font-black uppercase tracking-widest text-[#1E293B] placeholder:text-slate-300 focus:ring-0 p-0"
                                     />
@@ -348,6 +417,21 @@ export default function Navbar({ admin = false, vertical = false }) {
                                         Close
                                     </button>
                                 </form>
+                                <div className="mt-5 flex flex-wrap gap-2 border-t border-slate-100 pt-5">
+                                    {trendingSearches.map((term) => (
+                                        <button
+                                            key={term}
+                                            type="button"
+                                            onClick={() => {
+                                                setIsSearchOpen(false);
+                                                router.get('/shop', { search: term });
+                                            }}
+                                            className="bg-slate-50 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-slate-500 transition hover:bg-[#ff3f6c] hover:text-white"
+                                        >
+                                            {term}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </motion.div>
                     )}
@@ -367,7 +451,7 @@ export default function Navbar({ admin = false, vertical = false }) {
                             className="fixed inset-y-0 left-0 w-[85%] max-w-sm bg-white z-50 lg:hidden flex flex-col shadow-2xl"
                         >
                             <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                                <span className="text-xl font-black tracking-tighter uppercase text-[#1E293B] italic">Studio Menu</span>
+                                <span className="text-xl font-black tracking-tighter uppercase text-[#1E293B] italic">{site.nav_mobile_title || 'Studio Menu'}</span>
                                 <button onClick={() => setIsMobileMenuOpen(false)} className="text-slate-400 hover:text-black p-1">
                                     <X size={24} />
                                 </button>
@@ -403,4 +487,26 @@ export default function Navbar({ admin = false, vertical = false }) {
             </AnimatePresence>
         </>
     );
-} 
+}
+
+function parseJsonList(value, fallback = []) {
+    if (!value) return fallback;
+
+    try {
+        const decoded = typeof value === 'string' ? JSON.parse(value) : value;
+        return Array.isArray(decoded) && decoded.length ? decoded : fallback;
+    } catch {
+        return fallback;
+    }
+}
+
+function parseJsonObject(value, fallback = {}) {
+    if (!value) return fallback;
+
+    try {
+        const decoded = typeof value === 'string' ? JSON.parse(value) : value;
+        return decoded && typeof decoded === 'object' && !Array.isArray(decoded) ? decoded : fallback;
+    } catch {
+        return fallback;
+    }
+}

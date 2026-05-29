@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use App\Models\StorefrontSetting;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -74,7 +75,26 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
+
+            'site' => fn () => $this->siteSettings(),
         ];
+    }
+
+    private function siteSettings(): array
+    {
+        if (! Schema::hasTable('storefront_settings')) {
+            return [];
+        }
+
+        return StorefrontSetting::query()
+            ->where(function ($query) {
+                $query->where('key', 'like', 'site_%')
+                    ->orWhere('key', 'like', 'nav_%')
+                    ->orWhere('key', 'like', 'footer_%');
+            })
+            ->pluck('value', 'key')
+            ->map(fn ($value) => is_string($value) ? trim($value) : $value)
+            ->toArray();
     }
 
     private function accountAddresses(int $userId)

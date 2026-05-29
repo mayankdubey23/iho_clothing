@@ -64,6 +64,14 @@ export default function CreateProduct({ categories = [], brands = [], colors = [
         }));
     };
 
+    const handleGenderChange = (value) => {
+        setData((current) => ({
+            ...current,
+            gender: value,
+            show_on_men_page: value === 'men' || value === 'unisex',
+        }));
+    };
+
     // 📸 Studio Visuals Handler (Images + videos, max 5 total)
     const handleImageUpload = (e) => {
         const files = Array.from(e.target.files);
@@ -175,13 +183,16 @@ export default function CreateProduct({ categories = [], brands = [], colors = [
                                         <input type="text" value={data.custom_brand} onChange={e => setData('custom_brand', e.target.value)} placeholder="Enter Brand Name" className="form-input bg-slate-50 italic" />
                                     </FormField>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <FormField label="Gender" error={errors.gender}>
-                                            <select value={data.gender} onChange={e => setData('gender', e.target.value)} className="form-input appearance-none cursor-pointer">
+                                        <FormField label="Gender *" error={errors.gender}>
+                                            <select value={data.gender} onChange={e => handleGenderChange(e.target.value)} className="form-input appearance-none cursor-pointer" required>
                                                 <option value="">Select...</option>
                                                 <option value="men">Men</option>
                                                 <option value="women">Women</option>
-                                                <option value="unisex">Unisex</option>
+                                                <option value="unisex">Unisex - shows in Men & Women</option>
                                             </select>
+                                            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                                                Unisex products are automatically included in both Men and Women shop filters.
+                                            </p>
                                         </FormField>
                                         <FormField label="Sub-category" error={errors.subcategory_slug}>
                                             <div className="relative">
@@ -343,7 +354,7 @@ export default function CreateProduct({ categories = [], brands = [], colors = [
                             <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-[#1E293B] mb-10 border-b border-slate-100 pb-5">Visibility Attributes</h3>
                             <div className="space-y-8">
                                 <ToggleButton label="Feature this Product" sub="Appears in hero highlights" checked={data.is_featured} onChange={v => setData('is_featured', v)} />
-                                <ToggleButton label="Show on Men Page" sub="Direct link in Men's section" checked={data.show_on_men_page} onChange={v => setData('show_on_men_page', v)} />
+                                <ToggleButton label="Include in Men Collection" sub="Auto-on for Men and Unisex products" checked={data.show_on_men_page} onChange={v => setData('show_on_men_page', v)} />
                                 <ToggleButton label="Best Seller" sub="Adds Best Seller badge" checked={data.is_best_seller} onChange={v => setData('is_best_seller', v)} />
                                 <ToggleButton label="Visible on Storefront" sub="Live to Customers" checked={data.status === 'active'} onChange={v => setData('status', v ? 'active' : 'inactive')} />
                             </div>

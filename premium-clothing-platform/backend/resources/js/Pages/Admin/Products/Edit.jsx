@@ -110,6 +110,14 @@ export default function EditProduct({ product, categories = [], brands = [], siz
         setData('variants', [...data.variants, { size: '', color: '', color_hex: '#000000', qty: '' }]);
     };
 
+    const handleGenderChange = (value) => {
+        setData((current) => ({
+            ...current,
+            gender: value,
+            show_on_men_page: value === 'men' || value === 'unisex',
+        }));
+    };
+
     const selectedCategory = categories.find((cat) => String(cat.id) === String(data.category_id));
     const categorySubcategories = selectedCategory?.children || [];
     const subcategories = [
@@ -172,13 +180,16 @@ export default function EditProduct({ product, categories = [], brands = [], siz
                                     <input type="text" value={data.custom_brand} onChange={e => setData('custom_brand', e.target.value)} placeholder="Add brand if not listed" className="form-input" />
                                 </FormField>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <FormField label="Gender" error={errors.gender}>
-                                        <select value={data.gender} onChange={e => setData('gender', e.target.value)} className="form-input">
+                                    <FormField label="Gender *" error={errors.gender}>
+                                        <select value={data.gender} onChange={e => handleGenderChange(e.target.value)} className="form-input" required>
                                             <option value="">Select gender...</option>
                                             <option value="men">Men</option>
                                             <option value="women">Women</option>
-                                            <option value="unisex">Unisex</option>
+                                            <option value="unisex">Unisex - shows in Men & Women</option>
                                         </select>
+                                        <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                                            Unisex products are automatically included in both Men and Women shop filters.
+                                        </p>
                                     </FormField>
                                     <FormField label="Sub-category" error={errors.subcategory_slug}>
                                         <select value={data.subcategory_slug} onChange={e => setData('subcategory_slug', e.target.value)} className="form-input">
@@ -385,7 +396,7 @@ export default function EditProduct({ product, categories = [], brands = [], siz
                             </label>
                             <label className="flex items-start gap-3 cursor-pointer group mb-5">
                                 <input type="checkbox" checked={data.show_on_men_page} onChange={e => setData('show_on_men_page', e.target.checked)} className="mt-0.5 rounded-none text-black border-slate-300 focus:ring-black size-4 transition-all" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B]">Show on Men page</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B]">Include in Men collection</span>
                             </label>
                             <label className="flex items-start gap-3 cursor-pointer group mb-5">
                                 <input type="checkbox" checked={data.is_best_seller} onChange={e => setData('is_best_seller', e.target.checked)} className="mt-0.5 rounded-none text-black border-slate-300 focus:ring-black size-4 transition-all" />

@@ -47,14 +47,31 @@ class ProductController extends Controller
                 $query->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('slug', $category));
             })
             ->when($validated['gender'] ?? null, function ($query, $gender) {
-                $query->where(function ($genderQuery) use ($gender) {
-                    if (Schema::hasColumn('products', 'gender')) {
-                        $genderQuery->where('gender', $gender);
-                    }
+                $genderAliases = [
+                    'men' => ['men', 'male', 'man', 'mens', "men's"],
+                    'male' => ['men', 'male', 'man', 'mens', "men's"],
+                    'women' => ['women', 'female', 'woman', 'womens', "women's"],
+                    'female' => ['women', 'female', 'woman', 'womens', "women's"],
+                    'unisex' => ['unisex', 'all', 'neutral', 'all-gender', 'all gender'],
+                ];
+                $selectedGender = strtolower(trim((string) $gender));
+                $genderTerms = $genderAliases[$selectedGender] ?? [$selectedGender];
+                $productGenderTerms = $genderTerms;
 
-                    $genderQuery->orWhereHas('category', fn ($categoryQuery) => $categoryQuery
-                        ->where('slug', 'like', "%{$gender}%")
-                        ->orWhere('name', 'like', "%{$gender}%"));
+                if (in_array($selectedGender, ['men', 'male', 'women', 'female'], true)) {
+                    $productGenderTerms = array_values(array_unique(array_merge($productGenderTerms, $genderAliases['unisex'])));
+                }
+
+                if (Schema::hasColumn('products', 'gender')) {
+                    $query->whereIn(DB::raw('LOWER(TRIM(products.gender))'), $productGenderTerms);
+                    return;
+                }
+
+                $query->whereHas('category', function ($categoryQuery) use ($genderTerms) {
+                    foreach ($genderTerms as $term) {
+                        $categoryQuery->orWhere('slug', 'like', "%{$term}%")
+                            ->orWhere('name', 'like', "%{$term}%");
+                    }
                 });
             })
             ->when($validated['subcategory'] ?? null, function ($query, $subcategory) {

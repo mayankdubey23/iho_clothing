@@ -1,3 +1,5 @@
+const defaultTheme = require('tailwindcss/defaultTheme');
+
 module.exports = {
   content: [
     './resources/**/*.blade.php',
@@ -39,6 +41,12 @@ module.exports = {
           white: '#FFFFFF',
           gray: '#F5F5F7',
         }
+      },
+      fontFamily: {
+        // Inter for extremely clean, readable product details and menus
+        sans: ['Inter', ...defaultTheme.fontFamily.sans],
+        // Montserrat for premium, wider headings
+        heading: ['Montserrat', ...defaultTheme.fontFamily.sans],
       },
     },
   },

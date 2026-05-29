@@ -14,6 +14,69 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
     const [editingFeaturedCategory, setEditingFeaturedCategory] = useState(null);
     const [featuredCategoryImageError, setFeaturedCategoryImageError] = useState('');
     const maxFeaturedCategoryImageSize = 4 * 1024 * 1024;
+    const siteSettingsDefaults = {
+        site_brand_name: '',
+        site_logo_mark: '',
+        site_tagline: '',
+        site_logo: null,
+        nav_mobile_title: '',
+        nav_search_placeholder: '',
+        nav_promo_eyebrow: '',
+        nav_promo_title: '',
+        nav_promo_cta: '',
+        nav_promo_link: '',
+        nav_trending_searches_json: '',
+        nav_links_json: '',
+        nav_mega_menu_json: '',
+        footer_about_text: '',
+        footer_newsletter_title: '',
+        footer_newsletter_placeholder: '',
+        footer_copyright: '',
+        footer_link_groups_json: '',
+        footer_trust_badges_json: '',
+        footer_social_links_json: '',
+        footer_payment_methods_json: '',
+        footer_bottom_links_json: '',
+    };
+    const homepageSettingsDefaults = {
+        home_seo_title: '',
+        home_top_strip: '',
+        home_hero_badge: '',
+        home_hero_title: '',
+        home_hero_subtitle: '',
+        home_hero_cta_text: '',
+        home_hero_cta_link: '',
+        home_hero_secondary_text: '',
+        home_hero_secondary_link: '',
+        home_hero_media: null,
+        home_hero_media_alt: '',
+        home_sale_title: '',
+        home_sale_subtitle: '',
+        home_coupon_text: '',
+        home_hidden_sections: '',
+        home_section_order: '',
+        home_category_offers_json: '',
+        home_promo_tiles_json: '',
+        home_categories_title: '',
+        home_categories_subtitle: '',
+        home_best_sellers_title: '',
+        home_best_sellers_subtitle: '',
+        home_new_arrivals_title: '',
+        home_new_arrivals_subtitle: '',
+        home_gym_title: '',
+        home_gym_subtitle: '',
+        home_offers_title: '',
+        home_offers_subtitle: '',
+        home_reviews_title: '',
+        home_reviews_subtitle: '',
+        home_trust_title: '',
+        home_trust_subtitle: '',
+        home_benefits_json: '',
+        home_franchise_title: '',
+        home_franchise_subtitle: '',
+        home_franchise_cta_text: '',
+        home_franchise_cta_link: '',
+    };
 
     const { data, setData, post, processing, errors, reset } = useForm({
         customer_name: '',
@@ -55,6 +118,8 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
         processing: settingsProcessing,
         errors: settingsErrors,
     } = useForm({
+        ...siteSettingsDefaults,
+        ...homepageSettingsDefaults,
         shop_hero_title: '',
         shop_hero_subtitle: '',
         shop_promo_banner: '',
@@ -79,6 +144,14 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
         if (activeTab !== 'settings') return;
 
         setSettingsData({
+            ...Object.keys(siteSettingsDefaults).reduce((payload, key) => {
+                payload[key] = key === 'site_logo' ? null : (tabData?.[key] || '');
+                return payload;
+            }, {}),
+            ...Object.keys(homepageSettingsDefaults).reduce((payload, key) => {
+                payload[key] = key === 'home_hero_media' ? null : (tabData?.[key] || '');
+                return payload;
+            }, {}),
             shop_hero_title: tabData?.shop_hero_title || '',
             shop_hero_subtitle: tabData?.shop_hero_subtitle || '',
             shop_promo_banner: tabData?.shop_promo_banner || '',
@@ -380,6 +453,330 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
 
                     {activeTab === 'settings' && (
                         <form id="settings-settings" onSubmit={handleSettingsSubmit} className="max-w-4xl space-y-8">
+                            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+                                <div className="border-b border-gray-100 pb-6">
+                                    <h2 className="mb-1 text-lg font-black uppercase tracking-wider text-[#1A1A2E]">Global Brand & Layout</h2>
+                                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Controls the logo, navbar, footer, social links, payment labels, and reusable storefront text.</p>
+                                </div>
+
+                                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+                                    <InputField
+                                        label="Brand Name"
+                                        value={settingsData.site_brand_name}
+                                        onChange={(e) => setSettingsData('site_brand_name', e.target.value)}
+                                        error={settingsErrors.site_brand_name}
+                                        placeholder="IHO STUDIO"
+                                    />
+                                    <InputField
+                                        label="Logo Text Mark"
+                                        value={settingsData.site_logo_mark}
+                                        onChange={(e) => setSettingsData('site_logo_mark', e.target.value)}
+                                        error={settingsErrors.site_logo_mark}
+                                        placeholder="IHO"
+                                    />
+                                    <InputField
+                                        label="Tagline"
+                                        value={settingsData.site_tagline}
+                                        onChange={(e) => setSettingsData('site_tagline', e.target.value)}
+                                        error={settingsErrors.site_tagline}
+                                        placeholder="Performance Store"
+                                    />
+                                </div>
+
+                                <div className="mt-5 space-y-1.5">
+                                    <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">Website Logo</label>
+                                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => setSettingsData('site_logo', e.target.files[0])}
+                                            className="w-full cursor-pointer rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-bold text-[#1A1A2E]"
+                                        />
+                                        {tabData?.site_logo && (
+                                            <div className="grid h-16 w-28 shrink-0 place-items-center overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+                                                <img src={`/storage/${tabData.site_logo}`} alt="Current logo" className="h-full w-full object-contain p-2" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <p className="ml-1 mt-1 text-[9px] font-bold uppercase tracking-widest text-gray-400">Leave empty to keep current logo. If no logo is uploaded, the text mark is used.</p>
+                                    {settingsErrors.site_logo && <p className="ml-1 text-[10px] font-bold text-red-500">{settingsErrors.site_logo}</p>}
+                                </div>
+
+                                <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+                                    {[
+                                        ['nav_mobile_title', 'Mobile Menu Title', 'Studio Menu'],
+                                        ['nav_search_placeholder', 'Search Placeholder', 'SEARCH FOR RUNNING GEAR, GYM WEAR...'],
+                                        ['nav_promo_eyebrow', 'Mega Menu Promo Eyebrow', 'IHO Style Days'],
+                                        ['nav_promo_title', 'Mega Menu Promo Title', 'Fresh drops, sharper deals'],
+                                        ['nav_promo_cta', 'Mega Menu Promo Button', 'Explore'],
+                                        ['nav_promo_link', 'Mega Menu Promo Link', '/shop?sort=newest'],
+                                        ['footer_newsletter_title', 'Footer Newsletter Title', 'Get Style Updates'],
+                                        ['footer_newsletter_placeholder', 'Footer Newsletter Placeholder', 'Enter your email for early access'],
+                                        ['footer_copyright', 'Footer Copyright', 'Copyright 2026 IHO STUDIO. ALL RIGHTS RESERVED.'],
+                                    ].map(([key, label, placeholder]) => (
+                                        <InputField
+                                            key={key}
+                                            label={label}
+                                            value={settingsData[key]}
+                                            onChange={(e) => setSettingsData(key, e.target.value)}
+                                            error={settingsErrors[key]}
+                                            placeholder={placeholder}
+                                        />
+                                    ))}
+                                </div>
+
+                                <div className="mt-5 space-y-1.5">
+                                    <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">Footer About Text</label>
+                                    <textarea
+                                        value={settingsData.footer_about_text}
+                                        onChange={(e) => setSettingsData('footer_about_text', e.target.value)}
+                                        rows="3"
+                                        className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-bold text-[#1A1A2E] outline-none transition-all focus:ring-2 focus:ring-[#E94E3C]"
+                                        placeholder="Short brand description shown in the footer."
+                                    />
+                                    {settingsErrors.footer_about_text && <p className="ml-1 text-[10px] font-bold text-red-500">{settingsErrors.footer_about_text}</p>}
+                                </div>
+
+                                <div className="mt-6 grid grid-cols-1 gap-5">
+                                    {[
+                                        ['nav_trending_searches_json', 'Trending Searches JSON', '["oversized t-shirts","gym joggers","running shorts"]'],
+                                        ['nav_links_json', 'Navbar Links JSON', '[{"name":"Home","href":"/"},{"name":"Men","href":"/shop?gender=men"}]'],
+                                        ['nav_mega_menu_json', 'Mega Menu JSON', '{"Men":[{"title":"Topwear","links":[["T-Shirts","/shop?gender=men&subcategory=t-shirts"]]}]}'],
+                                        ['footer_link_groups_json', 'Footer Link Groups JSON', '[{"title":"Shop","links":[{"label":"All Products","href":"/shop"}]}]'],
+                                        ['footer_trust_badges_json', 'Footer Trust Badges JSON', '[{"icon":"truck","title":"Fast Shipping","desc":"Quick dispatch network"}]'],
+                                        ['footer_social_links_json', 'Footer Social Links JSON', '[{"icon":"instagram","label":"Instagram","href":"https://instagram.com/"}]'],
+                                        ['footer_payment_methods_json', 'Footer Payment Methods JSON', '["VISA","MASTER","UPI","COD"]'],
+                                        ['footer_bottom_links_json', 'Footer Bottom Links JSON', '[{"label":"Privacy","href":"/privacy-policy"}]'],
+                                    ].map(([key, label, placeholder]) => (
+                                        <JsonTextArea
+                                            key={key}
+                                            label={label}
+                                            value={settingsData[key]}
+                                            onChange={(e) => setSettingsData(key, e.target.value)}
+                                            error={settingsErrors[key]}
+                                            placeholder={placeholder}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+                                <div className="border-b border-gray-100 pb-6">
+                                    <h2 className="text-lg font-black text-[#1A1A2E] uppercase tracking-wider mb-1">Homepage Storefront Content</h2>
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Controls the premium landing page hero, rails, trust blocks, reviews, offers, and franchise CTA.</p>
+                                </div>
+
+                                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <InputField
+                                        label="Homepage SEO Title"
+                                        value={settingsData.home_seo_title}
+                                        onChange={(e) => setSettingsData('home_seo_title', e.target.value)}
+                                        error={settingsErrors.home_seo_title}
+                                        placeholder="IHO STUDIO | Performance Luxury"
+                                    />
+                                    <InputField
+                                        label="Top Sale Strip"
+                                        value={settingsData.home_top_strip}
+                                        onChange={(e) => setSettingsData('home_top_strip', e.target.value)}
+                                        error={settingsErrors.home_top_strip}
+                                        placeholder="FLAT 40-70% OFF | FREE SHIPPING ABOVE RS 999"
+                                    />
+                                    <InputField
+                                        label="Hero Badge"
+                                        value={settingsData.home_hero_badge}
+                                        onChange={(e) => setSettingsData('home_hero_badge', e.target.value)}
+                                        error={settingsErrors.home_hero_badge}
+                                        placeholder="IHO Studio Performance Store"
+                                    />
+                                    <InputField
+                                        label="Hero Title"
+                                        value={settingsData.home_hero_title}
+                                        onChange={(e) => setSettingsData('home_hero_title', e.target.value)}
+                                        error={settingsErrors.home_hero_title}
+                                        placeholder="Sportswear Built For Motion"
+                                    />
+                                    <InputField
+                                        label="Hero Media Alt Text"
+                                        value={settingsData.home_hero_media_alt}
+                                        onChange={(e) => setSettingsData('home_hero_media_alt', e.target.value)}
+                                        error={settingsErrors.home_hero_media_alt}
+                                        placeholder="Hero model image alt text"
+                                    />
+                                </div>
+
+                                <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <InputField
+                                        label="Sale Badge Title"
+                                        value={settingsData.home_sale_title}
+                                        onChange={(e) => setSettingsData('home_sale_title', e.target.value)}
+                                        error={settingsErrors.home_sale_title}
+                                        placeholder="50-80% OFF"
+                                    />
+                                    <InputField
+                                        label="Sale Badge Subtitle"
+                                        value={settingsData.home_sale_subtitle}
+                                        onChange={(e) => setSettingsData('home_sale_subtitle', e.target.value)}
+                                        error={settingsErrors.home_sale_subtitle}
+                                        placeholder="On latest active storefront picks"
+                                    />
+                                    <InputField
+                                        label="Coupon Strip Text"
+                                        value={settingsData.home_coupon_text}
+                                        onChange={(e) => setSettingsData('home_coupon_text', e.target.value)}
+                                        error={settingsErrors.home_coupon_text}
+                                        placeholder="Use code IHOSTYLE for extra savings"
+                                    />
+                                </div>
+
+                                <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <InputField
+                                        label="Hide Homepage Sections"
+                                        value={settingsData.home_hidden_sections}
+                                        onChange={(e) => setSettingsData('home_hidden_sections', e.target.value)}
+                                        error={settingsErrors.home_hidden_sections}
+                                        placeholder="example: reviews,franchise"
+                                    />
+                                    <InputField
+                                        label="Homepage Section Order"
+                                        value={settingsData.home_section_order}
+                                        onChange={(e) => setSettingsData('home_section_order', e.target.value)}
+                                        error={settingsErrors.home_section_order}
+                                        placeholder="hero,promo,categories,best,new,gym,offers,reviews,trust,franchise"
+                                    />
+                                </div>
+                                <p className="mt-2 text-[9px] font-bold uppercase tracking-widest text-gray-400">
+                                    Section IDs: hero, promo, categories, best, new, gym, offers, reviews, trust, franchise.
+                                </p>
+
+                                <div className="mt-5 space-y-1.5">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Hero Subtitle</label>
+                                    <textarea
+                                        value={settingsData.home_hero_subtitle}
+                                        onChange={(e) => setSettingsData('home_hero_subtitle', e.target.value)}
+                                        rows="3"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none transition-all resize-none"
+                                        placeholder="Premium training, running, and daily performance essentials."
+                                    />
+                                    {settingsErrors.home_hero_subtitle && <p className="text-[10px] text-red-500 font-bold ml-1">{settingsErrors.home_hero_subtitle}</p>}
+                                </div>
+
+                                <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <InputField
+                                        label="Primary CTA Text"
+                                        value={settingsData.home_hero_cta_text}
+                                        onChange={(e) => setSettingsData('home_hero_cta_text', e.target.value)}
+                                        error={settingsErrors.home_hero_cta_text}
+                                        placeholder="Shop Collection"
+                                    />
+                                    <InputField
+                                        label="Primary CTA Link"
+                                        value={settingsData.home_hero_cta_link}
+                                        onChange={(e) => setSettingsData('home_hero_cta_link', e.target.value)}
+                                        error={settingsErrors.home_hero_cta_link}
+                                        placeholder="/shop"
+                                    />
+                                    <InputField
+                                        label="Secondary CTA Text"
+                                        value={settingsData.home_hero_secondary_text}
+                                        onChange={(e) => setSettingsData('home_hero_secondary_text', e.target.value)}
+                                        error={settingsErrors.home_hero_secondary_text}
+                                        placeholder="Apply Franchise"
+                                    />
+                                    <InputField
+                                        label="Secondary CTA Link"
+                                        value={settingsData.home_hero_secondary_link}
+                                        onChange={(e) => setSettingsData('home_hero_secondary_link', e.target.value)}
+                                        error={settingsErrors.home_hero_secondary_link}
+                                        placeholder="/franchise-enquiry"
+                                    />
+                                </div>
+
+                                <div className="mt-5 space-y-1.5">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Hero Background Media</label>
+                                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                                        <input
+                                            type="file"
+                                            accept="image/*,video/mp4,video/webm"
+                                            onChange={(e) => setSettingsData('home_hero_media', e.target.files[0])}
+                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-bold text-[#1A1A2E] cursor-pointer"
+                                        />
+                                        {tabData?.home_hero_media && (
+                                            <div className="h-16 w-28 bg-gray-100 rounded-lg overflow-hidden shrink-0 border border-gray-200">
+                                                <img src={`/storage/${tabData.home_hero_media}`} alt="Current homepage hero media" className="w-full h-full object-cover" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest ml-1 mt-1">Leave empty to keep current media. The storefront shows a blank placeholder until media is uploaded.</p>
+                                    {settingsErrors.home_hero_media && <p className="text-[10px] text-red-500 font-bold ml-1">{settingsErrors.home_hero_media}</p>}
+                                </div>
+
+                                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {[
+                                        ['home_categories_title', 'Featured Categories Title'],
+                                        ['home_categories_subtitle', 'Featured Categories Subtitle'],
+                                        ['home_best_sellers_title', 'Best Sellers Title'],
+                                        ['home_best_sellers_subtitle', 'Best Sellers Subtitle'],
+                                        ['home_new_arrivals_title', 'New Arrivals Title'],
+                                        ['home_new_arrivals_subtitle', 'New Arrivals Subtitle'],
+                                        ['home_gym_title', 'Gym Products Title'],
+                                        ['home_gym_subtitle', 'Gym Products Subtitle'],
+                                        ['home_offers_title', 'Offers Title'],
+                                        ['home_offers_subtitle', 'Offers Subtitle'],
+                                        ['home_reviews_title', 'Reviews Title'],
+                                        ['home_reviews_subtitle', 'Reviews Subtitle'],
+                                        ['home_trust_title', 'Trust Section Title'],
+                                        ['home_trust_subtitle', 'Trust Section Subtitle'],
+                                        ['home_franchise_title', 'Franchise CTA Title'],
+                                        ['home_franchise_cta_text', 'Franchise CTA Button'],
+                                        ['home_franchise_cta_link', 'Franchise CTA Link'],
+                                    ].map(([key, label]) => (
+                                        <InputField
+                                            key={key}
+                                            label={label}
+                                            value={settingsData[key]}
+                                            onChange={(e) => setSettingsData(key, e.target.value)}
+                                            error={settingsErrors[key]}
+                                        />
+                                    ))}
+                                </div>
+
+                                <div className="mt-5 space-y-1.5">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Franchise CTA Subtitle</label>
+                                    <textarea
+                                        value={settingsData.home_franchise_subtitle}
+                                        onChange={(e) => setSettingsData('home_franchise_subtitle', e.target.value)}
+                                        rows="3"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none transition-all resize-none"
+                                    />
+                                    {settingsErrors.home_franchise_subtitle && <p className="text-[10px] text-red-500 font-bold ml-1">{settingsErrors.home_franchise_subtitle}</p>}
+                                </div>
+
+                                <BenefitEditor
+                                    value={settingsData.home_benefits_json}
+                                    onChange={(value) => setSettingsData('home_benefits_json', value)}
+                                    error={settingsErrors.home_benefits_json}
+                                />
+
+                                <PromoTileEditor
+                                    value={settingsData.home_promo_tiles_json}
+                                    onChange={(value) => setSettingsData('home_promo_tiles_json', value)}
+                                    error={settingsErrors.home_promo_tiles_json}
+                                />
+
+                                <div className="mt-5 space-y-1.5">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Category Card Offers JSON</label>
+                                    <textarea
+                                        value={settingsData.home_category_offers_json}
+                                        onChange={(e) => setSettingsData('home_category_offers_json', e.target.value)}
+                                        rows="4"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-mono text-xs font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none transition-all resize-none"
+                                        placeholder='[{"title":"Mens Activewear","discount":"Studio Picks","href":"/shop?category=men-sportswear"}]'
+                                    />
+                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest ml-1">Optional. Items match category cards by position.</p>
+                                    {settingsErrors.home_category_offers_json && <p className="text-[10px] text-red-500 font-bold ml-1">{settingsErrors.home_category_offers_json}</p>}
+                                </div>
+                            </div>
+
                             <div className="border-b border-gray-100 pb-6">
                                 <h2 className="text-lg font-black text-[#1A1A2E] uppercase tracking-wider mb-1">Shop Page Configuration</h2>
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Control the main collection page visuals.</p>
@@ -896,6 +1293,143 @@ function InputField({ label, error, ...props }) {
             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{label}</label>
             <input className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none transition-all" {...props} />
             {error && <p className="text-[10px] text-red-500 font-bold ml-1">{error}</p>}
+        </div>
+    );
+}
+
+function JsonTextArea({ label, error, ...props }) {
+    return (
+        <div className="space-y-1.5">
+            <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">{label}</label>
+            <textarea
+                rows="4"
+                className="w-full resize-y rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-mono text-xs font-bold text-[#1A1A2E] outline-none transition-all focus:ring-2 focus:ring-[#E94E3C]"
+                {...props}
+            />
+            <p className="ml-1 text-[9px] font-bold uppercase tracking-widest text-gray-400">Optional advanced control. Leave empty to use the site default.</p>
+            {error && <p className="ml-1 text-[10px] font-bold text-red-500">{error}</p>}
+        </div>
+    );
+}
+
+function parseEditorRows(value, fallback) {
+    if (!value) return fallback;
+
+    try {
+        const decoded = JSON.parse(value);
+        return Array.isArray(decoded) && decoded.length ? decoded : fallback;
+    } catch {
+        return fallback;
+    }
+}
+
+function PromoTileEditor({ value, onChange, error }) {
+    const fallback = [
+        { title: 'Min. 50% Off', subtitle: 'Performance Tees', href: '/shop', from: '#ff3f6c', to: '#ff905a' },
+        { title: 'Buy 2 Save More', subtitle: 'Gym Essentials', href: '/shop?category=gym-wear', from: '#14b8a6', to: '#2563eb' },
+        { title: 'New Season', subtitle: 'Running Gear', href: '/shop?category=running-wear', from: '#f59e0b', to: '#ef4444' },
+    ];
+    const [rows, setRows] = useState(() => parseEditorRows(value, fallback));
+
+    useEffect(() => {
+        setRows(parseEditorRows(value, fallback));
+    }, [value]);
+
+    const updateRows = (nextRows) => {
+        setRows(nextRows);
+        onChange(JSON.stringify(nextRows));
+    };
+
+    return (
+        <div className="mt-6 rounded-2xl border border-gray-100 bg-gray-50 p-5">
+            <div className="mb-4 flex items-center justify-between gap-4">
+                <div>
+                    <h3 className="text-sm font-black uppercase tracking-wider text-[#1A1A2E]">Homepage Promo Tiles</h3>
+                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Editable cards below the hero.</p>
+                </div>
+                <button type="button" onClick={() => updateRows([...rows, { title: '', subtitle: '', href: '/shop', from: '#ff3f6c', to: '#ff905a' }])} className="bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#1A1A2E] shadow-sm hover:text-[#E94E3C]">
+                    Add Tile
+                </button>
+            </div>
+
+            <div className="space-y-4">
+                {rows.map((row, index) => (
+                    <div key={`promo-tile-${index}`} className="grid gap-3 bg-white p-4 md:grid-cols-6">
+                        {['title', 'subtitle', 'href', 'from', 'to'].map((field) => (
+                            <input
+                                key={field}
+                                value={row[field] || ''}
+                                onChange={(e) => {
+                                    const nextRows = rows.map((item, itemIndex) => itemIndex === index ? { ...item, [field]: e.target.value } : item);
+                                    updateRows(nextRows);
+                                }}
+                                placeholder={field}
+                                className="bg-gray-50 border border-gray-200 px-3 py-2 text-xs font-bold text-[#1A1A2E] outline-none focus:ring-2 focus:ring-[#E94E3C] md:col-span-1"
+                            />
+                        ))}
+                        <button type="button" onClick={() => updateRows(rows.filter((_, itemIndex) => itemIndex !== index))} className="bg-red-50 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white">
+                            Remove
+                        </button>
+                    </div>
+                ))}
+            </div>
+            {error && <p className="mt-2 text-[10px] font-bold text-red-500">{error}</p>}
+        </div>
+    );
+}
+
+function BenefitEditor({ value, onChange, error }) {
+    const fallback = [
+        { title: 'Easy Returns', body: 'Simple exchange and return support.' },
+        { title: 'Fast Shipping', body: 'Quick dispatch for active catalog products.' },
+        { title: 'Secure Checkout', body: 'Protected payments and account handling.' },
+        { title: 'Fresh Drops', body: 'New styles and offers keep the store moving.' },
+    ];
+    const [rows, setRows] = useState(() => parseEditorRows(value, fallback));
+
+    useEffect(() => {
+        setRows(parseEditorRows(value, fallback));
+    }, [value]);
+
+    const updateRows = (nextRows) => {
+        setRows(nextRows);
+        onChange(JSON.stringify(nextRows));
+    };
+
+    return (
+        <div className="mt-6 rounded-2xl border border-gray-100 bg-gray-50 p-5">
+            <div className="mb-4 flex items-center justify-between gap-4">
+                <div>
+                    <h3 className="text-sm font-black uppercase tracking-wider text-[#1A1A2E]">Trust Benefit Cards</h3>
+                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Shown in the assurance section.</p>
+                </div>
+                <button type="button" onClick={() => updateRows([...rows, { title: '', body: '' }])} className="bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#1A1A2E] shadow-sm hover:text-[#E94E3C]">
+                    Add Card
+                </button>
+            </div>
+
+            <div className="space-y-4">
+                {rows.map((row, index) => (
+                    <div key={`benefit-card-${index}`} className="grid gap-3 bg-white p-4 md:grid-cols-[1fr_2fr_auto]">
+                        <input
+                            value={row.title || ''}
+                            onChange={(e) => updateRows(rows.map((item, itemIndex) => itemIndex === index ? { ...item, title: e.target.value } : item))}
+                            placeholder="Title"
+                            className="bg-gray-50 border border-gray-200 px-3 py-2 text-xs font-bold text-[#1A1A2E] outline-none focus:ring-2 focus:ring-[#E94E3C]"
+                        />
+                        <input
+                            value={row.body || ''}
+                            onChange={(e) => updateRows(rows.map((item, itemIndex) => itemIndex === index ? { ...item, body: e.target.value } : item))}
+                            placeholder="Description"
+                            className="bg-gray-50 border border-gray-200 px-3 py-2 text-xs font-bold text-[#1A1A2E] outline-none focus:ring-2 focus:ring-[#E94E3C]"
+                        />
+                        <button type="button" onClick={() => updateRows(rows.filter((_, itemIndex) => itemIndex !== index))} className="bg-red-50 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white">
+                            Remove
+                        </button>
+                    </div>
+                ))}
+            </div>
+            {error && <p className="mt-2 text-[10px] font-bold text-red-500">{error}</p>}
         </div>
     );
 }

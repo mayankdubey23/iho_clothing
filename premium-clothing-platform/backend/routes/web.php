@@ -35,11 +35,15 @@ use Inertia\Inertia;
 
 Route::get('/{category_slug}', function (string $category_slug) {
     $categoryMap = [
-        'men' => 'men-sportswear',
-        'women' => 'women-sportswear',
+        'men' => 'men',
+        'women' => 'women',
         'gym-wear' => 'gym-wear',
         'running-wear' => 'running-wear',
     ];
+
+    if (in_array($category_slug, ['men', 'women'], true)) {
+        return redirect()->route('shop', ['gender' => $categoryMap[$category_slug]]);
+    }
 
     return redirect()->route('shop', ['category' => $categoryMap[$category_slug]]);
 })->where('category_slug', 'men|women|gym-wear|running-wear')->name('shop.category');
@@ -65,6 +69,42 @@ Route::get('/cart', function () {
 Route::get('/wishlist', function () {
     return Inertia::render('Wishlist');
 })->name('wishlist');
+
+Route::get('/shipping', fn () => Inertia::render('StaticPage', [
+    'eyebrow' => 'Delivery',
+    'title' => 'Shipping Policy',
+    'body' => 'Orders are packed from active inventory and dispatched as quickly as possible. Shipping timelines, charges, and tracking details are shown during checkout and inside your account order history.',
+]))->name('shipping');
+
+Route::get('/returns', fn () => Inertia::render('StaticPage', [
+    'eyebrow' => 'Support',
+    'title' => 'Returns & Refunds',
+    'body' => 'Eligible unused products with original tags can be requested for return or exchange from your account. Refunds are processed after inspection according to the order payment method.',
+]))->name('returns.public');
+
+Route::get('/privacy-policy', fn () => Inertia::render('StaticPage', [
+    'eyebrow' => 'Legal',
+    'title' => 'Privacy Policy',
+    'body' => 'We use customer information to manage accounts, orders, delivery, payments, support, fraud prevention, and storefront improvements. Sensitive account actions remain protected behind authentication.',
+]))->name('privacy');
+
+Route::get('/terms', fn () => Inertia::render('StaticPage', [
+    'eyebrow' => 'Legal',
+    'title' => 'Terms & Conditions',
+    'body' => 'By using IHO Studio you agree to provide accurate account and delivery details, follow checkout policies, and use offers, returns, and franchise workflows fairly.',
+]))->name('terms');
+
+Route::get('/cancellation', fn () => Inertia::render('StaticPage', [
+    'eyebrow' => 'Orders',
+    'title' => 'Cancellation Policy',
+    'body' => 'Orders can be cancelled before dispatch where available. Once shipped, the order can be handled through the return or exchange process after delivery.',
+]))->name('cancellation');
+
+Route::get('/support', fn () => Inertia::render('StaticPage', [
+    'eyebrow' => 'Help',
+    'title' => 'Customer Support',
+    'body' => 'For order help, returns, payments, or franchise questions, sign in to your account and raise a support request so the team can track the conversation properly.',
+]))->name('support.public');
 
 Route::get('/sports-wear', function () {
     $products = Product::query()
@@ -94,14 +134,14 @@ Route::get('/sports-wear', function () {
     ]);
 })->name('sports-wear');
 
-Route::redirect('/men', '/shop?category=men-sportswear')->name('men');
-Route::redirect('/women', '/shop?category=women-sportswear')->name('women');
+Route::redirect('/men', '/shop?gender=men')->name('men');
+Route::redirect('/women', '/shop?gender=women')->name('women');
 Route::redirect('/gym-wear', '/shop?category=gym-wear')->name('gym-wear');
 Route::redirect('/running-wear', '/shop?category=running-wear')->name('running-wear');
 Route::get('/category/{slug}', function (string $slug) {
     return match ($slug) {
-        'men' => redirect()->route('shop', ['category' => 'men-sportswear']),
-        'women' => redirect()->route('shop', ['category' => 'women-sportswear']),
+        'men' => redirect()->route('shop', ['gender' => 'men']),
+        'women' => redirect()->route('shop', ['gender' => 'women']),
         default => redirect()->route('shop', ['category' => $slug]),
     };
 })->name('category.show');
@@ -122,6 +162,22 @@ Route::get('/shop', function (\Illuminate\Http\Request $request) {
         'sort' => ['nullable', 'string'],
     ]);
 
+    $genderAliases = [
+        'men' => ['men', 'male', 'man', 'mens', "men's"],
+        'male' => ['men', 'male', 'man', 'mens', "men's"],
+        'women' => ['women', 'female', 'woman', 'womens', "women's"],
+        'female' => ['women', 'female', 'woman', 'womens', "women's"],
+        'unisex' => ['unisex', 'all', 'neutral', 'all-gender', 'all gender'],
+    ];
+
+    $selectedGender = strtolower(trim((string) ($filters['gender'] ?? '')));
+    $genderTerms = $genderAliases[$selectedGender] ?? ($selectedGender ? [$selectedGender] : []);
+    $productGenderTerms = $genderTerms;
+
+    if (in_array($selectedGender, ['men', 'male', 'women', 'female'], true)) {
+        $productGenderTerms = array_values(array_unique(array_merge($productGenderTerms, $genderAliases['unisex'])));
+    }
+
     $products = Product::query()
         ->with(['category', 'skus.inventory', 'images' => fn ($q) => $q->orderByDesc('is_primary')])
         ->when(Schema::hasColumn('products', 'is_active'), fn ($q) => $q->where(fn ($query) => $query->where('is_active', true)->orWhereNull('is_active')))
@@ -140,15 +196,17 @@ Route::get('/shop', function (\Illuminate\Http\Request $request) {
 
             $q->whereIn('category_id', $categoryIds->unique()->values());
         })
-        ->when(($filters['gender'] ?? null), function ($q, $gender) {
-            $q->where(function ($query) use ($gender) {
-                if (Schema::hasColumn('products', 'gender')) {
-                    $query->where('gender', $gender);
-                }
+        ->when(($filters['gender'] ?? null), function ($q) use ($genderTerms, $productGenderTerms) {
+            if (Schema::hasColumn('products', 'gender')) {
+                $q->whereIn(DB::raw('LOWER(TRIM(products.gender))'), $productGenderTerms);
+                return;
+            }
 
-                $query->orWhereHas('category', fn ($category) => $category
-                    ->where('slug', 'like', "%{$gender}%")
-                    ->orWhere('name', 'like', "%{$gender}%"));
+            $q->whereHas('category', function ($category) use ($genderTerms) {
+                foreach ($genderTerms as $term) {
+                    $category->orWhere('slug', 'like', "%{$term}%")
+                        ->orWhere('name', 'like', "%{$term}%");
+                }
             });
         })
         ->when(($filters['subcategory'] ?? null), function ($q, $subcategory) {

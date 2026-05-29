@@ -108,7 +108,17 @@ export default function Shop({ filters = {}, products, categories = [], brands =
                                     <button
                                         key={gender}
                                         type="button"
-                                        onClick={() => applyFilter({ gender })}
+                                        onClick={() => applyFilter({
+                                            gender,
+                                            category: '',
+                                            subcategory: '',
+                                            brand: '',
+                                            color: '',
+                                            size: '',
+                                            discount: '',
+                                            min_price: '',
+                                            max_price: '',
+                                        })}
                                         className={`border px-4 py-3 text-[10px] font-black uppercase tracking-widest transition-colors ${filters?.gender === gender ? 'border-[#1E293B] bg-[#1E293B] text-white' : 'border-slate-200 bg-slate-50 text-[#1E293B] hover:border-[#1E293B]'}`}
                                     >
                                         {gender}
@@ -129,7 +139,7 @@ export default function Shop({ filters = {}, products, categories = [], brands =
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                             <ul className="flex flex-col gap-4 pl-1 text-[11px] font-bold uppercase tracking-widest text-slate-500">
                                 <li>
-                                    <Link href="/shop" className={`transition-colors hover:text-[#1E293B] ${!filters?.category ? 'border-l-2 border-[#E94E3C] pl-2 font-black text-[#1E293B]' : ''}`}>
+                                    <Link href={filterUrl({ category: '', subcategory: '' })} className={`transition-colors hover:text-[#1E293B] ${!filters?.category ? 'border-l-2 border-[#E94E3C] pl-2 font-black text-[#1E293B]' : ''}`}>
                                         All Gear
                                     </Link>
                                 </li>
@@ -140,7 +150,7 @@ export default function Shop({ filters = {}, products, categories = [], brands =
 
                                     return (
                                         <li key={cat.id} className="flex flex-col gap-2">
-                                            <Link href={`/shop?category=${cat.slug}`} className={`transition-colors hover:text-[#1E293B] ${isParentActive ? 'font-black text-[#1E293B]' : ''}`}>
+                                            <Link href={filterUrl({ category: cat.slug, subcategory: '' })} className={`transition-colors hover:text-[#1E293B] ${isParentActive ? 'font-black text-[#1E293B]' : ''}`}>
                                                 {cat.name}
                                             </Link>
 
@@ -151,7 +161,7 @@ export default function Shop({ filters = {}, products, categories = [], brands =
                                                         <ul className="ml-2 mt-2 flex flex-col gap-3 border-l-2 border-slate-100 pl-3">
                                                             {cat.children.map((subCat) => (
                                                                 <li key={subCat.id}>
-                                                                    <Link href={`/shop?category=${subCat.slug}`} className={`text-[10px] transition-colors hover:text-[#1E293B] ${activeCategory?.id === subCat.id ? 'font-black text-[#E94E3C]' : 'text-slate-400'}`}>
+                                                                    <Link href={filterUrl({ category: subCat.slug, subcategory: '' })} className={`text-[10px] transition-colors hover:text-[#1E293B] ${activeCategory?.id === subCat.id ? 'font-black text-[#E94E3C]' : 'text-slate-400'}`}>
                                                                         {subCat.name}
                                                                     </Link>
                                                                 </li>
@@ -363,8 +373,8 @@ export default function Shop({ filters = {}, products, categories = [], brands =
                             </div>
                         ) : (
                             <div className="rounded-2xl border border-dashed border-slate-300 py-24 text-center">
-                                <p className="mb-2 text-lg font-black uppercase tracking-tight text-[#1E293B]">Inventory Empty</p>
-                                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Awaiting deployment from the central admin network.</p>
+                                <p className="mb-2 text-lg font-black uppercase tracking-tight text-[#1E293B]">No Styles Found</p>
+                                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Try a different category, gender, size, or price filter.</p>
                             </div>
                         )}
                     </div>

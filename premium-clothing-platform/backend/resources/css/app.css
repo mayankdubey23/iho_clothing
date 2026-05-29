@@ -1,5 +1,19 @@
 @import 'tailwindcss';
 
+@layer base {
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        /* Use standard CSS for the font family to avoid Tailwind caching issues */
+        font-family: 'Montserrat', sans-serif;
+        @apply font-semibold;
+    }
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';

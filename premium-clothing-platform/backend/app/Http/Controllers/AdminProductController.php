@@ -192,7 +192,7 @@ class AdminProductController extends Controller
             'category_id' => ['required', 'exists:categories,id'],
             'brand_id' => $brandRule,
             'custom_brand' => ['nullable', 'string', 'max:255'],
-            'gender' => ['nullable', 'in:men,women,unisex'],
+            'gender' => ['required', 'in:men,women,unisex'],
             'subcategory_slug' => ['nullable', 'string', 'max:255'],
             'fabric_detail' => ['nullable', 'string'],
             'mrp' => ['required', 'numeric', 'min:0'],
@@ -232,7 +232,9 @@ class AdminProductController extends Controller
 
                 foreach (['gender', 'subcategory_slug', 'show_on_men_page'] as $column) {
                     if (Schema::hasColumn('products', $column)) {
-                        $productData[$column] = $validated[$column] ?? ($column === 'show_on_men_page' ? false : null);
+                        $productData[$column] = $validated[$column] ?? ($column === 'show_on_men_page'
+                            ? in_array($validated['gender'], ['men', 'unisex'], true)
+                            : null);
                     }
                 }
 
@@ -410,7 +412,7 @@ class AdminProductController extends Controller
             'category_id' => ['required', 'exists:categories,id'],
             'brand_id' => $brandRule,
             'custom_brand' => ['nullable', 'string', 'max:255'],
-            'gender' => ['nullable', 'in:men,women,unisex'],
+            'gender' => ['required', 'in:men,women,unisex'],
             'subcategory_slug' => ['nullable', 'string', 'max:255'],
             'fabric_detail' => ['nullable', 'string'],
             'mrp' => ['required', 'numeric', 'min:0'],
@@ -452,7 +454,9 @@ class AdminProductController extends Controller
 
                 foreach (['gender', 'subcategory_slug', 'show_on_men_page'] as $column) {
                     if (Schema::hasColumn('products', $column)) {
-                        $productData[$column] = $validated[$column] ?? ($column === 'show_on_men_page' ? false : null);
+                        $productData[$column] = $validated[$column] ?? ($column === 'show_on_men_page'
+                            ? in_array($validated['gender'], ['men', 'unisex'], true)
+                            : null);
                     }
                 }
 

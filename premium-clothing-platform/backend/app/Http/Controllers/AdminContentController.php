@@ -174,10 +174,24 @@ class AdminContentController extends Controller
             $type = is_array($value) ? 'json' : 'text';
 
             if ($request->hasFile($key)) {
+                $request->validate([
+                    $key => ['file', 'mimes:jpg,jpeg,png,webp,mp4,webm', 'max:10240'],
+                ]);
+
                 $value = $request->file($key)->store('storefront_assets', 'public');
-                $type  = 'image';
+                $type  = str_starts_with((string) $request->file($key)->getMimeType(), 'video/') ? 'video' : 'image';
             } elseif ($value === null) {
                 continue;
+            } elseif (str_ends_with($key, '_json') && is_string($value) && trim($value) !== '') {
+                json_decode($value);
+
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return back()->withErrors([
+                        $key => 'Please enter valid JSON.',
+                    ])->withInput();
+                }
+
+                $type = 'json';
             } elseif (is_array($value)) {
                 $value = json_encode($value);
             }
