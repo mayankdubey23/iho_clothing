@@ -28,10 +28,11 @@ class AdminReturnController extends Controller
             ->paginate(15)
             ->withQueryString();
 
+        // 🛠️ FIXED: 'type' changed to 'return_type' and 'Received' to 'Item Received'
         $stats = [
             'pending_requests' => DB::table('returns')->where('status', 'Requested')->count(),
-            'pending_pickups' => DB::table('returns')->whereIn('status', ['Approved', 'Pickup Scheduled'])->count(),
-            'awaiting_refund' => DB::table('returns')->where('status', 'Received')->where('type', 'Refund')->count(),
+            'pending_pickups' => DB::table('returns')->whereIn('status', ['Forwarded to Admin', 'Pickup Scheduled'])->count(),
+            'awaiting_refund' => DB::table('returns')->where('status', 'Item Received')->where('return_type', 'Refund')->count(),
         ];
 
         return Inertia::render('Admin/Returns', [
@@ -41,7 +42,7 @@ class AdminReturnController extends Controller
         ]);
     }
 
-    // 🚀 Update Basic Status (Requested -> Approved -> Pickup Scheduled)
+    // 🚀 Update Basic Status
     public function updateStatus(Request $request, $id)
     {
         $request->validate(['status' => 'required|string']);
@@ -60,11 +61,11 @@ class AdminReturnController extends Controller
         $validated = $request->validate([
             'items' => 'required|array',
             'items.*.id' => 'required|exists:return_items,id',
-            'items.*.condition' => 'required|in:Good,Damaged',
+            'items.*.condition' => 'required|in:Good,Damaged,Sellable',
             'items.*.product_id' => 'required',
             'items.*.sku_id' => 'nullable',
             'items.*.quantity' => 'required',
-            'refund_action' => 'required|boolean' // If true, process refund automatically
+            'refund_action' => 'required|boolean'
         ]);
 
         $returnReq = DB::table('returns')->where('id', $id)->first();
@@ -74,22 +75,20 @@ class AdminReturnController extends Controller
 
         DB::transaction(function () use ($validated, $returnReq, $id) {
             foreach ($validated['items'] as $item) {
+                
+                // 🛠️ FIXED: Map Frontend condition to Database ENUM ('Sellable' or 'Damaged')
+                $dbCondition = in_array($item['condition'], ['Good', 'Sellable']) ? 'Sellable' : 'Damaged';
+
                 $returnItem = DB::table('return_items')->where('id', $item['id'])->first();
-                $skuId = $item['sku_id'] ?? $returnItem?->sku_id;
+                $skuId = $item['sku_id'] ?? $returnItem?->variant_id ?? null;
 
-                if (! $skuId && $returnItem?->order_item_id) {
-                    $skuId = DB::table('order_items')->where('id', $returnItem->order_item_id)->value('sku_id');
+                if (! $skuId && $returnItem?->product_id) {
+                    $skuId = DB::table('skus')->where('product_id', $returnItem->product_id)->value('id');
                 }
 
-                if (! $skuId) {
-                    $skuId = DB::table('skus')->where('product_id', $item['product_id'])->value('id');
-                }
-
-                // 1. Update Return Item Condition
+                // 1. Update Return Item Condition (FIXED: 'item_condition' to 'condition')
                 DB::table('return_items')->where('id', $item['id'])->update([
-                    'item_condition' => $item['condition'],
-                    'sku_id' => $skuId,
-                    'is_restocked' => true,
+                    'condition' => $dbCondition,
                     'updated_at' => now()
                 ]);
 
@@ -99,10 +98,12 @@ class AdminReturnController extends Controller
                     : null;
 
                 if ($inventory) {
-                    if ($item['condition'] === 'Good') {
+                    if ($dbCondition === 'Sellable') {
                         DB::table('inventories')->where('id', $inventory->id)->increment('stock_quantity', $item['quantity']);
                     } else {
-                        DB::table('inventories')->where('id', $inventory->id)->increment('damaged_quantity', $item['quantity']);
+                        if (Schema::hasColumn('inventories', 'damaged_quantity')) {
+                            DB::table('inventories')->where('id', $inventory->id)->increment('damaged_quantity', $item['quantity']);
+                        }
                     }
                 }
 
@@ -113,7 +114,7 @@ class AdminReturnController extends Controller
                         'franchise_id' => null,
                         'transaction_type' => 'in',
                         'quantity' => $item['quantity'],
-                        'reason' => $item['condition'] === 'Good'
+                        'reason' => $dbCondition === 'Sellable'
                             ? "Return Request #{$id} restocked"
                             : "Return Request #{$id} damaged stock",
                         'performed_by' => auth()->id(),
@@ -123,24 +124,25 @@ class AdminReturnController extends Controller
                 }
             }
 
-            // Update main status to Received
-            DB::table('returns')->where('id', $id)->update(['status' => 'Received', 'updated_at' => now()]);
+            // 🛠️ FIXED: Update main status to 'Item Received' to match migration ENUM
+            DB::table('returns')->where('id', $id)->update(['status' => 'Item Received', 'updated_at' => now()]);
 
-            // Optional: Issue Refund record if requested
-            if ($validated['refund_action'] && $returnReq->type === 'Refund') {
-                $payment = DB::table('payments')->where('order_id', $returnReq->order_id)->first();
-                if($payment) {
-                    DB::table('refunds')->insert([
-                        'return_id' => $id,
-                        'payment_id' => $payment->id,
-                        'amount' => $returnReq->total_refund_amount,
-                        'status' => 'Processed',
-                        'created_at' => now(),
-                        'updated_at' => now()
-                    ]);
-                    DB::table('returns')->where('id', $id)->update(['status' => 'Refunded']);
-                    DB::table('payments')->where('id', $payment->id)->update(['status' => 'Refunded']);
-                }
+            // Optional: Issue Refund record if requested (FIXED: 'type' to 'return_type')
+            if ($validated['refund_action'] && $returnReq->return_type === 'Refund') {
+                $orderAmount = DB::table('orders')->where('id', $returnReq->order_id)->value('total_amount') ?? 0;
+                
+                // FIXED: Matched exact columns in the `refunds` table migration
+                DB::table('refunds')->insert([
+                    'return_id' => $id,
+                    'order_id' => $returnReq->order_id, 
+                    'amount' => $orderAmount, 
+                    'status' => 'Processed',
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+                
+                // Complete the return process
+                DB::table('returns')->where('id', $id)->update(['status' => 'Completed']);
             }
         });
 

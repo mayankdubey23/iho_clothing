@@ -20,6 +20,7 @@ class AdminTicketController extends Controller
         $hasFranchiseId = Schema::hasColumn('support_tickets', 'franchise_id');
         $hasTicketNumber = Schema::hasColumn('support_tickets', 'ticket_number');
         $hasPriority = Schema::hasColumn('support_tickets', 'priority');
+        $hasUserType = Schema::hasColumn('support_tickets', 'user_type');
         $hasUserRole = Schema::hasColumn('users', 'role');
         $selectColumns = ['support_tickets.*', 'users.name as creator_name', 'users.email'];
 
@@ -28,17 +29,25 @@ class AdminTicketController extends Controller
         }
 
         $tickets = DB::table('support_tickets')
-            ->when($hasUserId, fn ($query) => $query->leftJoin('users', 'support_tickets.user_id', '=', 'users.id'))
-            ->when(! $hasUserId && $hasFranchiseId, fn ($query) => $query->leftJoin('users', 'support_tickets.franchise_id', '=', 'users.id'))
+            ->leftJoin('users', function ($join) use ($hasUserId, $hasFranchiseId) {
+                if ($hasUserId && $hasFranchiseId) {
+                    $join->on('users.id', '=', DB::raw('COALESCE(support_tickets.user_id, support_tickets.franchise_id)'));
+                } elseif ($hasUserId) {
+                    $join->on('support_tickets.user_id', '=', 'users.id');
+                } elseif ($hasFranchiseId) {
+                    $join->on('support_tickets.franchise_id', '=', 'users.id');
+                }
+            })
             ->select($selectColumns)
-            ->when($hasUserRole && $tab === 'Customer', function ($query) {
+            ->when($hasUserType && $tab, fn ($query) => $query->where('support_tickets.user_type', $tab))
+            ->when(! $hasUserType && $hasUserRole && $tab === 'Customer', function ($query) {
                 $query->where(function ($inner) {
                     $inner->whereNull('users.role')
                         ->orWhereNotIn('users.role', ['franchise', 'super_admin', 'admin']);
                 });
             })
-            ->when($hasUserRole && $tab === 'Franchise', fn ($query) => $query->where('users.role', 'franchise'))
-            ->when(! $hasUserRole && $tab === 'Customer' && $hasFranchiseId && ! $hasUserId, fn ($query) => $query->whereRaw('1 = 0'))
+            ->when(! $hasUserType && $hasUserRole && $tab === 'Franchise', fn ($query) => $query->where('users.role', 'franchise'))
+            ->when(! $hasUserType && ! $hasUserRole && $tab === 'Customer' && $hasFranchiseId && ! $hasUserId, fn ($query) => $query->whereRaw('1 = 0'))
             ->when($search, function ($query, $search) use ($hasTicketNumber) {
                 $query->where(function ($inner) use ($search, $hasTicketNumber) {
                     if ($hasTicketNumber) {
@@ -46,11 +55,12 @@ class AdminTicketController extends Controller
                     }
 
                     $inner->orWhere('support_tickets.subject', 'like', "%{$search}%")
-                        ->orWhere('users.name', 'like', "%{$search}%");
+                        ->orWhere('users.name', 'like', "%{$search}%")
+                        ->orWhere('users.email', 'like', "%{$search}%");
                 });
             })
             ->when($statusFilter, fn ($query) => $query->where('support_tickets.status', $statusFilter))
-            ->orderByRaw("CASE WHEN support_tickets.status = 'Open' THEN 1 WHEN support_tickets.status = 'In Progress' THEN 2 ELSE 3 END")
+            ->orderByRaw("CASE WHEN support_tickets.status = 'Open' THEN 1 WHEN support_tickets.status = 'In Progress' THEN 2 WHEN support_tickets.status IN ('Waiting for Customer', 'Waiting for Reply') THEN 3 ELSE 4 END")
             ->orderBy('support_tickets.updated_at', 'desc')
             ->paginate(15)
             ->withQueryString();
@@ -66,7 +76,7 @@ class AdminTicketController extends Controller
         });
 
         $stats = [
-            'open_tickets' => DB::table('support_tickets')->whereIn('status', ['Open', 'In Progress', 'Waiting for Reply'])->count(),
+            'open_tickets' => DB::table('support_tickets')->whereIn('status', ['Open', 'In Progress', 'Waiting for Customer', 'Waiting for Reply'])->count(),
             'urgent_tickets' => $hasPriority
                 ? DB::table('support_tickets')->where('priority', 'Urgent')->where('status', '!=', 'Closed')->count()
                 : 0,
@@ -87,20 +97,43 @@ class AdminTicketController extends Controller
 
         $hasUserId = Schema::hasColumn('support_tickets', 'user_id');
         $hasFranchiseId = Schema::hasColumn('support_tickets', 'franchise_id');
+        $hasUserRole = Schema::hasColumn('users', 'role');
+
+        $selectColumns = ['support_tickets.*', 'users.name as creator_name', 'users.email'];
+        if (Schema::hasColumn('users', 'phone')) {
+            $selectColumns[] = 'users.phone';
+        }
+        if ($hasUserRole) {
+            $selectColumns[] = 'users.role as creator_role';
+        }
 
         $ticket = DB::table('support_tickets')
-            ->when($hasUserId, fn ($query) => $query->leftJoin('users', 'support_tickets.user_id', '=', 'users.id'))
-            ->when(! $hasUserId && $hasFranchiseId, fn ($query) => $query->leftJoin('users', 'support_tickets.franchise_id', '=', 'users.id'))
-            ->select('support_tickets.*', 'users.name as creator_name', 'users.email', 'users.phone')
+            ->leftJoin('users', function ($join) use ($hasUserId, $hasFranchiseId) {
+                if ($hasUserId && $hasFranchiseId) {
+                    $join->on('users.id', '=', DB::raw('COALESCE(support_tickets.user_id, support_tickets.franchise_id)'));
+                } elseif ($hasUserId) {
+                    $join->on('support_tickets.user_id', '=', 'users.id');
+                } elseif ($hasFranchiseId) {
+                    $join->on('support_tickets.franchise_id', '=', 'users.id');
+                }
+            })
+            ->select($selectColumns)
             ->where('support_tickets.id', $id)
             ->first();
 
         abort_unless($ticket, 404);
 
+        $ticket->ticket_number = $ticket->ticket_number ?? 'TKT-' . str_pad($ticket->id, 5, '0', STR_PAD_LEFT);
+        $ticket->priority = $ticket->priority ?? 'Medium';
+        $ticket->user_type = $ticket->user_type ?? (($ticket->creator_role ?? null) === 'franchise' ? 'Franchise' : 'Customer');
+        $ticket->creator_name = $ticket->creator_name ?: 'Unknown User';
+        $ticket->email = $ticket->email ?: 'No email';
+        $ticket->phone = $ticket->phone ?? null;
+
         $messages = collect();
         if (Schema::hasTable('support_ticket_messages')) {
-            $ticketKey = Schema::hasColumn('support_ticket_messages', 'support_ticket_id') ? 'support_ticket_id' : 'ticket_id';
-            $senderKey = Schema::hasColumn('support_ticket_messages', 'sender_id') ? 'sender_id' : 'user_id';
+            $ticketKey = $this->ticketMessageKey();
+            $senderKey = $this->messageSenderKey();
 
             $messages = DB::table('support_ticket_messages')
                 ->leftJoin('users', "support_ticket_messages.{$senderKey}", '=', 'users.id')
@@ -109,10 +142,24 @@ class AdminTicketController extends Controller
                 ->orderBy('support_ticket_messages.created_at')
                 ->get();
 
-            if (Schema::hasTable('ticket_attachments') && Schema::hasColumn('ticket_attachments', 'message_id')) {
-                foreach ($messages as $message) {
-                    $message->attachments = DB::table('ticket_attachments')->where('message_id', $message->id)->get();
+            foreach ($messages as $message) {
+                $message->sender_name = $message->sender_name ?: ($message->is_admin_reply ? 'Super Admin' : $ticket->creator_name);
+                $attachments = collect();
+
+                if (! empty($message->attachment_path)) {
+                    $attachments->push([
+                        'id' => 'inline-' . $message->id,
+                        'file_path' => $message->attachment_path,
+                        'file_name' => basename($message->attachment_path),
+                        'file_type' => null,
+                    ]);
                 }
+
+                if (Schema::hasTable('ticket_attachments') && Schema::hasColumn('ticket_attachments', 'message_id')) {
+                    $attachments = $attachments->merge(DB::table('ticket_attachments')->where('message_id', $message->id)->get());
+                }
+
+                $message->attachments = $attachments->values();
             }
         }
 
@@ -126,14 +173,15 @@ class AdminTicketController extends Controller
     {
         $request->validate([
             'message' => 'required|string',
-            'status' => 'required|string',
-            'attachments.*' => 'nullable|file|max:5120',
+            'status' => 'required|string|in:Open,In Progress,Waiting for Customer,Waiting for Reply,Resolved,Closed',
+            'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,webp,pdf,doc,docx|max:5120',
         ]);
 
         DB::transaction(function () use ($request, $id) {
             if (Schema::hasTable('support_ticket_messages')) {
-                $ticketKey = Schema::hasColumn('support_ticket_messages', 'support_ticket_id') ? 'support_ticket_id' : 'ticket_id';
-                $senderKey = Schema::hasColumn('support_ticket_messages', 'sender_id') ? 'sender_id' : 'user_id';
+                $ticketKey = $this->ticketMessageKey();
+                $senderKey = $this->messageSenderKey();
+                $firstAttachmentPath = null;
 
                 $messageData = [
                     $ticketKey => $id,
@@ -144,17 +192,25 @@ class AdminTicketController extends Controller
                     'updated_at' => now(),
                 ];
 
+                if ($request->hasFile('attachments') && Schema::hasColumn('support_ticket_messages', 'attachment_path')) {
+                    $firstAttachmentPath = $request->file('attachments')[0]->store('support_attachments', 'public');
+                    $messageData['attachment_path'] = $firstAttachmentPath;
+                }
+
                 $messageId = DB::table('support_ticket_messages')->insertGetId($messageData);
 
                 if ($request->hasFile('attachments') && Schema::hasTable('ticket_attachments')) {
                     foreach ($request->file('attachments') as $file) {
-                        $path = $file->store('tickets/attachments', 'public');
+                        $path = $firstAttachmentPath && $file === $request->file('attachments')[0]
+                            ? $firstAttachmentPath
+                            : $file->store('support_attachments', 'public');
                         DB::table('ticket_attachments')->insert([
                             'message_id' => $messageId,
                             'file_path' => $path,
                             'file_name' => $file->getClientOriginalName(),
                             'file_type' => $file->getMimeType(),
                             'created_at' => now(),
+                            'updated_at' => now(),
                         ]);
                     }
                 }
@@ -171,7 +227,7 @@ class AdminTicketController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        $request->validate(['status' => 'required|string']);
+        $request->validate(['status' => 'required|string|in:Open,In Progress,Waiting for Customer,Waiting for Reply,Resolved,Closed']);
 
         DB::table('support_tickets')->where('id', $id)->update([
             'status' => $request->status,
@@ -179,5 +235,15 @@ class AdminTicketController extends Controller
         ]);
 
         return back()->with('success', "Ticket marked as {$request->status}.");
+    }
+
+    private function ticketMessageKey(): string
+    {
+        return Schema::hasColumn('support_ticket_messages', 'support_ticket_id') ? 'support_ticket_id' : 'ticket_id';
+    }
+
+    private function messageSenderKey(): string
+    {
+        return Schema::hasColumn('support_ticket_messages', 'sender_id') ? 'sender_id' : 'user_id';
     }
 }

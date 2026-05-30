@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 
 class AccountController extends Controller
@@ -222,18 +223,70 @@ class AccountController extends Controller
             'message' => 'required|string|min:10',
         ]);
 
-        // Assuming you have a support_tickets table
-        DB::table('support_tickets')->insert([
-            'user_id' => auth()->id(),
-            'subject' => $validated['subject'],
-            'order_id' => $validated['order_id'],
-            'message' => $validated['message'],
-            'status' => 'Open',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        if (! Schema::hasTable('support_tickets')) {
+            return back()->with('error', 'Support tickets are not available yet.');
+        }
+
+        DB::transaction(function () use ($validated) {
+            $ticketPayload = [
+                'subject' => $validated['subject'],
+                'status' => 'Open',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+
+            if (Schema::hasColumn('support_tickets', 'ticket_number')) {
+                $ticketPayload['ticket_number'] = $this->nextTicketNumber();
+            }
+            if (Schema::hasColumn('support_tickets', 'user_id')) {
+                $ticketPayload['user_id'] = auth()->id();
+            }
+            if (Schema::hasColumn('support_tickets', 'user_type')) {
+                $ticketPayload['user_type'] = 'Customer';
+            }
+            if (Schema::hasColumn('support_tickets', 'category')) {
+                $ticketPayload['category'] = 'Customer Support';
+            }
+            if (Schema::hasColumn('support_tickets', 'priority')) {
+                $ticketPayload['priority'] = 'Medium';
+            }
+            if (Schema::hasColumn('support_tickets', 'order_id')) {
+                $ticketPayload['order_id'] = $validated['order_id'] ?? null;
+            }
+            if (Schema::hasColumn('support_tickets', 'message')) {
+                $ticketPayload['message'] = $validated['message'];
+            }
+
+            $ticketId = DB::table('support_tickets')->insertGetId($ticketPayload);
+
+            if (Schema::hasTable('support_ticket_messages')) {
+                $messagePayload = [
+                    'message' => $validated['message'],
+                    'is_admin_reply' => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+
+                $ticketKey = Schema::hasColumn('support_ticket_messages', 'support_ticket_id') ? 'support_ticket_id' : 'ticket_id';
+                $senderKey = Schema::hasColumn('support_ticket_messages', 'sender_id') ? 'sender_id' : 'user_id';
+
+                $messagePayload[$ticketKey] = $ticketId;
+                $messagePayload[$senderKey] = auth()->id();
+
+                DB::table('support_ticket_messages')->insert($messagePayload);
+            }
+        });
 
         return back()->with('success', 'Ticket raised successfully. We will get back to you soon.');
+    }
+
+    private function nextTicketNumber(): string
+    {
+        do {
+            $ticketNumber = 'TKT-' . now()->format('ymd') . '-' . strtoupper(Str::random(5));
+        } while (DB::table('support_tickets')->where('ticket_number', $ticketNumber)->exists());
+
+        return $ticketNumber;
     }
 
     

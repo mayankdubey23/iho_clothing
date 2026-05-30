@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use App\Models\StorefrontSetting;
 use App\Models\FeaturedCategoryItem;
+use App\Models\StorefrontBanner;
 use Inertia\Inertia;
 
 class AdminContentController extends Controller
@@ -18,12 +20,12 @@ class AdminContentController extends Controller
         $tabData = [];
 
         if ($activeTab === 'banners') {
-            $tabData = Schema::hasTable('banners')
-                ? DB::table('banners')->orderBy('display_order', 'asc')->get()
+            $tabData = Schema::hasTable('storefront_banners')
+                ? StorefrontBanner::orderBy('sort_order')->latest()->get()
                 : collect();
         } elseif ($activeTab === 'pages') {
             $tabData = Schema::hasTable('pages')
-                ? DB::table('pages')->get()
+                ? DB::table('pages')->orderByDesc('updated_at')->get()
                 : collect();
         } elseif ($activeTab === 'testimonials') {
             if (! Schema::hasTable('testimonials')) {
@@ -71,7 +73,7 @@ class AdminContentController extends Controller
         }
 
         $stats = [
-            'active_banners'    => Schema::hasTable('banners') ? DB::table('banners')->where('status', 'active')->count() : 0,
+            'active_banners'    => Schema::hasTable('storefront_banners') ? StorefrontBanner::where('is_active', true)->count() : 0,
             'published_pages'   => Schema::hasTable('pages') ? DB::table('pages')->where('status', 'published')->count() : 0,
             'total_faqs'        => Schema::hasTable('faqs') ? DB::table('faqs')->where('status', 'active')->count() : 0,
             'featured_cats'     => Schema::hasTable('featured_category_items') ? FeaturedCategoryItem::where('is_active', true)->count() : 0,
@@ -82,6 +84,54 @@ class AdminContentController extends Controller
             'activeTab' => $activeTab,
             'stats'     => $stats,
         ]);
+    }
+
+    // ---------------------------------------------------------------
+    // Static Pages CRUD
+    // ---------------------------------------------------------------
+
+    public function storePage(Request $request)
+    {
+        $validated = $this->validatePage($request);
+
+        DB::table('pages')->insert([
+            ...$validated,
+            'slug' => $this->normalizePageSlug($validated['slug']),
+            'status' => $validated['status'] ?? 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', 'Static page created successfully.');
+    }
+
+    public function updatePage(Request $request, int $id)
+    {
+        $page = DB::table('pages')->where('id', $id)->first();
+
+        if (! $page) {
+            return back()->withErrors('Page not found.');
+        }
+
+        $validated = $this->validatePage($request, $id);
+
+        DB::table('pages')
+            ->where('id', $id)
+            ->update([
+                ...$validated,
+                'slug' => $this->normalizePageSlug($validated['slug']),
+                'status' => $validated['status'] ?? $page->status,
+                'updated_at' => now(),
+            ]);
+
+        return back()->with('success', 'Static page updated successfully.');
+    }
+
+    public function destroyPage(int $id)
+    {
+        DB::table('pages')->where('id', $id)->delete();
+
+        return back()->with('success', 'Static page deleted successfully.');
     }
 
     // ---------------------------------------------------------------
@@ -291,6 +341,29 @@ class AdminContentController extends Controller
             'product_purchased' => 'nullable|string|max:255',
             'image'            => 'nullable|image|max:2048',
         ]);
+    }
+
+    private function validatePage(Request $request, ?int $ignoreId = null): array
+    {
+        return $request->validate([
+            'slug' => [
+                'required',
+                'string',
+                'max:120',
+                'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
+                Rule::unique('pages', 'slug')->ignore($ignoreId),
+            ],
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['nullable', 'string'],
+            'meta_title' => ['nullable', 'string', 'max:255'],
+            'meta_description' => ['nullable', 'string', 'max:500'],
+            'status' => ['required', 'in:published,draft'],
+        ]);
+    }
+
+    private function normalizePageSlug(string $slug): string
+    {
+        return trim(strtolower($slug), '/');
     }
 
     private function testimonialPayload(array $validated, ?string $imagePath, bool $isDummy, bool $isNew = true): array

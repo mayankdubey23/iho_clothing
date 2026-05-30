@@ -35,8 +35,22 @@ class StockRequestController extends Controller
 
         // 🚀 OPTIMIZATION: Sirf 'Active' products hi catalog mein dikhayein
         $masterProducts = DB::table('products')
+            ->leftJoin('skus', 'products.id', '=', 'skus.product_id')
+            ->leftJoin('inventories', function ($join) {
+                $join->on('skus.id', '=', 'inventories.sku_id')
+                    ->whereNull('inventories.franchise_id');
+            })
             ->where('is_active', 1) 
-            ->select('id', 'name', 'image_path', DB::raw("{$priceColumn} as franchise_price"))
+            ->select(
+                'products.id',
+                'products.name',
+                'products.image_path',
+                DB::raw("products.{$priceColumn} as franchise_price"),
+                DB::raw('COALESCE(SUM(inventories.stock_quantity), 0) as available_stock')
+            )
+            ->groupBy('products.id', 'products.name', 'products.image_path', "products.{$priceColumn}")
+            ->havingRaw('COALESCE(SUM(inventories.stock_quantity), 0) > 0')
+            ->orderBy('products.name')
             ->get();
 
         return Inertia::render('Franchise/BuyStock', [
@@ -150,9 +164,12 @@ class StockRequestController extends Controller
                 'franchise_id' => Auth::id(),
                 'items' => $request->input('items', []),
             ]);
-            return back()->withErrors(['items' => 'Something went wrong while processing your request. Please try again.']);
+            return back()->withErrors([
+                'items' => 'DB ERROR: ' . $e->getMessage() . ' (Line: ' . $e->getLine() . ')'
+            ]);
         }
     }
+
 
     private function productPriceColumn(): string
     {

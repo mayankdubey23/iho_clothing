@@ -24,13 +24,14 @@ export default function TicketView({ ticket, messages }) {
         e.preventDefault();
         post(`/franchise-superadmin/tickets/${ticket.id}/reply`, {
             onSuccess: () => reset('message', 'attachments'),
+            preserveScroll: true,
             forceFormData: true // Crucial for file uploads
         });
     };
 
     const updateTicketStatus = (newStatus) => {
         if (confirm(`Change ticket status to ${newStatus}?`)) {
-            router.post(`/franchise-superadmin/tickets/${ticket.id}/status`, { status: newStatus });
+            router.post(`/franchise-superadmin/tickets/${ticket.id}/status`, { status: newStatus }, { preserveScroll: true });
         }
     };
 
@@ -168,7 +169,7 @@ export default function TicketView({ ticket, messages }) {
                             </h3>
                             <div className="flex items-center gap-4 mb-6">
                                 <div className="size-14 bg-gradient-to-tr from-[#1A1A2E] to-gray-700 text-white rounded-2xl flex items-center justify-center font-black text-xl">
-                                    {ticket.creator_name[0]}
+                                    {(ticket.creator_name || 'U')[0]}
                                 </div>
                                 <div>
                                     <p className="font-black text-[#1A1A2E]">{ticket.creator_name}</p>

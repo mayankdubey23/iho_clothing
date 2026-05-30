@@ -41,7 +41,13 @@ class AdminCouponController extends Controller
 
         // 🚀 NEW: Fetch Storefront Visual Offers (Banners)
         $storeOffers = Schema::hasTable('store_offers')
-            ? DB::table('store_offers')->get()
+            ? DB::table('store_offers')->get()->map(function ($offer) {
+                $offer->offer_code = $offer->offer_code ?? $offer->code ?? null;
+                $offer->code = $offer->code ?? $offer->offer_code ?? null;
+                $offer->subtitle = $offer->subtitle ?? '';
+                $offer->display_type = $offer->display_type ?? 'store_offer';
+                return $offer;
+            })
             : collect();
 
         return Inertia::render('Admin/Coupons', [
@@ -110,11 +116,25 @@ class AdminCouponController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $validated['updated_at'] = now();
-
         abort_unless(Schema::hasTable('store_offers'), 404, 'Store offer banners table is not available.');
 
-        DB::table('store_offers')->where('id', $id)->update($validated);
+        $updates = [
+            'title' => $validated['title'],
+            'is_active' => $validated['is_active'] ?? false,
+            'updated_at' => now(),
+        ];
+
+        if (Schema::hasColumn('store_offers', 'subtitle')) {
+            $updates['subtitle'] = $validated['subtitle'] ?? null;
+        }
+
+        if (Schema::hasColumn('store_offers', 'offer_code')) {
+            $updates['offer_code'] = $validated['offer_code'] ?? null;
+        } elseif (Schema::hasColumn('store_offers', 'code')) {
+            $updates['code'] = $validated['offer_code'] ?? null;
+        }
+
+        DB::table('store_offers')->where('id', $id)->update($updates);
 
         return back()->with('success', 'Storefront offer banner updated successfully!');
     }

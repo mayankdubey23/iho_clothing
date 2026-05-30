@@ -11,14 +11,15 @@ export default function SupportTickets({ tickets, stats, activeTab, filters }) {
     const [search, setSearch] = useState(filters.search || '');
     const [statusFilter, setStatusFilter] = useState(filters.status || '');
 
-    const applyFilters = (tab = activeTab) => {
-        router.get('/franchise-superadmin/tickets', { tab, search, status: statusFilter }, { preserveState: true });
+    const applyFilters = (tab = activeTab, nextStatus = statusFilter) => {
+        router.get('/franchise-superadmin/tickets', { tab, search, status: nextStatus }, { preserveState: true, preserveScroll: true });
     };
 
     const statusColors = {
         'Open': 'bg-red-50 text-red-600 border-red-200',
         'In Progress': 'bg-blue-50 text-blue-600 border-blue-200',
         'Waiting for Customer': 'bg-orange-50 text-orange-600 border-orange-200',
+        'Waiting for Reply': 'bg-orange-50 text-orange-600 border-orange-200',
         'Resolved': 'bg-green-50 text-green-700 border-green-200',
         'Closed': 'bg-gray-100 text-gray-600 border-gray-300',
     };
@@ -66,7 +67,7 @@ export default function SupportTickets({ tickets, stats, activeTab, filters }) {
                         <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                         <input type="text" placeholder="Search Ticket #, Subject or Name..." value={search} onChange={e => setSearch(e.target.value)} onKeyPress={e => e.key === 'Enter' && applyFilters()} className="w-full bg-gray-50 border-none rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none" />
                     </div>
-                    <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setTimeout(() => applyFilters(), 100); }} className="bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-gray-600 focus:ring-2 focus:ring-[#E94E3C] outline-none cursor-pointer">
+                    <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); applyFilters(activeTab, e.target.value); }} className="bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-gray-600 focus:ring-2 focus:ring-[#E94E3C] outline-none cursor-pointer">
                         <option value="">All Statuses</option>
                         {Object.keys(statusColors).map(s => <option key={s} value={s}>{s}</option>)}
                     </select>

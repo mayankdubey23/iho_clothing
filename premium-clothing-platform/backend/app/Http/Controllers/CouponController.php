@@ -34,7 +34,15 @@ class CouponController extends Controller
                 'most_used_code' => $mostUsedCode ?? 'N/A',
             ],
             'filters' => [],
-            'storeOffers' => Schema::hasTable('store_offers') ? DB::table('store_offers')->get() : [],
+            'storeOffers' => Schema::hasTable('store_offers')
+                ? DB::table('store_offers')->get()->map(function ($offer) {
+                    $offer->offer_code = $offer->offer_code ?? $offer->code ?? null;
+                    $offer->code = $offer->code ?? $offer->offer_code ?? null;
+                    $offer->subtitle = $offer->subtitle ?? '';
+                    $offer->display_type = $offer->display_type ?? 'store_offer';
+                    return $offer;
+                })
+                : [],
         ]);
     }
 
@@ -92,9 +100,23 @@ class CouponController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        DB::table('store_offers')->where('id', $id)->update(array_merge($validated, [
+        $updates = [
+            'title' => $validated['title'],
+            'is_active' => $validated['is_active'] ?? false,
             'updated_at' => now(),
-        ]));
+        ];
+
+        if (Schema::hasColumn('store_offers', 'subtitle')) {
+            $updates['subtitle'] = $validated['subtitle'] ?? null;
+        }
+
+        if (Schema::hasColumn('store_offers', 'offer_code')) {
+            $updates['offer_code'] = $validated['offer_code'] ?? null;
+        } elseif (Schema::hasColumn('store_offers', 'code')) {
+            $updates['code'] = $validated['offer_code'] ?? null;
+        }
+
+        DB::table('store_offers')->where('id', $id)->update($updates);
 
         return back()->with('success', 'Storefront offer banner updated successfully!');
     }

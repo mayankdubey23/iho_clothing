@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -68,93 +68,109 @@ export default function AdminLayout({ active = '', children }) {
     });
   };
 
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-[#0F172A] text-slate-300 shadow-2xl border-r border-slate-800 relative overflow-hidden">
-      {/* ❄️ Subtle Background Glow */}
-      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-slate-800/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+  const SidebarContent = () => {
+    const sidebarRef = useRef(null);
+    const itemRefs = useRef({});
 
-      {/* Logo Area */}
-      <div className="h-24 flex items-center px-8 border-b border-white/5 relative z-10">
-        <Link href={isAdmin ? '/franchise-superadmin/command-center' : '/franchise/dashboard'} className="flex items-center gap-4">
-          <div className="grid size-10 place-items-center bg-white text-[#0F172A] font-black text-xs tracking-widest shadow-xl">
-            IHO
-          </div>
-          <div>
-            <span className="block text-xl font-black tracking-tighter uppercase leading-none text-white italic">
-              STUDIO<span className="font-light text-slate-400">CTRL</span>
-            </span>
-            <span className="text-[8px] font-black tracking-[0.3em] text-[#94A3B8] uppercase mt-1 block">
-              {isAdmin ? 'Global Network' : 'Franchise Partner'}
-            </span>
-          </div>
-        </Link>
-      </div>
+    useEffect(() => {
+      // Scroll the active item into view if it exists
+      const activeItem = Object.values(itemRefs.current).find(ref => ref && ref.dataset.active === 'true');
+      if (activeItem && sidebarRef.current) {
+        // Scroll so the active item is visible in the sidebar
+        activeItem.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+      }
+    }, [active]);
 
-      {/* Navigation Menu */}
-      <div className="flex-1 overflow-y-auto py-8 px-4 custom-scrollbar relative z-10">
-        <p className="px-4 text-[9px] font-black tracking-[0.3em] text-slate-500 uppercase mb-6">Management</p>
-        <nav className="space-y-1">
-          {navItems.length === 0 && (
-            <div className="border border-white/5 bg-white/5 px-4 py-6 text-[10px] font-bold uppercase tracking-widest text-slate-500 text-center">
-              Modules will appear here.
+    return (
+      <div ref={sidebarRef} className="flex flex-col h-full bg-[#0F172A] text-slate-300 shadow-2xl border-r border-slate-800 relative overflow-hidden">
+        {/* ❄️ Subtle Background Glow */}
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-slate-800/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+
+        {/* Logo Area */}
+        <div className="h-24 flex items-center px-8 border-b border-white/5 relative z-10">
+          <Link href={isAdmin ? '/franchise-superadmin/command-center' : '/franchise/dashboard'} className="flex items-center gap-4">
+            <div className="grid size-10 place-items-center bg-white text-[#0F172A] font-black text-xs tracking-widest shadow-xl">
+              IHO
             </div>
-          )}
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
-            const autoActive = item.href && currentPath === item.href;
-            const isActive = active === item.id || autoActive;
-
-            return (
-              <Link
-                key={item.id}
-                href={item.href}
-                onClick={() => setIsMobileSidebarOpen(false)}
-                className={`relative flex items-center gap-4 px-4 py-3.5 transition-all duration-500 group overflow-hidden ${isActive
-                  ? 'bg-white/10 text-white'
-                  : 'text-slate-400 hover:bg-white/5 hover:text-white'
-                  }`}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="active-sidebar-indicator"
-                    className="absolute left-0 top-0 w-1 h-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.5)]"
-                  />
-                )}
-                <Icon
-                  size={18}
-                  strokeWidth={isActive ? 2.5 : 1.5}
-                  className={`transition-colors ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-white'}`}
-                />
-                <span className={`text-[11px] font-bold tracking-[0.15em] uppercase ${isActive ? 'text-white' : ''}`}>
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* User Profile Area */}
-      <div className="p-6 border-t border-white/5 relative z-10 bg-black/20">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="grid size-10 place-items-center bg-slate-800 text-white font-black text-xs border border-slate-700">
-            {user.name.split(' ').map(p => p[0]).slice(0, 2).join('')}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-black text-white uppercase tracking-widest truncate">{user.name}</p>
-            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest truncate">{user.email}</p>
-          </div>
+            <div>
+              <span className="block text-xl font-black tracking-tighter uppercase leading-none text-white italic">
+                STUDIO<span className="font-light text-slate-400">CTRL</span>
+              </span>
+              <span className="text-[8px] font-black tracking-[0.3em] text-[#94A3B8] uppercase mt-1 block">
+                {isAdmin ? 'Global Network' : 'Franchise Partner'}
+              </span>
+            </div>
+          </Link>
         </div>
-        <button
-          onClick={() => setIsLogoutModalOpen(true)}
-          className="flex items-center justify-center gap-3 w-full py-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 border border-slate-700 hover:text-white hover:border-white hover:bg-white/5 transition-all"
-        >
-          <LogOut size={14} strokeWidth={2} /> Terminate Session
-        </button>
+
+        {/* Navigation Menu */}
+        <div className="flex-1 overflow-y-auto py-8 px-4 custom-scrollbar relative z-10">
+          <p className="px-4 text-[9px] font-black tracking-[0.3em] text-slate-500 uppercase mb-6">Management</p>
+          <nav className="space-y-1">
+            {navItems.length === 0 && (
+              <div className="border border-white/5 bg-white/5 px-4 py-6 text-[10px] font-bold uppercase tracking-widest text-slate-500 text-center">
+                Modules will appear here.
+              </div>
+            )}
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+              const autoActive = item.href && currentPath === item.href;
+              const isActive = active === item.id || autoActive;
+
+              return (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  onClick={() => setIsMobileSidebarOpen(false)}
+                  ref={el => { itemRefs.current[item.id] = el; }}
+                  data-active={isActive ? 'true' : 'false'}
+                  className={`relative flex items-center gap-4 px-4 py-3.5 transition-all duration-500 group overflow-hidden ${isActive
+                    ? 'bg-white/10 text-white'
+                    : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                    }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-sidebar-indicator"
+                      className="absolute left-0 top-0 w-1 h-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.5)]"
+                    />
+                  )}
+                  <Icon
+                    size={18}
+                    strokeWidth={isActive ? 2.5 : 1.5}
+                    className={`transition-colors ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-white'}`}
+                  />
+                  <span className={`text-[11px] font-bold tracking-[0.15em] uppercase ${isActive ? 'text-white' : ''}`}>
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* User Profile Area */}
+        <div className="p-6 border-t border-white/5 relative z-10 bg-black/20">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="grid size-10 place-items-center bg-slate-800 text-white font-black text-xs border border-slate-700">
+              {user.name.split(' ').map(p => p[0]).slice(0, 2).join('')}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-black text-white uppercase tracking-widest truncate">{user.name}</p>
+              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest truncate">{user.email}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsLogoutModalOpen(true)}
+            className="flex items-center justify-center gap-3 w-full py-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 border border-slate-700 hover:text-white hover:border-white hover:bg-white/5 transition-all"
+          >
+            <LogOut size={14} strokeWidth={2} /> Terminate Session
+          </button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans flex"> {/* ❄️ Cool Slate Background */}

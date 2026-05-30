@@ -28,10 +28,11 @@ class AdminServiceAreaController extends Controller
         // Need franchise list for the dropdowns
         $franchises = User::where('role', 'franchise')->where('status', 'active')->select('id', 'name', 'city')->get();
 
+        // 🛠️ YAHAN FIX KIYA HAI: 'status' ki jagah 'is_active'
         $stats = [
             'total_covered' => DB::table('franchise_service_areas')->count(),
-            'active_zones' => DB::table('franchise_service_areas')->where('status', 'active')->count(),
-            'blocked_zones' => DB::table('franchise_service_areas')->where('status', 'blocked')->count(),
+            'active_zones' => DB::table('franchise_service_areas')->where('is_active', true)->count(),
+            'blocked_zones' => DB::table('franchise_service_areas')->where('is_active', false)->count(),
             'total_franchises' => $franchises->count(),
         ];
 
@@ -50,15 +51,17 @@ class AdminServiceAreaController extends Controller
             'franchise_id' => 'required|exists:users,id',
             'state' => 'required|string',
             'city' => 'required|string',
-            'pincode' => 'required|string|unique:franchise_service_areas,pincode', // Strict Duplicate Prevention
+            'pincode' => 'required|string|unique:franchise_service_areas,pincode',
+            'locality' => 'nullable|string'
         ]);
 
         DB::table('franchise_service_areas')->insert([
             'franchise_id' => $validated['franchise_id'],
             'state' => $validated['state'],
             'city' => $validated['city'],
+            'locality' => $validated['locality'] ?? 'Main City',
             'pincode' => $validated['pincode'],
-            'status' => 'active',
+            'is_active' => true, 
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -85,13 +88,14 @@ class AdminServiceAreaController extends Controller
         $area = DB::table('franchise_service_areas')->where('id', $id)->first();
         if(!$area) return back()->withErrors('Area not found.');
 
-        $newStatus = $area->status === 'active' ? 'blocked' : 'active';
+        $newStatus = !$area->is_active;
+        $statusText = $newStatus ? 'active' : 'blocked';
         
         DB::table('franchise_service_areas')->where('id', $id)->update([
-            'status' => $newStatus,
+            'is_active' => $newStatus,
             'updated_at' => now()
         ]);
 
-        return back()->with('success', "Service area marked as {$newStatus}.");
+        return back()->with('success', "Service area marked as {$statusText}.");
     }
 }

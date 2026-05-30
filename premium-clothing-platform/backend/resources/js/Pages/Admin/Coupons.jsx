@@ -11,6 +11,7 @@ import AdminLayout from '@/Layouts/AdminLayout';
 export default function Coupons({ coupons, stats, filters, storeOffers }) {
     const [search, setSearch] = useState(filters?.search || '');
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const storefrontOffers = Array.isArray(storeOffers) ? storeOffers : [];
 
     // 🚀 Form for adding a new Coupon Code
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -136,6 +137,8 @@ export default function Coupons({ coupons, stats, filters, storeOffers }) {
                 {/* ========================================================= */}
                 {/* 🚀 NEW SECTION: STOREFRONT VISUAL BANNERS                 */}
                 {/* ========================================================= */}
+                {storefrontOffers.length > 0 && (
+                    <>
                 <div className="mb-6 border-b border-gray-200 pb-4">
                     <h2 className="text-2xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-2">
                         <LayoutTemplate size={24} className="text-[#E94E3C]" />
@@ -147,10 +150,12 @@ export default function Coupons({ coupons, stats, filters, storeOffers }) {
                 </div>
 
                 <div className="grid gap-6 pb-12">
-                    {storeOffers && storeOffers.map((offer) => (
+                    {storefrontOffers.map((offer) => (
                         <StoreOfferEditCard key={offer.id} offer={offer} />
                     ))}
                 </div>
+                    </>
+                )}
                 {/* ========================================================= */}
 
             </div>
@@ -245,7 +250,7 @@ function StoreOfferEditCard({ offer }) {
     const { data, setData, put, processing } = useForm({
         title: offer.title || '',
         subtitle: offer.subtitle || '',
-        offer_code: offer.offer_code || '',
+        offer_code: offer.offer_code || offer.code || '',
         is_active: offer.is_active === 1,
     });
 
@@ -263,13 +268,13 @@ function StoreOfferEditCard({ offer }) {
                 <>
                     <div className="flex-1">
                         <span className="text-[10px] font-black uppercase tracking-widest text-[#E94E3C] bg-[#E94E3C]/10 px-2 py-1 rounded-md mb-3 inline-block">
-                            {offer.display_type.replace('_', ' ')}
+                            {(offer.display_type || 'store_offer').replace('_', ' ')}
                         </span>
                         <h3 className="text-xl font-black text-[#1A1A2E] uppercase">{offer.title}</h3>
                         <p className="text-sm text-gray-500 font-bold mt-1">{offer.subtitle || 'No Subtitle'}</p>
-                        {offer.offer_code && (
+                        {(offer.offer_code || offer.code) && (
                             <p className="mt-3 text-xs font-black text-gray-400 uppercase tracking-widest">
-                                Linked Code: <span className="bg-gray-50 px-2 py-1 rounded text-[#1A1A2E]">{offer.offer_code}</span>
+                                Linked Code: <span className="bg-gray-50 px-2 py-1 rounded text-[#1A1A2E]">{offer.offer_code || offer.code}</span>
                             </p>
                         )}
                     </div>

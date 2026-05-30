@@ -14,6 +14,7 @@ export default function Analytics({ stats, chartData, tableData, franchises, fil
     const [dateRange, setDateRange] = useState(filters.date_range);
     const [reportType, setReportType] = useState(filters.report_type);
     const [franchiseId, setFranchiseId] = useState(filters.franchise_id);
+    const [exportFormat, setExportFormat] = useState('csv');
     const [customDates, setCustomDates] = useState({ start: filters.start_date || '', end: filters.end_date || '' });
 
     // Apply Filters Function
@@ -21,6 +22,22 @@ export default function Analytics({ stats, chartData, tableData, franchises, fil
         let newFilters = { date_range: dateRange, report_type: reportType, franchise_id: franchiseId, start_date: customDates.start, end_date: customDates.end };
         newFilters[key] = value;
         router.get('/franchise-superadmin/analytics', newFilters, { preserveState: true, preserveScroll: true });
+    };
+
+    const exportReport = () => {
+        const params = new URLSearchParams({
+            report_type: reportType,
+            date_range: dateRange,
+            franchise_id: franchiseId,
+            format: exportFormat,
+        });
+
+        if (dateRange === 'custom') {
+            if (customDates.start) params.set('start_date', customDates.start);
+            if (customDates.end) params.set('end_date', customDates.end);
+        }
+
+        window.location.href = `/franchise-superadmin/analytics/export?${params.toString()}`;
     };
 
     // Format Data for Charts
@@ -45,9 +62,15 @@ export default function Analytics({ stats, chartData, tableData, franchises, fil
                         </h1>
                         <p className="text-gray-500 font-bold text-sm mt-1">Comprehensive reports for sales, products, and franchises.</p>
                     </div>
-                    <button onClick={() => alert('CSV Export module trigger.')} className="bg-white border-2 border-gray-200 text-[#1A1A2E] px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:border-[#1A1A2E] hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
-                        <Download size={16} /> Export Report
-                    </button>
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <select value={exportFormat} onChange={(e) => setExportFormat(e.target.value)} className="bg-white border-2 border-gray-200 text-[#1A1A2E] px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-[#E94E3C] outline-none">
+                            <option value="csv">CSV</option>
+                            <option value="pdf">PDF</option>
+                        </select>
+                        <button onClick={exportReport} className="bg-white border-2 border-gray-200 text-[#1A1A2E] px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:border-[#1A1A2E] hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
+                            <Download size={16} /> Export Report
+                        </button>
+                    </div>
                 </div>
 
                 {/* 🚀 MASTER FILTERS */}

@@ -3,13 +3,16 @@ import { Head, router, useForm } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutTemplate, Image as ImageIcon, FileText, MessageSquare,
-    HelpCircle, Settings, EyeOff, Eye, Plus, Star, X, Edit3, Trash2, ShoppingBag, Save, Dumbbell, Tags
+    HelpCircle, Settings, EyeOff, Eye, Plus, Star, X, Edit3, Trash2, ShoppingBag, Save, Dumbbell, Tags, Upload
 } from 'lucide-react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
 export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) {
     const [isTestimonialModalOpen, setIsTestimonialModalOpen] = useState(false);
     const [editingTestimonial, setEditingTestimonial] = useState(null);
+    const [isPageModalOpen, setIsPageModalOpen] = useState(false);
+    const [editingPage, setEditingPage] = useState(null);
+    const [isBannerModalOpen, setIsBannerModalOpen] = useState(false);
     const [isFeaturedCategoryModalOpen, setIsFeaturedCategoryModalOpen] = useState(false);
     const [editingFeaturedCategory, setEditingFeaturedCategory] = useState(null);
     const [featuredCategoryImageError, setFeaturedCategoryImageError] = useState('');
@@ -84,6 +87,23 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
         review_text: '',
         product_purchased: '',
         image: null,
+    });
+
+    const pageForm = useForm({
+        slug: '',
+        title: '',
+        content: '',
+        meta_title: '',
+        meta_description: '',
+        status: 'published',
+    });
+
+    const bannerForm = useForm({
+        title: '',
+        placement_type: 'main_hero_slider',
+        desktop_image: null,
+        mobile_image: null,
+        target_url: '',
     });
 
     const shopForm = useForm({
@@ -205,6 +225,56 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
         setIsTestimonialModalOpen(true);
     };
 
+    const openCreatePage = () => {
+        setEditingPage(null);
+        pageForm.reset();
+        pageForm.setData({
+            slug: '',
+            title: '',
+            content: '',
+            meta_title: '',
+            meta_description: '',
+            status: 'published',
+        });
+        setIsPageModalOpen(true);
+    };
+
+    const openCreateBanner = () => {
+        bannerForm.reset();
+        bannerForm.setData({
+            title: '',
+            placement_type: 'main_hero_slider',
+            desktop_image: null,
+            mobile_image: null,
+            target_url: '',
+        });
+        setIsBannerModalOpen(true);
+    };
+
+    const closeBannerModal = () => {
+        setIsBannerModalOpen(false);
+        bannerForm.reset();
+    };
+
+    const openEditPage = (page) => {
+        setEditingPage(page);
+        pageForm.setData({
+            slug: page.slug || '',
+            title: page.title || '',
+            content: page.content || '',
+            meta_title: page.meta_title || '',
+            meta_description: page.meta_description || '',
+            status: page.status || 'published',
+        });
+        setIsPageModalOpen(true);
+    };
+
+    const closePageModal = () => {
+        setIsPageModalOpen(false);
+        setEditingPage(null);
+        pageForm.reset();
+    };
+
     const openEditTestimonial = (review) => {
         setEditingTestimonial(review);
         setData({
@@ -226,6 +296,10 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
     const handleAddClick = () => {
         if (activeTab === 'testimonials') {
             openCreateTestimonial();
+        } else if (activeTab === 'banners') {
+            openCreateBanner();
+        } else if (activeTab === 'pages') {
+            openCreatePage();
         } else if (activeTab === 'featured_categories') {
             openCreateFeaturedCategory();
         } else if (activeTab === 'shop_page' || activeTab === 'gym_wear' || activeTab === 'settings') {
@@ -241,6 +315,16 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
         shopForm.post('/franchise-superadmin/content/shop-page', {
             forceFormData: true,
             preserveScroll: true,
+        });
+    };
+
+    const handleBannerSubmit = (e) => {
+        e.preventDefault();
+
+        bannerForm.post('/franchise-superadmin/banners', {
+            forceFormData: true,
+            preserveScroll: true,
+            onSuccess: closeBannerModal,
         });
     };
 
@@ -281,6 +365,46 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
             forceFormData: true,
             preserveScroll: true,
             onSuccess: closeTestimonialModal,
+        });
+    };
+
+    const handlePageSubmit = (e) => {
+        e.preventDefault();
+
+        if (editingPage) {
+            router.put(`/franchise-superadmin/content/pages/${editingPage.id}`, pageForm.data, {
+                preserveScroll: true,
+                onSuccess: closePageModal,
+                onError: () => setIsPageModalOpen(true),
+            });
+            return;
+        }
+
+        pageForm.post('/franchise-superadmin/content/pages', {
+            preserveScroll: true,
+            onSuccess: closePageModal,
+        });
+    };
+
+    const deletePage = (page) => {
+        if (!window.confirm(`Delete static page "${page.title}"?`)) return;
+
+        router.delete(`/franchise-superadmin/content/pages/${page.id}`, {
+            preserveScroll: true,
+        });
+    };
+
+    const toggleBanner = (banner) => {
+        router.post(`/franchise-superadmin/banners/${banner.id}/toggle`, {}, {
+            preserveScroll: true,
+        });
+    };
+
+    const deleteBanner = (banner) => {
+        if (!window.confirm(`Delete banner "${banner.title}" permanently?`)) return;
+
+        router.delete(`/franchise-superadmin/banners/${banner.id}`, {
+            preserveScroll: true,
         });
     };
 
@@ -421,11 +545,11 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                     {activeTab === 'banners' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {tabData.map((banner) => (
-                                <div key={banner.id} className={`border border-gray-100 rounded-2xl overflow-hidden relative group ${banner.status === 'inactive' ? 'opacity-60' : ''}`}>
+                                <div key={banner.id} className={`border border-gray-100 rounded-2xl overflow-hidden relative group ${!banner.is_active ? 'opacity-60' : ''}`}>
                                     <div className="h-40 bg-gray-100 relative">
-                                        {banner.image_path ? (
+                                        {banner.desktop_image_path ? (
                                             <img
-                                                src={`/storage/${banner.image_path}`}
+                                                src={`/storage/${banner.desktop_image_path}`}
                                                 alt={banner.title || 'Storefront Banner'}
                                                 className="w-full h-full object-cover"
                                                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
@@ -436,18 +560,77 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                             </span>
                                         )}
                                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                                            <button onClick={() => toggleStatus(banner.id, 'banners')} className="bg-white text-[#1A1A2E] p-3 rounded-full hover:bg-[#E94E3C] hover:text-white transition-colors">
-                                                {banner.status === 'active' ? <EyeOff size={18} /> : <Eye size={18} />}
+                                            <button type="button" onClick={() => toggleBanner(banner)} className="bg-white text-[#1A1A2E] p-3 rounded-full hover:bg-[#E94E3C] hover:text-white transition-colors" title={banner.is_active ? 'Hide banner' : 'Show banner'}>
+                                                {banner.is_active ? <EyeOff size={18} /> : <Eye size={18} />}
+                                            </button>
+                                            <button type="button" onClick={() => deleteBanner(banner)} className="bg-white text-red-500 p-3 rounded-full hover:bg-red-500 hover:text-white transition-colors" title="Delete banner">
+                                                <Trash2 size={18} />
                                             </button>
                                         </div>
                                     </div>
                                     <div className="p-4 bg-white">
                                         <h3 className="font-black text-[#1A1A2E] text-sm uppercase">{banner.title}</h3>
-                                        <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">{banner.type}</p>
+                                        <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">{String(banner.placement_type || '').replace(/_/g, ' ')}</p>
+                                        <p className={`mt-2 text-[9px] font-black uppercase tracking-widest ${banner.is_active ? 'text-green-500' : 'text-red-500'}`}>
+                                            {banner.is_active ? 'Live on storefront' : 'Hidden'}
+                                        </p>
                                     </div>
                                 </div>
                             ))}
                             {tabData.length === 0 && <EmptyState icon={ImageIcon} text="No Banners Uploaded" />}
+                        </div>
+                    )}
+
+                    {activeTab === 'pages' && (
+                        <div className="space-y-6">
+                            <div className="flex flex-col justify-between gap-4 rounded-2xl border border-slate-100 bg-slate-50 p-5 md:flex-row md:items-center">
+                                <div>
+                                    <h2 className="text-lg font-black uppercase tracking-wider text-[#1A1A2E]">Static Pages</h2>
+                                    <p className="mt-1 text-xs font-bold uppercase tracking-widest text-slate-500">Create, edit, publish, draft, and SEO-manage customer information pages.</p>
+                                </div>
+                                <button type="button" onClick={openCreatePage} className="inline-flex items-center justify-center gap-2 bg-[#1A1A2E] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-[#E94E3C]">
+                                    <Plus size={16} /> New Page
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+                                {tabData.map((page) => (
+                                    <div key={page.id} className="border border-slate-100 bg-white p-5 shadow-sm">
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div className="min-w-0">
+                                                <div className="mb-3 flex flex-wrap items-center gap-2">
+                                                    <span className={`px-2 py-1 text-[9px] font-black uppercase tracking-widest ${page.status === 'published' ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'}`}>
+                                                        {page.status}
+                                                    </span>
+                                                    <span className="bg-slate-50 px-2 py-1 font-mono text-[9px] font-black uppercase tracking-widest text-slate-500">/{page.slug}</span>
+                                                </div>
+                                                <h3 className="truncate text-xl font-black uppercase tracking-tight text-[#1A1A2E]">{page.title}</h3>
+                                                <p className="mt-2 line-clamp-2 text-sm font-semibold leading-6 text-slate-500">{stripHtml(page.content || 'No content yet.')}</p>
+                                            </div>
+                                            <div className="flex shrink-0 gap-2">
+                                                <button type="button" onClick={() => openEditPage(page)} className="bg-slate-100 p-2 text-slate-600 hover:bg-[#1A1A2E] hover:text-white" title="Edit page">
+                                                    <Edit3 size={16} />
+                                                </button>
+                                                <button type="button" onClick={() => toggleStatus(page.id, 'pages')} className="bg-slate-100 p-2 text-slate-600 hover:bg-[#1A1A2E] hover:text-white" title="Publish or draft">
+                                                    {page.status === 'published' ? <EyeOff size={16} /> : <Eye size={16} />}
+                                                </button>
+                                                <button type="button" onClick={() => deletePage(page)} className="bg-red-50 p-2 text-red-500 hover:bg-red-500 hover:text-white" title="Delete page">
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-5 grid grid-cols-1 gap-3 border-t border-slate-100 pt-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 md:grid-cols-2">
+                                            <span>SEO: {page.meta_title ? 'Configured' : 'Missing title'}</span>
+                                            <a href={`/page/${page.slug}`} target="_blank" rel="noreferrer" className="text-[#E94E3C] hover:text-[#1A1A2E] md:text-right">
+                                                Preview /page/{page.slug}
+                                            </a>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {tabData.length === 0 && <EmptyState icon={FileText} text="No Static Pages Added Yet" />}
                         </div>
                     )}
 
@@ -1149,6 +1332,182 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
             </div>
 
             <AnimatePresence>
+                {isBannerModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1A1A2E]/60 p-4 backdrop-blur-sm">
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-3xl overflow-hidden bg-white shadow-2xl">
+                            <div className="flex items-center justify-between border-b border-gray-100 bg-white p-6">
+                                <div>
+                                    <h3 className="flex items-center gap-2 font-black uppercase tracking-wider text-[#1A1A2E]">
+                                        <ImageIcon size={18} className="text-[#E94E3C]" /> Add Storefront Banner
+                                    </h3>
+                                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Upload desktop and mobile artwork for responsive website campaigns.</p>
+                                </div>
+                                <button type="button" onClick={closeBannerModal} className="text-gray-400 hover:text-red-500"><X size={20} /></button>
+                            </div>
+
+                            <form onSubmit={handleBannerSubmit} className="space-y-5 p-6">
+                                <InputField
+                                    label="Campaign Title *"
+                                    value={bannerForm.data.title}
+                                    onChange={(e) => bannerForm.setData('title', e.target.value)}
+                                    error={bannerForm.errors.title}
+                                    placeholder="Summer Sale 2026"
+                                    required
+                                />
+
+                                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                    <div className="space-y-1.5">
+                                        <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">Placement *</label>
+                                        <select value={bannerForm.data.placement_type} onChange={(e) => bannerForm.setData('placement_type', e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-bold text-[#1A1A2E] outline-none focus:ring-2 focus:ring-[#E94E3C]">
+                                            <option value="main_hero_slider">Main Hero Slider</option>
+                                            <option value="mid_page_banner">Mid Page Banner</option>
+                                            <option value="category_banner">Category Collection</option>
+                                        </select>
+                                        {bannerForm.errors.placement_type && <p className="ml-1 text-[10px] font-bold text-red-500">{bannerForm.errors.placement_type}</p>}
+                                    </div>
+
+                                    <InputField
+                                        label="Target URL"
+                                        value={bannerForm.data.target_url}
+                                        onChange={(e) => bannerForm.setData('target_url', e.target.value)}
+                                        error={bannerForm.errors.target_url}
+                                        placeholder="/shop?category=gym-wear"
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <BannerUploadField
+                                        label="Desktop Banner *"
+                                        hint="Recommended wide artwork"
+                                        file={bannerForm.data.desktop_image}
+                                        error={bannerForm.errors.desktop_image}
+                                        onChange={(file) => bannerForm.setData('desktop_image', file)}
+                                    />
+                                    <BannerUploadField
+                                        label="Mobile Banner *"
+                                        hint="Recommended portrait or square crop"
+                                        file={bannerForm.data.mobile_image}
+                                        error={bannerForm.errors.mobile_image}
+                                        onChange={(file) => bannerForm.setData('mobile_image', file)}
+                                    />
+                                </div>
+
+                                <div className="flex flex-col-reverse justify-end gap-3 border-t border-gray-100 pt-5 sm:flex-row">
+                                    <button type="button" onClick={closeBannerModal} className="border border-slate-200 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:border-[#1A1A2E] hover:text-[#1A1A2E]">
+                                        Cancel
+                                    </button>
+                                    <button disabled={bannerForm.processing} type="submit" className="inline-flex items-center justify-center gap-2 bg-[#1A1A2E] px-8 py-4 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-[#E94E3C] disabled:opacity-50">
+                                        <Upload size={15} /> {bannerForm.processing ? 'Publishing...' : 'Publish Banner'}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {isPageModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1A1A2E]/60 p-4 backdrop-blur-sm">
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="max-h-[92vh] w-full max-w-5xl overflow-y-auto bg-white shadow-2xl">
+                            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white p-6">
+                                <div>
+                                    <h3 className="flex items-center gap-2 font-black uppercase tracking-wider text-[#1A1A2E]">
+                                        <FileText size={18} className="text-[#E94E3C]" /> {editingPage ? 'Edit Static Page' : 'Create Static Page'}
+                                    </h3>
+                                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Published pages are available at /page/slug and supported fixed links.</p>
+                                </div>
+                                <button type="button" onClick={closePageModal} className="text-gray-400 hover:text-red-500"><X size={20} /></button>
+                            </div>
+
+                            <form onSubmit={handlePageSubmit} className="space-y-6 p-6">
+                                <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+                                    <InputField
+                                        label="Page Title *"
+                                        value={pageForm.data.title}
+                                        onChange={(e) => {
+                                            pageForm.setData('title', e.target.value);
+                                            if (!editingPage && !pageForm.data.slug) {
+                                                pageForm.setData('slug', slugify(e.target.value));
+                                            }
+                                        }}
+                                        error={pageForm.errors.title}
+                                        placeholder="Shipping Policy"
+                                        required
+                                    />
+                                    <InputField
+                                        label="URL Slug *"
+                                        value={pageForm.data.slug}
+                                        onChange={(e) => pageForm.setData('slug', slugify(e.target.value))}
+                                        error={pageForm.errors.slug}
+                                        placeholder="shipping"
+                                        required
+                                    />
+                                    <div className="space-y-1.5">
+                                        <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">Status</label>
+                                        <select value={pageForm.data.status} onChange={(e) => pageForm.setData('status', e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-bold text-[#1A1A2E] outline-none focus:ring-2 focus:ring-[#E94E3C]">
+                                            <option value="published">Published</option>
+                                            <option value="draft">Draft</option>
+                                        </select>
+                                        {pageForm.errors.status && <p className="ml-1 text-[10px] font-bold text-red-500">{pageForm.errors.status}</p>}
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                    <InputField
+                                        label="SEO Meta Title"
+                                        value={pageForm.data.meta_title}
+                                        onChange={(e) => pageForm.setData('meta_title', e.target.value)}
+                                        error={pageForm.errors.meta_title}
+                                        placeholder="Shipping Policy | IHO STUDIO"
+                                    />
+                                    <InputField
+                                        label="SEO Meta Description"
+                                        value={pageForm.data.meta_description}
+                                        onChange={(e) => pageForm.setData('meta_description', e.target.value)}
+                                        error={pageForm.errors.meta_description}
+                                        placeholder="Short summary for search engines"
+                                    />
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+                                        <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">Page Content *</label>
+                                        <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Supports plain text or simple HTML like h2, p, ul, strong.</span>
+                                    </div>
+                                    <textarea
+                                        value={pageForm.data.content}
+                                        onChange={(e) => pageForm.setData('content', e.target.value)}
+                                        rows="14"
+                                        className="w-full resize-y rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-mono text-sm font-bold leading-7 text-[#1A1A2E] outline-none transition-all focus:ring-2 focus:ring-[#E94E3C]"
+                                        placeholder="<h2>Policy Heading</h2><p>Write your page content here.</p>"
+                                    />
+                                    {pageForm.errors.content && <p className="ml-1 text-[10px] font-bold text-red-500">{pageForm.errors.content}</p>}
+                                </div>
+
+                                <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Live URL</p>
+                                    <p className="mt-2 font-mono text-sm font-black text-[#1A1A2E]">/page/{pageForm.data.slug || 'your-page-slug'}</p>
+                                    {['shipping', 'returns', 'privacy-policy', 'terms', 'cancellation', 'support'].includes(pageForm.data.slug) && (
+                                        <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#E94E3C]">This slug also powers the matching main footer/static route.</p>
+                                    )}
+                                </div>
+
+                                <div className="flex flex-col-reverse justify-end gap-3 border-t border-gray-100 pt-5 sm:flex-row">
+                                    <button type="button" onClick={closePageModal} className="border border-slate-200 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:border-[#1A1A2E] hover:text-[#1A1A2E]">
+                                        Cancel
+                                    </button>
+                                    <button disabled={pageForm.processing} type="submit" className="bg-[#1A1A2E] px-8 py-4 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-[#E94E3C] disabled:opacity-50">
+                                        {pageForm.processing ? 'Saving...' : editingPage ? 'Update Page' : 'Create Page'}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
                 {isTestimonialModalOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A2E]/60 backdrop-blur-sm">
                         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden">
@@ -1284,6 +1643,30 @@ function EmptyState({ icon: Icon, text }) {
             <Icon size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} />
             <p className="text-[#1A1A2E] font-black text-lg">{text}</p>
         </div>
+    );
+}
+
+function slugify(value) {
+    return String(value || '')
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
+
+function stripHtml(value) {
+    return String(value || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function BannerUploadField({ label, hint, file, error, onChange }) {
+    return (
+        <label className="relative block cursor-pointer overflow-hidden rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 p-5 text-center transition-colors hover:bg-gray-100">
+            <input type="file" accept="image/*" onChange={(e) => onChange(e.target.files[0] || null)} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
+            <ImageIcon size={24} className="mx-auto mb-3 text-gray-400" />
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#1A1A2E]">{label}</p>
+            <p className="mt-1 text-[9px] font-bold uppercase tracking-widest text-gray-400">{file ? file.name : hint}</p>
+            {error && <p className="mt-2 text-[10px] font-bold text-red-500">{error}</p>}
+        </label>
     );
 }
 

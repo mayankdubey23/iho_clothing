@@ -92,8 +92,12 @@ export default function BuyStock({ requests, masterProducts = [] }) {
         switch (String(status || '').toLowerCase()) {
             case 'pending': return 'bg-orange-50 text-orange-600 border-orange-200';
             case 'approved': return 'bg-blue-50 text-blue-600 border-blue-200';
+            case 'paid': return 'bg-indigo-50 text-indigo-600 border-indigo-200';
+            case 'dispatched': return 'bg-purple-50 text-purple-600 border-purple-200';
+            case 'completed':
             case 'delivered': return 'bg-green-50 text-green-600 border-green-200';
             case 'rejected': return 'bg-red-50 text-red-600 border-red-200';
+            case 'cancelled': return 'bg-gray-100 text-gray-600 border-gray-300';
             default: return 'bg-gray-50 text-gray-600 border-gray-200';
         }
     };
@@ -131,7 +135,7 @@ export default function BuyStock({ requests, masterProducts = [] }) {
                                     >
                                         <option value="">-- Choose from Catalog --</option>
                                         {masterProducts && masterProducts.map(p => (
-                                            <option key={p.id} value={p.id}>{p.name}</option>
+                                            <option key={p.id} value={p.id}>{p.name} | Rs {Number(p.franchise_price || 0).toLocaleString()} | {p.available_stock} in stock</option>
                                         ))}
                                     </select>
                                 </div>

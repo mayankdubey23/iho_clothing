@@ -28,7 +28,7 @@ const fallbackCms = {
     home_hero_cta_text: 'Shop Now',
     home_hero_cta_link: '/shop',
     home_hero_secondary_text: 'View Offers',
-    home_hero_secondary_link: '/shop?offers=1',
+    home_hero_secondary_link: '/offers',
     home_sale_title: '50-80% OFF',
     home_sale_subtitle: 'On latest active storefront picks',
     home_coupon_text: 'Use code IHOSTYLE for extra savings at checkout',
@@ -148,9 +148,10 @@ function SectionHeader({ eyebrow, title, subtitle, action, dark = false }) {
     );
 }
 
-function Hero({ cms, categories, products }) {
+function Hero({ cms, categories, products, banners = [] }) {
     const [searchQuery, setSearchQuery] = useState('');
-    const heroMedia = mediaUrl(cms.home_hero_media) || products.find((product) => product.image)?.image;
+    const heroBanner = banners.find((banner) => banner.placement_type === 'main_hero_slider') || banners[0];
+    const heroMedia = heroBanner?.desktop_image || mediaUrl(cms.home_hero_media) || products.find((product) => product.image)?.image;
     const categoryLinks = categories.slice(0, 6);
     const normalizedSearch = searchQuery.trim().toLowerCase();
     const searchSuggestions = normalizedSearch
@@ -240,18 +241,31 @@ function Hero({ cms, categories, products }) {
                                 {cms.home_hero_cta_text}
                                 <ArrowRight size={16} />
                             </Link>
-                            <Link href={cms.home_hero_secondary_link || '/shop?offers=1'} className="inline-flex min-h-12 items-center justify-center border border-[#282c3f]/15 bg-white px-7 text-xs font-black uppercase tracking-widest text-[#282c3f] transition hover:border-[#ff3f6c] hover:text-[#ff3f6c]">
+                            <Link href={(cms.home_hero_secondary_link || '/offers') === '/shop?offers=1' ? '/offers' : (cms.home_hero_secondary_link || '/offers')} className="inline-flex min-h-12 items-center justify-center border border-[#282c3f]/15 bg-white px-7 text-xs font-black uppercase tracking-widest text-[#282c3f] transition hover:border-[#ff3f6c] hover:text-[#ff3f6c]">
                                 {cms.home_hero_secondary_text}
                             </Link>
                         </div>
                     </div>
 
-                    <StorefrontImage src={heroMedia} alt={cms.home_hero_media_alt || cms.home_hero_title} className="group min-h-[360px] lg:min-h-[560px]">
-                        <div className="absolute inset-x-5 bottom-5 bg-white/92 p-5 shadow-xl backdrop-blur">
-                            <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#ff3f6c]">{cms.home_sale_title}</p>
-                            <p className="mt-1 text-xl font-black uppercase text-[#282c3f]">{cms.home_sale_subtitle}</p>
-                        </div>
-                    </StorefrontImage>
+                    {heroBanner ? (
+                        <Link href={heroBanner.target_url || '/shop'} className="group relative min-h-[360px] overflow-hidden bg-slate-100 lg:min-h-[560px]">
+                            <picture>
+                                <source media="(max-width: 767px)" srcSet={heroBanner.mobile_image || heroBanner.desktop_image} />
+                                <img src={heroMedia} alt={heroBanner.title || cms.home_hero_title} className="h-full min-h-[360px] w-full object-cover transition duration-700 group-hover:scale-105 lg:min-h-[560px]" />
+                            </picture>
+                            <div className="absolute inset-x-5 bottom-5 bg-white/92 p-5 shadow-xl backdrop-blur">
+                                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#ff3f6c]">{cms.home_sale_title}</p>
+                                <p className="mt-1 text-xl font-black uppercase text-[#282c3f]">{heroBanner.title || cms.home_sale_subtitle}</p>
+                            </div>
+                        </Link>
+                    ) : (
+                        <StorefrontImage src={heroMedia} alt={cms.home_hero_media_alt || cms.home_hero_title} className="group min-h-[360px] lg:min-h-[560px]">
+                            <div className="absolute inset-x-5 bottom-5 bg-white/92 p-5 shadow-xl backdrop-blur">
+                                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#ff3f6c]">{cms.home_sale_title}</p>
+                                <p className="mt-1 text-xl font-black uppercase text-[#282c3f]">{cms.home_sale_subtitle}</p>
+                            </div>
+                        </StorefrontImage>
+                    )}
                 </motion.div>
             </div>
         </section>
@@ -530,7 +544,7 @@ function Offers({ offers, cms }) {
                     title={cms.home_offers_title}
                     subtitle={cms.home_offers_subtitle}
                     dark
-                    action={<Link href="/shop?offers=1" className="text-[10px] font-black uppercase tracking-[0.24em] text-white/70 hover:text-white">Shop Offers</Link>}
+                    action={<Link href="/offers" className="text-[10px] font-black uppercase tracking-[0.24em] text-white/70 hover:text-white">Shop Offers</Link>}
                 />
                 <div className="mb-5 border border-white/10 bg-white/10 p-5 text-center text-xs font-black uppercase tracking-[0.22em] text-white">
                     {cms.home_coupon_text}
@@ -673,6 +687,7 @@ export default function Storefront({
     gymProducts,
     allProducts,
     offers,
+    banners,
     testimonials,
     cms = {},
 }) {
@@ -684,6 +699,7 @@ export default function Storefront({
     const gymProductsList = asList(gymProducts);
     const allProductsList = asList(allProducts).length ? asList(allProducts) : asList(products);
     const offersList = asList(offers);
+    const bannerList = asList(banners);
     const reviewList = asList(testimonials);
     const hiddenSections = new Set(String(content.home_hidden_sections || '').split(',').map((item) => item.trim()).filter(Boolean));
     const sectionOrder = String(content.home_section_order || fallbackCms.home_section_order)
@@ -719,7 +735,7 @@ export default function Storefront({
     ], [allProductsList, bestSellersList, content, gymProductsList, newArrivalsList]);
 
     const sections = [
-        { id: 'hero', node: <Hero cms={content} categories={categoryList} products={allProductsList} /> },
+        { id: 'hero', node: <Hero cms={content} categories={categoryList} products={allProductsList} banners={bannerList} /> },
         { id: 'promo', node: <PromoTiles cms={content} /> },
         { id: 'categories', node: <CategoryStrip categories={categoryList} cms={content} /> },
         { id: 'best', node: <ProductRail {...rails[0]} onAddedToBag={() => setIsCartOpen(true)} /> },

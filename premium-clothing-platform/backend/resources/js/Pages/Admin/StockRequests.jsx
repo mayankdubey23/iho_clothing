@@ -11,6 +11,7 @@ export default function StockRequests({ requests, stats, filters }) {
     const [search, setSearch] = useState(filters?.search || '');
     const [statusFilter, setStatusFilter] = useState(filters?.status || '');
     const [openActionMenu, setOpenActionMenu] = useState(null);
+    const [detailsRequest, setDetailsRequest] = useState(null);
 
     const applyFilters = () => {
         router.get('/franchise-superadmin/stock-requests', { search, status: statusFilter }, { preserveState: true });
@@ -123,7 +124,7 @@ export default function StockRequests({ requests, stats, filters }) {
                                                 {openActionMenu === req.id && (
                                                     <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 10 }} className="absolute right-12 top-2 w-48 bg-white border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.1)] rounded-2xl z-50 overflow-hidden text-left">
                                                         <div className="p-2 space-y-1">
-                                                            <button onClick={() => alert('View Details Modal implementation pending.')} className="block w-full text-left px-4 py-2.5 text-xs font-black uppercase tracking-widest text-[#1A1A2E] hover:bg-gray-50 rounded-xl transition-colors">View Items</button>
+                                                            <button onClick={() => { setDetailsRequest(req); setOpenActionMenu(null); }} className="block w-full text-left px-4 py-2.5 text-xs font-black uppercase tracking-widest text-[#1A1A2E] hover:bg-gray-50 rounded-xl transition-colors">View Items</button>
 
                                                             {normalizeStatus(req.status) === 'pending' && (
                                                                 <>
@@ -158,6 +159,39 @@ export default function StockRequests({ requests, stats, filters }) {
                 </div>
 
             </div>
+
+            <AnimatePresence>
+                {detailsRequest && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1A1A2E]/60 p-4 backdrop-blur-sm">
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl">
+                            <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50 p-6">
+                                <div>
+                                    <h3 className="font-black uppercase tracking-wider text-[#1A1A2E]">{detailsRequest.request_number || `REQ-${detailsRequest.id}`}</h3>
+                                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">{detailsRequest.franchise_name} | Rs {Number(detailsRequest.total_amount || 0).toLocaleString()}</p>
+                                </div>
+                                <button onClick={() => setDetailsRequest(null)} className="text-gray-400 hover:text-red-500"><XCircle size={20} /></button>
+                            </div>
+
+                            <div className="max-h-[60vh] overflow-y-auto p-6">
+                                <div className="space-y-3">
+                                    {detailsRequest.items?.map((item) => (
+                                        <div key={item.id} className="grid grid-cols-[1fr_auto] gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4">
+                                            <div>
+                                                <p className="font-black text-[#1A1A2E]">{item.product_name}</p>
+                                                <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Qty {item.quantity}</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-sm font-black text-[#1A1A2E]">Rs {Number(item.total_price || 0).toLocaleString()}</p>
+                                                <p className="text-[10px] font-bold text-gray-400">Rs {Number(item.franchise_price || 0).toLocaleString()} / unit</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </AdminLayout>
     );
 }

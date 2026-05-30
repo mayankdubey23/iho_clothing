@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CustomerController extends Controller
 {
@@ -54,42 +54,65 @@ class CustomerController extends Controller
         return back()->with('success', "Customer Account {$action} Successfully.");
     }
 
-    // 🚀 Export Customer Data (Secure & Sanitized)
-    public function exportData()
+    // 🚀 View Full Customer Profile
+    public function show($id)
     {
-        // Strict Data Selection: No passwords, no tokens
-        $customers = User::where('role', 'customer')
-            ->select('id', 'name', 'email', 'mobile_number', 'status', 'created_at')
-            ->get()
-            ->map(function ($user) {
-                return [
-                    'Customer ID' => $user->id,
-                    'Full Name' => $user->name,
-                    'Email Address' => $user->email,
-                    'Phone Number' => $user->mobile_number ?? 'N/A',
-                    'Account Status' => strtoupper($user->status),
-                    'Joined Date' => $user->created_at->format('Y-m-d H:i:s'),
-                ];
-            });
+        // Customer ki poori history fetch kar rahe hain
+        $customer = \App\Models\User::with([
+            'orders' => function($query) {
+                $query->orderBy('created_at', 'desc')->take(5); // Latest 5 orders
+            },
+            'supportTickets' => function($query) {
+                $query->orderBy('created_at', 'desc')->take(5); // Latest 5 tickets
+            }
+        ])
+        ->where('role', 'customer')
+        ->findOrFail($id);
 
-        $filename = "IHO_Customer_Export_" . date('Ymd') . ".csv";
-
-        $handle = fopen('php://temp', 'w+');
-        // Add headers
-        fputcsv($handle, ['Customer ID', 'Full Name', 'Email Address', 'Phone Number', 'Account Status', 'Joined Date']);
-        
-        // Add data
-        foreach ($customers as $row) {
-            fputcsv($handle, $row);
-        }
-        
-        rewind($handle);
-        $csv = stream_get_contents($handle);
-        fclose($handle);
-
-        return Response::make($csv, 200, [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        // Frontend par data bhej rahe hain
+        return Inertia::render('Admin/CustomerProfile', [
+            'customer' => $customer
         ]);
+    }
+
+    // 🚀 Export Customers Data to CSV (Streamed directly to avoid Windows temp file locks)
+    public function export()
+    {
+        $fileName = 'customers_export_' . date('Y-m-d_H-i-s') . '.csv';
+        
+        // Fetch customers
+        $customers = User::where('role', 'customer')->orderBy('created_at', 'desc')->get();
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        // Column headings for CSV
+        $columns = ['Customer ID', 'Full Name', 'Email Address', 'Mobile Number', 'Status', 'Registered On'];
+
+        $callback = function() use($customers, $columns) {
+            // Write directly to output buffer (bypasses temp files completely)
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($customers as $customer) {
+                fputcsv($file, [
+                    $customer->id,
+                    $customer->name,
+                    $customer->email,
+                    $customer->mobile_number ?? 'N/A',
+                    $customer->status ?? 'Active',
+                    $customer->created_at ? $customer->created_at->format('Y-m-d H:i:s') : 'N/A'
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return new StreamedResponse($callback, 200, $headers);
     }
 }

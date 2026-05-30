@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class SupportController extends Controller
@@ -14,17 +15,21 @@ class SupportController extends Controller
     public function index()
     {
         $franchiseId = Auth::id();
+        $ownerColumn = Schema::hasColumn('support_tickets', 'franchise_id') ? 'franchise_id' : 'user_id';
 
         $tickets = DB::table('support_tickets')
-            ->where('franchise_id', $franchiseId)
+            ->where($ownerColumn, $franchiseId)
             ->orderBy('updated_at', 'desc')
             ->get();
 
         // Fetch messages for active view
         foreach ($tickets as $ticket) {
+            $ticketKey = Schema::hasColumn('support_ticket_messages', 'support_ticket_id') ? 'support_ticket_id' : 'ticket_id';
+            $senderKey = Schema::hasColumn('support_ticket_messages', 'sender_id') ? 'sender_id' : 'user_id';
+
             $ticket->messages = DB::table('support_ticket_messages')
-                ->join('users', 'support_ticket_messages.user_id', '=', 'users.id')
-                ->where('ticket_id', $ticket->id)
+                ->leftJoin('users', "support_ticket_messages.{$senderKey}", '=', 'users.id')
+                ->where($ticketKey, $ticket->id)
                 ->select('support_ticket_messages.*', 'users.name as sender_name')
                 ->orderBy('created_at', 'asc')
                 ->get();
@@ -48,15 +53,32 @@ class SupportController extends Controller
 
         DB::transaction(function () use ($request, &$ticketId) {
             // 1. Create Ticket
-            $ticketId = DB::table('support_tickets')->insertGetId([
-                'ticket_number' => 'TKT-' . strtoupper(Str::random(8)),
-                'franchise_id' => Auth::id(),
-                'category' => $request->category,
+            $ticketPayload = [
                 'subject' => $request->subject,
                 'status' => 'Open',
                 'created_at' => now(),
                 'updated_at' => now()
-            ]);
+            ];
+
+            if (Schema::hasColumn('support_tickets', 'ticket_number')) {
+                $ticketPayload['ticket_number'] = $this->nextTicketNumber();
+            }
+            if (Schema::hasColumn('support_tickets', 'franchise_id')) {
+                $ticketPayload['franchise_id'] = Auth::id();
+            } elseif (Schema::hasColumn('support_tickets', 'user_id')) {
+                $ticketPayload['user_id'] = Auth::id();
+            }
+            if (Schema::hasColumn('support_tickets', 'user_type')) {
+                $ticketPayload['user_type'] = 'Franchise';
+            }
+            if (Schema::hasColumn('support_tickets', 'category')) {
+                $ticketPayload['category'] = $request->category;
+            }
+            if (Schema::hasColumn('support_tickets', 'priority')) {
+                $ticketPayload['priority'] = 'Medium';
+            }
+
+            $ticketId = DB::table('support_tickets')->insertGetId($ticketPayload);
 
             // 2. Upload Attachment if exists
             $path = null;
@@ -65,15 +87,35 @@ class SupportController extends Controller
             }
 
             // 3. Create First Message
-            DB::table('support_ticket_messages')->insert([
-                'ticket_id' => $ticketId,
-                'user_id' => Auth::id(),
+            $ticketKey = Schema::hasColumn('support_ticket_messages', 'support_ticket_id') ? 'support_ticket_id' : 'ticket_id';
+            $senderKey = Schema::hasColumn('support_ticket_messages', 'sender_id') ? 'sender_id' : 'user_id';
+
+            $messagePayload = [
                 'message' => $request->message,
-                'attachment_path' => $path,
                 'is_admin_reply' => false,
                 'created_at' => now(),
                 'updated_at' => now()
-            ]);
+            ];
+
+            $messagePayload[$ticketKey] = $ticketId;
+            $messagePayload[$senderKey] = Auth::id();
+
+            if (Schema::hasColumn('support_ticket_messages', 'attachment_path')) {
+                $messagePayload['attachment_path'] = $path;
+            }
+
+            $messageId = DB::table('support_ticket_messages')->insertGetId($messagePayload);
+
+            if ($path && Schema::hasTable('ticket_attachments')) {
+                DB::table('ticket_attachments')->insert([
+                    'message_id' => $messageId,
+                    'file_path' => $path,
+                    'file_name' => $request->file('attachment')->getClientOriginalName(),
+                    'file_type' => $request->file('attachment')->getMimeType(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         });
 
         return back()->with('success', 'Support ticket created successfully.');
@@ -91,15 +133,38 @@ class SupportController extends Controller
             $path = $request->file('attachment')->store('support_attachments', 'public');
         }
 
-        DB::table('support_ticket_messages')->insert([
-            'ticket_id' => $id,
-            'user_id' => Auth::id(),
+        $ticketKey = Schema::hasColumn('support_ticket_messages', 'support_ticket_id') ? 'support_ticket_id' : 'ticket_id';
+        $senderKey = Schema::hasColumn('support_ticket_messages', 'sender_id') ? 'sender_id' : 'user_id';
+        $ownerColumn = Schema::hasColumn('support_tickets', 'franchise_id') ? 'franchise_id' : 'user_id';
+
+        abort_unless(DB::table('support_tickets')->where('id', $id)->where($ownerColumn, Auth::id())->exists(), 404);
+
+        $messagePayload = [
             'message' => $request->message,
-            'attachment_path' => $path,
             'is_admin_reply' => false,
             'created_at' => now(),
             'updated_at' => now()
-        ]);
+        ];
+
+        $messagePayload[$ticketKey] = $id;
+        $messagePayload[$senderKey] = Auth::id();
+
+        if (Schema::hasColumn('support_ticket_messages', 'attachment_path')) {
+            $messagePayload['attachment_path'] = $path;
+        }
+
+        $messageId = DB::table('support_ticket_messages')->insertGetId($messagePayload);
+
+        if ($path && Schema::hasTable('ticket_attachments')) {
+            DB::table('ticket_attachments')->insert([
+                'message_id' => $messageId,
+                'file_path' => $path,
+                'file_name' => $request->file('attachment')->getClientOriginalName(),
+                'file_type' => $request->file('attachment')->getMimeType(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
         // Update parent ticket status
         DB::table('support_tickets')->where('id', $id)->update([
@@ -112,14 +177,25 @@ class SupportController extends Controller
 
     public function close($id)
     {
+        $ownerColumn = Schema::hasColumn('support_tickets', 'franchise_id') ? 'franchise_id' : 'user_id';
+
         DB::table('support_tickets')
             ->where('id', $id)
-            ->where('franchise_id', Auth::id())
+            ->where($ownerColumn, Auth::id())
             ->update([
                 'status' => 'Closed',
                 'updated_at' => now()
             ]);
 
         return back()->with('success', 'Ticket closed successfully.');
+    }
+
+    private function nextTicketNumber(): string
+    {
+        do {
+            $ticketNumber = 'TKT-' . now()->format('ymd') . '-' . strtoupper(Str::random(5));
+        } while (DB::table('support_tickets')->where('ticket_number', $ticketNumber)->exists());
+
+        return $ticketNumber;
     }
 }
