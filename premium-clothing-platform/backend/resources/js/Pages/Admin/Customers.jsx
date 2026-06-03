@@ -35,8 +35,8 @@ export default function Customers({ customers, stats, filters }) {
                 {/* 🚀 HEADER & STATS */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                     <div>
-                        <h1 className="text-3xl font-black text-[#1E293B] uppercase tracking-tighter flex items-center gap-3 italic">
-                            <Users className="text-[#0B5CAD]" size={32} /> Customer Database
+                        <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3 italic">
+                            <Users className="text-[#ff3f6c]" size={32} /> Customer Database
                         </h1>
                         <p className="text-slate-400 font-bold text-sm mt-1 uppercase tracking-widest">Securely manage your premium customers.</p>
                     </div>
@@ -45,14 +45,14 @@ export default function Customers({ customers, stats, filters }) {
                     <a
                         href="/franchise-superadmin/customers/export"
                         target="_blank"
-                        className="bg-[#1E293B] text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[#0B5CAD] transition-all flex items-center justify-center gap-2 shadow-[0_10px_20px_rgba(11,92,173,0.15)] active:scale-95"
+                        className="bg-[#282c3f] text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[#ff3f6c] transition-all flex items-center justify-center gap-2 shadow-[0_10px_20px_rgba(11,92,173,0.15)] active:scale-95"
                     >
                         <Download size={16} /> Export Safe Data
                     </a>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <StatCard title="Total Customers" value={stats?.total} icon={Users} color="text-[#0B5CAD]" bgColor="bg-blue-50" />
+                    <StatCard title="Total Customers" value={stats?.total} icon={Users} color="text-[#ff3f6c]" bgColor="bg-blue-50" />
                     <StatCard title="Active Accounts" value={stats?.active} icon={ShieldCheck} color="text-emerald-500" bgColor="bg-emerald-50" />
                     <StatCard title="Blocked Accounts" value={stats?.blocked} icon={ShieldAlert} color="text-red-500" bgColor="bg-red-50" alert={stats?.blocked > 0} />
                     <StatCard title="Network Orders" value={stats?.total_orders} icon={ShoppingBag} color="text-indigo-500" bgColor="bg-indigo-50" />
@@ -65,13 +65,13 @@ export default function Customers({ customers, stats, filters }) {
                         <input
                             type="text" placeholder="Search by name, email or phone..."
                             value={search} onChange={e => setSearch(e.target.value)} onKeyPress={e => e.key === 'Enter' && applyFilters()}
-                            className="w-full bg-slate-50/50 border border-slate-100 rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-[#1E293B] focus:ring-2 focus:ring-[#0B5CAD]/20 focus:border-[#0B5CAD] transition-all outline-none"
+                            className="w-full bg-slate-50/50 border border-slate-100 rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c]/20 focus:border-[#ff3f6c] transition-all outline-none"
                         />
                     </div>
                     <select
                         value={statusFilter}
                         onChange={e => { setStatusFilter(e.target.value); setTimeout(applyFilters, 100); }}
-                        className="bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 focus:ring-2 focus:ring-[#0B5CAD]/20 focus:border-[#0B5CAD] transition-all outline-none cursor-pointer min-w-[160px]"
+                        className="bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 focus:ring-2 focus:ring-[#ff3f6c]/20 focus:border-[#ff3f6c] transition-all outline-none cursor-pointer min-w-[160px]"
                     >
                         <option value="">All Accounts</option>
                         <option value="active">Active</option>
@@ -100,11 +100,11 @@ export default function Customers({ customers, stats, filters }) {
                                         {/* Avatar & Name */}
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="size-10 bg-gradient-to-tr from-[#0B5CAD] to-blue-400 text-white rounded-2xl flex items-center justify-center font-black text-sm shadow-inner shrink-0 transform group-hover:scale-105 transition-transform">
+                                                <div className="size-10 bg-gradient-to-tr from-[#ff3f6c] to-blue-400 text-white rounded-2xl flex items-center justify-center font-black text-sm shadow-inner shrink-0 transform group-hover:scale-105 transition-transform">
                                                     {customer.name?.charAt(0).toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <p className="font-black text-[#1E293B] text-sm">{customer.name}</p>
+                                                    <p className="font-black text-[#282c3f] text-sm">{customer.name}</p>
                                                     <p className="text-[10px] font-bold text-slate-400 flex items-center gap-1 mt-0.5">
                                                         <Calendar size={10} /> Joined {new Date(customer.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
                                                     </p>
@@ -115,14 +115,14 @@ export default function Customers({ customers, stats, filters }) {
                                         {/* Secure Contact Info */}
                                         <td className="px-6 py-4">
                                             <div className="space-y-1">
-                                                <p className="text-xs font-bold text-slate-600 flex items-center gap-1.5 truncate max-w-[200px]"><Mail size={12} className="text-[#0B5CAD]" /> {customer.email}</p>
-                                                <p className="text-xs font-bold text-slate-600 flex items-center gap-1.5"><Phone size={12} className="text-[#0B5CAD]" /> {customer.mobile_number || 'Not provided'}</p>
+                                                <p className="text-xs font-bold text-slate-600 flex items-center gap-1.5 truncate max-w-[200px]"><Mail size={12} className="text-[#ff3f6c]" /> {customer.email}</p>
+                                                <p className="text-xs font-bold text-slate-600 flex items-center gap-1.5"><Phone size={12} className="text-[#ff3f6c]" /> {customer.mobile_number || 'Not provided'}</p>
                                             </div>
                                         </td>
 
                                         {/* Order Count */}
                                         <td className="px-6 py-4 text-center">
-                                            <span className="bg-blue-50/80 text-[#0B5CAD] font-black text-xs px-3 py-1 rounded-lg border border-blue-100/50 backdrop-blur-sm">{customer.orders_count || 0}</span>
+                                            <span className="bg-blue-50/80 text-[#ff3f6c] font-black text-xs px-3 py-1 rounded-lg border border-blue-100/50 backdrop-blur-sm">{customer.orders_count || 0}</span>
                                         </td>
 
                                         {/* Tickets Count */}
@@ -144,7 +144,7 @@ export default function Customers({ customers, stats, filters }) {
 
                                         {/* Action Menu */}
                                         <td className="px-6 py-4 text-right relative">
-                                            <button onClick={() => setOpenActionMenu(openActionMenu === customer.id ? null : customer.id)} className="p-2 text-slate-400 hover:text-[#0B5CAD] hover:bg-blue-50 rounded-xl transition-colors focus:outline-none">
+                                            <button onClick={() => setOpenActionMenu(openActionMenu === customer.id ? null : customer.id)} className="p-2 text-slate-400 hover:text-[#ff3f6c] hover:bg-blue-50 rounded-xl transition-colors focus:outline-none">
                                                 <MoreVertical size={20} />
                                             </button>
 
@@ -152,7 +152,7 @@ export default function Customers({ customers, stats, filters }) {
                                                 {openActionMenu === customer.id && (
                                                     <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 10 }} className="absolute right-12 top-2 w-48 bg-white/95 backdrop-blur-xl border border-slate-100 shadow-[0_20px_40px_rgba(0,0,0,0.1)] rounded-2xl z-50 overflow-hidden text-left">
                                                         <div className="p-2 space-y-1">
-                                                            <Link href={`/franchise-superadmin/customers/${customer.id}`} className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-black uppercase tracking-widest text-[#1E293B] hover:bg-slate-50 hover:text-[#0B5CAD] rounded-xl transition-colors">
+                                                            <Link href={`/franchise-superadmin/customers/${customer.id}`} className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-black uppercase tracking-widest text-[#282c3f] hover:bg-slate-50 hover:text-[#ff3f6c] rounded-xl transition-colors">
                                                                 View Full Profile
                                                             </Link>
                                                         </div>
@@ -170,7 +170,7 @@ export default function Customers({ customers, stats, filters }) {
                                     <tr>
                                         <td colSpan="6" className="px-6 py-20 text-center">
                                             <Users size={48} className="mx-auto text-slate-200 mb-4" strokeWidth={1} />
-                                            <p className="text-[#1E293B] font-black text-lg uppercase tracking-widest">No Customers Found</p>
+                                            <p className="text-[#282c3f] font-black text-lg uppercase tracking-widest">No Customers Found</p>
                                         </td>
                                     </tr>
                                 )}
@@ -187,7 +187,7 @@ export default function Customers({ customers, stats, filters }) {
                                 key={k}
                                 href={link.url || '#'}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
-                                className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${link.active ? 'bg-[#0B5CAD] text-white shadow-[0_4px_15px_rgba(11,92,173,0.3)]' : 'bg-white/80 backdrop-blur-md text-slate-500 hover:bg-slate-50 hover:text-[#0B5CAD] border border-slate-200 shadow-sm'}`}
+                                className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${link.active ? 'bg-[#ff3f6c] text-white shadow-[0_4px_15px_rgba(11,92,173,0.3)]' : 'bg-white/80 backdrop-blur-md text-slate-500 hover:bg-slate-50 hover:text-[#ff3f6c] border border-slate-200 shadow-sm'}`}
                             />
                         ))}
                     </div>
@@ -203,7 +203,7 @@ function StatCard({ title, value, icon: Icon, color, bgColor, alert }) {
         <div className={`bg-white/80 backdrop-blur-xl p-5 rounded-3xl border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-between ${alert ? 'border-red-100 shadow-red-500/10' : ''}`}>
             <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{title}</p>
-                <h4 className="text-2xl font-black text-[#1E293B]">{value?.toLocaleString() || 0}</h4>
+                <h4 className="text-2xl font-black text-[#282c3f]">{value?.toLocaleString() || 0}</h4>
             </div>
             <div className={`size-12 rounded-2xl flex items-center justify-center ${bgColor} ${color}`}>
                 <Icon size={20} strokeWidth={2.5} />

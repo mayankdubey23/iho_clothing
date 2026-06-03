@@ -119,21 +119,21 @@ export default function Login({ otpMode = false, status = null }) {
   };
 
   return (
-    <div className="grid min-h-screen bg-white font-sans selection:bg-[#1E293B] selection:text-white lg:grid-cols-[1fr_540px] xl:grid-cols-[1fr_620px]">
+    <div className="grid min-h-screen bg-white font-sans selection:bg-[#282c3f] selection:text-white lg:grid-cols-[1fr_540px] xl:grid-cols-[1fr_620px]">
       <Head title={otpMode ? 'Verify OTP | IHO Studio' : 'Login | IHO Studio'} />
 
-      <aside className="relative hidden overflow-hidden bg-[#0F172A] p-16 text-white lg:flex lg:flex-col lg:justify-between">
+      <aside className="relative hidden overflow-hidden bg-[#282c3f] p-16 text-white lg:flex lg:flex-col lg:justify-between">
         <div className="absolute left-0 top-0 h-[720px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/5 blur-[120px]" />
         <div className="relative z-10 flex items-center gap-4">
-          <div className="grid size-12 place-items-center bg-white text-xs font-black tracking-widest text-[#0F172A]">IHO</div>
+          <div className="grid size-12 place-items-center bg-white text-xs font-black tracking-widest text-[#282c3f]">IHO</div>
           <div>
             <p className="text-2xl font-black uppercase italic leading-none tracking-tighter">IHO<span className="font-light text-slate-400">STUDIO</span></p>
-            <p className="mt-1 text-[8px] font-black uppercase tracking-[0.4em] text-[#94A3B8]">Retail & Franchise Network</p>
+            <p className="mt-1 text-[8px] font-black uppercase tracking-[0.4em] text-[#ff3f6c]">Retail & Franchise Network</p>
           </div>
         </div>
 
         <div className="relative z-10">
-          <p className="mb-6 text-[10px] font-black uppercase tracking-[0.4em] text-[#94A3B8]">Customer and partner access</p>
+          <p className="mb-6 text-[10px] font-black uppercase tracking-[0.4em] text-[#ff3f6c]">Customer and partner access</p>
           <h1 className="text-5xl font-black uppercase leading-[1.05] tracking-tighter xl:text-7xl">
             Login to <br />
             <span className="italic text-slate-400">IHO Studio</span>
@@ -162,28 +162,28 @@ export default function Login({ otpMode = false, status = null }) {
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.03]"
           style={{
-            backgroundImage: 'linear-gradient(#1E293B 1px, transparent 1px), linear-gradient(90deg, #1E293B 1px, transparent 1px)',
+            backgroundImage: 'linear-gradient(#282c3f 1px, transparent 1px), linear-gradient(90deg, #282c3f 1px, transparent 1px)',
             backgroundSize: '40px 40px',
           }}
         />
 
         <div className="relative z-10 w-full max-w-sm">
           <Link href="/" className="mb-10 flex items-center gap-4 lg:hidden">
-            <div className="grid size-10 place-items-center bg-[#0F172A] text-xs font-black tracking-widest text-white">IHO</div>
-            <span className="text-2xl font-black uppercase italic tracking-tighter text-[#1E293B]">Studio</span>
+            <div className="grid size-10 place-items-center bg-[#282c3f] text-xs font-black tracking-widest text-white">IHO</div>
+            <span className="text-2xl font-black uppercase italic tracking-tighter text-[#282c3f]">Studio</span>
           </Link>
 
           <div className="mb-10">
-            <h2 className="border-l-4 border-black pl-4 text-3xl font-black uppercase italic tracking-tighter text-[#1E293B]">
+            <h2 className="border-l-4 border-black pl-4 text-3xl font-black uppercase italic tracking-tighter text-[#282c3f]">
               {otpMode ? 'OTP Verification' : 'Login to Your Account'}
             </h2>
-            <p className="mt-3 text-[10px] font-black uppercase tracking-[0.2em] text-[#94A3B8]">
+            <p className="mt-3 text-[10px] font-black uppercase tracking-[0.2em] text-[#ff3f6c]">
               {otpMode ? 'Enter the code sent to your registered contact.' : 'Track orders, manage wishlist, and checkout faster.'}
             </p>
           </div>
 
           {helperMessage && (
-            <div className="mb-6 border border-slate-200 bg-slate-50 p-4 text-[10px] font-bold uppercase tracking-widest text-[#1E293B]">
+            <div className="mb-6 border border-slate-200 bg-slate-50 p-4 text-[10px] font-bold uppercase tracking-widest text-[#282c3f]">
               {helperMessage}
             </div>
           )}
@@ -230,7 +230,7 @@ export default function Login({ otpMode = false, status = null }) {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 grid w-12 place-items-center text-slate-400 hover:text-[#1E293B]"
+                      className="absolute inset-y-0 right-0 grid w-12 place-items-center text-slate-400 hover:text-[#282c3f]"
                       title={showPassword ? 'Hide Password' : 'Show Password'}
                     >
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -244,11 +244,11 @@ export default function Login({ otpMode = false, status = null }) {
                       type="checkbox"
                       checked={data.remember}
                       onChange={(e) => setData('remember', e.target.checked)}
-                      className="size-4 rounded-none border-slate-300 text-[#1E293B] focus:ring-[#1E293B]"
+                      className="size-4 rounded-none border-slate-300 text-[#282c3f] focus:ring-[#282c3f]"
                     />
                     Remember Me
                   </label>
-                  <button type="button" onClick={() => setForgotOpen(!forgotOpen)} className="text-[10px] font-black uppercase tracking-widest text-[#1E293B] underline decoration-dotted">
+                  <button type="button" onClick={() => setForgotOpen(!forgotOpen)} className="text-[10px] font-black uppercase tracking-widest text-[#282c3f] underline decoration-dotted">
                     Forgot Password?
                   </button>
                 </div>
@@ -269,7 +269,7 @@ export default function Login({ otpMode = false, status = null }) {
 
             <button
               disabled={processing}
-              className="mt-2 flex min-h-[56px] w-full items-center justify-center gap-3 bg-[#000000] px-6 text-[10px] font-black uppercase tracking-[0.3em] text-white shadow-2xl shadow-black/10 transition-all duration-500 hover:bg-[#1E293B] disabled:opacity-50"
+              className="mt-2 flex min-h-[56px] w-full items-center justify-center gap-3 bg-[#000000] px-6 text-[10px] font-black uppercase tracking-[0.3em] text-white shadow-2xl shadow-black/10 transition-all duration-500 hover:bg-[#282c3f] disabled:opacity-50"
               type="submit"
             >
               {processing ? loginStatus : otpMode ? 'Verify OTP' : 'Login'}
@@ -279,7 +279,7 @@ export default function Login({ otpMode = false, status = null }) {
 
           {!otpMode && forgotOpen && (
             <div className="mt-6 border border-slate-200 bg-white p-5">
-              <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-[#1E293B]">Forgot Password</p>
+              <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-[#282c3f]">Forgot Password</p>
               <p className="mb-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Enter email/mobile, receive OTP or reset link, create a new password, then login again.</p>
               <div className="flex gap-2">
                 <input
@@ -288,7 +288,7 @@ export default function Login({ otpMode = false, status = null }) {
                   placeholder="Email or mobile"
                   className="min-w-0 flex-1 border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold outline-none focus:border-black"
                 />
-                <button type="button" onClick={requestForgotPassword} className="bg-[#1E293B] px-4 py-3 text-[9px] font-black uppercase tracking-widest text-white">
+                <button type="button" onClick={requestForgotPassword} className="bg-[#282c3f] px-4 py-3 text-[9px] font-black uppercase tracking-widest text-white">
                   Send
                 </button>
               </div>
@@ -297,10 +297,10 @@ export default function Login({ otpMode = false, status = null }) {
 
           {!otpMode && (
             <div className="mt-6 grid gap-3">
-              <button type="button" onClick={() => setMobileOtpOpen(!mobileOtpOpen)} className="flex items-center justify-center gap-3 border border-slate-200 bg-white px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#1E293B] hover:border-[#1E293B]">
+              <button type="button" onClick={() => setMobileOtpOpen(!mobileOtpOpen)} className="flex items-center justify-center gap-3 border border-slate-200 bg-white px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#282c3f] hover:border-[#282c3f]">
                 <Smartphone size={14} /> Login with Mobile OTP
               </button>
-              <button type="button" onClick={continueWithGoogle} disabled={googleProcessing} className="flex items-center justify-center gap-3 border border-slate-200 bg-white px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#1E293B] hover:border-[#1E293B] disabled:opacity-50">
+              <button type="button" onClick={continueWithGoogle} disabled={googleProcessing} className="flex items-center justify-center gap-3 border border-slate-200 bg-white px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-[#282c3f] hover:border-[#282c3f] disabled:opacity-50">
                 {googleProcessing ? 'Checking Google...' : 'Continue with Google'}
               </button>
             </div>
@@ -308,7 +308,7 @@ export default function Login({ otpMode = false, status = null }) {
 
           {!otpMode && mobileOtpOpen && (
             <div className="mt-6 border border-slate-200 bg-white p-5">
-              <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-[#1E293B]">Mobile OTP Login</p>
+              <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-[#282c3f]">Mobile OTP Login</p>
               <div className="grid gap-3">
                 <input
                   value={mobileNumber}
@@ -328,7 +328,7 @@ export default function Login({ otpMode = false, status = null }) {
                   type="button"
                   onClick={mobileStep === 'verify' ? verifyMobileOtp : requestMobileOtp}
                   disabled={mobileProcessing}
-                  className="bg-[#1E293B] px-4 py-3 text-[9px] font-black uppercase tracking-widest text-white disabled:opacity-50"
+                  className="bg-[#282c3f] px-4 py-3 text-[9px] font-black uppercase tracking-widest text-white disabled:opacity-50"
                 >
                   {mobileProcessing ? 'Please wait...' : mobileStep === 'verify' ? 'Verify OTP' : 'Send OTP'}
                 </button>
@@ -337,25 +337,25 @@ export default function Login({ otpMode = false, status = null }) {
           )}
 
           <div className="mt-8 text-center">
-            <p className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8]">
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#ff3f6c]">
               New customer?{' '}
-              <Link href="/register" className="ml-1 border-b border-[#1E293B] pb-0.5 text-[#1E293B] hover:text-slate-500">
+              <Link href="/register" className="ml-1 border-b border-[#282c3f] pb-0.5 text-[#282c3f] hover:text-slate-500">
                 Create Account
               </Link>
             </p>
           </div>
 
-          <div className="mt-10 border border-slate-200 bg-slate-50/50 p-7 text-center transition-colors duration-500 hover:border-[#1E293B]">
-            <p className="mb-2 text-[9px] font-black uppercase tracking-[0.4em] text-[#94A3B8]">Partner Program</p>
-            <p className="mb-2 text-sm font-black uppercase tracking-wide text-[#1E293B]">Want to become a franchise partner?</p>
+          <div className="mt-10 border border-slate-200 bg-slate-50/50 p-7 text-center transition-colors duration-500 hover:border-[#282c3f]">
+            <p className="mb-2 text-[9px] font-black uppercase tracking-[0.4em] text-[#ff3f6c]">Partner Program</p>
+            <p className="mb-2 text-sm font-black uppercase tracking-wide text-[#282c3f]">Want to become a franchise partner?</p>
             <p className="mb-6 text-[10px] font-bold uppercase tracking-widest text-slate-400">After approval, Super Admin will create or approve your franchise admin login.</p>
-            <Link href="/franchise-enquiry" className="inline-flex w-full items-center justify-center border border-[#1E293B] px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B] transition-all hover:bg-[#1E293B] hover:text-white">
+            <Link href="/franchise-enquiry" className="inline-flex w-full items-center justify-center border border-[#282c3f] px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#282c3f] transition-all hover:bg-[#282c3f] hover:text-white">
               Apply for Franchise
             </Link>
           </div>
 
           <p className="mt-10 text-center">
-            <Link href="/" className="inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] text-[#94A3B8] transition-colors hover:text-[#1E293B]">
+            <Link href="/" className="inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] text-[#ff3f6c] transition-colors hover:text-[#282c3f]">
               <ChevronLeft size={14} strokeWidth={2.5} /> Return to Storefront
             </Link>
           </p>
@@ -365,12 +365,12 @@ export default function Login({ otpMode = false, status = null }) {
       <style>{`
         .form-input {
           width: 100%;
-          background: #F8FAFC;
+          background: #f5f5f6;
           border-width: 1px;
           padding: 1rem 1.25rem;
           font-size: 0.875rem;
           font-weight: 700;
-          color: #1E293B;
+          color: #282c3f;
           outline: none;
           transition: all 0.2s ease;
         }
@@ -380,7 +380,7 @@ export default function Login({ otpMode = false, status = null }) {
           box-shadow: 0 0 0 1px #000;
         }
         .form-input::placeholder {
-          color: #CBD5E1;
+          color: #ffe1e8;
         }
       `}</style>
     </div>
@@ -390,7 +390,7 @@ export default function Login({ otpMode = false, status = null }) {
 function FormField({ label, error, children }) {
   return (
     <label className="relative grid gap-2.5">
-      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B]">{label}</span>
+      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#282c3f]">{label}</span>
       {children}
       {error && (
         <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-red-500">

@@ -20,9 +20,9 @@ const nodes = [
 
 export default function FranchiseEnquiryBanner() {
     return (
-        <section className="relative overflow-hidden bg-[#F8FAFC] border-t border-slate-200">
+        <section className="relative overflow-hidden bg-[#f5f5f6] border-t border-slate-200">
             <div className="max-w-[1400px] mx-auto px-6 py-20 lg:py-24">
-                <div className="relative overflow-hidden bg-[#0F172A] text-white min-h-[460px]">
+                <div className="relative overflow-hidden bg-[#282c3f] text-white min-h-[460px]">
                     <div className="absolute inset-0 opacity-[0.08] bg-[linear-gradient(90deg,#ffffff_1px,transparent_1px),linear-gradient(180deg,#ffffff_1px,transparent_1px)] bg-[size:48px_48px]" />
 
                     <motion.div
@@ -69,7 +69,7 @@ export default function FranchiseEnquiryBanner() {
                                 transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
                             >
                                 <div className="mb-5 flex items-center gap-3">
-                                    <div className="grid size-10 place-items-center border border-white/20 bg-white text-[#0F172A]">
+                                    <div className="grid size-10 place-items-center border border-white/20 bg-white text-[#282c3f]">
                                         <Store size={18} strokeWidth={2.4} />
                                     </div>
                                     <span className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-300">Franchise Enquiry</span>
@@ -85,7 +85,7 @@ export default function FranchiseEnquiryBanner() {
                                 <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                                     <Link
                                         href="/franchise-enquiry"
-                                        className="group inline-flex items-center justify-center gap-3 bg-white px-7 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-[#0F172A] transition-colors hover:bg-[#E94E3C] hover:text-white"
+                                        className="group inline-flex items-center justify-center gap-3 bg-white px-7 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-[#282c3f] transition-colors hover:bg-[#ff3f6c] hover:text-white"
                                     >
                                         Start Enquiry <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
                                     </Link>
@@ -106,7 +106,7 @@ export default function FranchiseEnquiryBanner() {
                                         <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Network Signal</p>
                                         <h3 className="mt-3 text-3xl font-black uppercase italic tracking-tight">Own Your Zone</h3>
                                     </div>
-                                    <TrendingUp className="text-[#E94E3C]" size={34} strokeWidth={2.2} />
+                                    <TrendingUp className="text-[#ff3f6c]" size={34} strokeWidth={2.2} />
                                 </motion.div>
 
                                 {stats.map((item, index) => {

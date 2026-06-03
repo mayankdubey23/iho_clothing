@@ -27,18 +27,18 @@ export default function CommandCenter({ stats, top_products, top_franchises }) {
         <AdminLayout active="dashboard">
             <Head title="Command Center | Super Admin" />
 
-            <div className="bg-[#1A1A2E] text-white pt-8 pb-24 px-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-[#E94E3C]/20 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+            <div className="bg-[#282c3f] text-white pt-8 pb-24 px-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-[#ff3f6c]/20 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
 
                 <div className="max-w-[1600px] mx-auto flex flex-col xl:flex-row xl:items-center justify-between gap-6 relative z-10">
                     <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E94E3C] mb-1">Super Admin Panel</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#ff3f6c] mb-1">Super Admin Panel</p>
                         <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter">Command Center</h1>
                     </div>
 
                     <div className="flex flex-wrap gap-2 xl:justify-end">
                         {QUICK_ACTIONS.map((action, i) => (
-                            <Link key={i} href={action.href} className="flex items-center gap-2 bg-white/10 hover:bg-[#E94E3C] border border-white/10 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all hover:scale-105 backdrop-blur-sm shadow-sm">
+                            <Link key={i} href={action.href} className="flex items-center gap-2 bg-white/10 hover:bg-[#ff3f6c] border border-white/10 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all hover:scale-105 backdrop-blur-sm shadow-sm">
                                 <action.icon size={14} /> <span>{action.label}</span>
                             </Link>
                         ))}
@@ -50,7 +50,7 @@ export default function CommandCenter({ stats, top_products, top_franchises }) {
 
                 {/* 🔴 SECTION 1: FINANCIALS & STOCK VALUE */}
                 <div>
-                    <h2 className="text-sm font-black uppercase tracking-widest text-[#1A1A2E] mb-4 flex items-center gap-2"><IndianRupee size={16} className="text-[#E94E3C]" /> Financial Overview</h2>
+                    <h2 className="text-sm font-black uppercase tracking-widest text-[#282c3f] mb-4 flex items-center gap-2"><IndianRupee size={16} className="text-[#ff3f6c]" /> Financial Overview</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <StatCard title="Total Revenue" value={formatCurrency(stats.total_revenue)} icon={IndianRupee} color="text-green-500" bg="bg-green-50" />
                         <StatCard title="Today's Revenue" value={formatCurrency(stats.today_revenue)} icon={TrendingUp} color="text-emerald-500" bg="bg-emerald-50" />
@@ -61,7 +61,7 @@ export default function CommandCenter({ stats, top_products, top_franchises }) {
 
                 {/* 🔴 SECTION 2: E-COMMERCE & ORDERS */}
                 <div>
-                    <h2 className="text-sm font-black uppercase tracking-widest text-[#1A1A2E] mb-4 flex items-center gap-2"><ShoppingCart size={16} className="text-[#E94E3C]" /> E-Commerce Performance</h2>
+                    <h2 className="text-sm font-black uppercase tracking-widest text-[#282c3f] mb-4 flex items-center gap-2"><ShoppingCart size={16} className="text-[#ff3f6c]" /> E-Commerce Performance</h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-4">
                         <MiniCard title="Total Orders" value={stats.total_orders} icon={ShoppingCart} />
                         <MiniCard title="Pending" value={stats.pending_orders} icon={Clock} alert={stats.pending_orders > 0} />
@@ -77,7 +77,7 @@ export default function CommandCenter({ stats, top_products, top_franchises }) {
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                     {/* 🔴 SECTION 3: FRANCHISE NETWORK */}
                     <div className="xl:col-span-2">
-                        <h2 className="text-sm font-black uppercase tracking-widest text-[#1A1A2E] mb-4 flex items-center gap-2"><Store size={16} className="text-[#E94E3C]" /> Franchise Network</h2>
+                        <h2 className="text-sm font-black uppercase tracking-widest text-[#282c3f] mb-4 flex items-center gap-2"><Store size={16} className="text-[#ff3f6c]" /> Franchise Network</h2>
                         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
                             <MiniCard title="Total" value={stats.total_franchises} icon={Store} />
                             <MiniCard title="Active" value={stats.active_franchises} icon={CheckCircle} />
@@ -87,14 +87,14 @@ export default function CommandCenter({ stats, top_products, top_franchises }) {
 
                         {/* Top Performing Franchises */}
                         <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                            <h3 className="font-black text-[#1A1A2E] uppercase tracking-wider mb-4">Top Performing Franchises</h3>
+                            <h3 className="font-black text-[#282c3f] uppercase tracking-wider mb-4">Top Performing Franchises</h3>
                             <div className="space-y-3">
                                 {top_franchises.length > 0 ? top_franchises.map((f, i) => (
                                     <div key={i} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-2xl">
                                         <div className="flex items-center gap-3">
-                                            <div className="size-8 bg-[#1A1A2E] text-white rounded-lg flex items-center justify-center font-black text-xs">{i + 1}</div>
+                                            <div className="size-8 bg-[#282c3f] text-white rounded-lg flex items-center justify-center font-black text-xs">{i + 1}</div>
                                             <div>
-                                                <h4 className="font-bold text-[#1A1A2E] text-sm">{f.name}</h4>
+                                                <h4 className="font-bold text-[#282c3f] text-sm">{f.name}</h4>
                                                 <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">{f.orders.toLocaleString()} Orders</p>
                                             </div>
                                         </div>
@@ -108,7 +108,7 @@ export default function CommandCenter({ stats, top_products, top_franchises }) {
                     {/* 🔴 SECTION 4: OPERATIONS, ALERTS & PRODUCTS */}
                     <div className="space-y-8">
                         <div>
-                            <h2 className="text-sm font-black uppercase tracking-widest text-[#1A1A2E] mb-4 flex items-center gap-2"><AlertCircle size={16} className="text-[#E94E3C]" /> System Alerts</h2>
+                            <h2 className="text-sm font-black uppercase tracking-widest text-[#282c3f] mb-4 flex items-center gap-2"><AlertCircle size={16} className="text-[#ff3f6c]" /> System Alerts</h2>
                             <div className="grid grid-cols-1 gap-3">
                                 <AlertRow title="Low Stock Alerts" value={stats.low_stock_alerts} icon={AlertCircle} type={stats.low_stock_alerts > 0 ? "danger" : "default"} />
                                 <AlertRow title="Pending Payments" value={stats.pending_payments} icon={CreditCard} type={stats.pending_payments > 0 ? "warning" : "default"} />
@@ -118,11 +118,11 @@ export default function CommandCenter({ stats, top_products, top_franchises }) {
 
                         {/* Top Selling Products */}
                         <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                            <h3 className="font-black text-[#1A1A2E] uppercase tracking-wider mb-4">Top Selling Products</h3>
+                            <h3 className="font-black text-[#282c3f] uppercase tracking-wider mb-4">Top Selling Products</h3>
                             <div className="space-y-3">
                                 {top_products.length > 0 ? top_products.map((p, i) => (
                                     <div key={i} className="p-3 bg-gray-50 border border-gray-100 rounded-2xl flex flex-col gap-1">
-                                        <h4 className="font-bold text-[#1A1A2E] text-sm truncate">{p.name}</h4>
+                                        <h4 className="font-bold text-[#282c3f] text-sm truncate">{p.name}</h4>
                                         <div className="flex justify-between items-center">
                                             <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">{p.sold.toLocaleString()} Units Sold</p>
                                             <p className="font-black text-green-600 text-xs">{formatCurrency(p.revenue)}</p>
@@ -146,14 +146,14 @@ function StatCard({ title, value, icon: Icon, color, bg }) {
             <div className={`size-12 rounded-2xl ${bg} ${color} flex items-center justify-center mb-4`}>
                 <Icon size={24} strokeWidth={2.5} />
             </div>
-            <h3 className="text-2xl lg:text-3xl font-black text-[#1A1A2E] tracking-tight">{value}</h3>
+            <h3 className="text-2xl lg:text-3xl font-black text-[#282c3f] tracking-tight">{value}</h3>
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">{title}</p>
         </div>
     );
 }
 
 function MiniCard({ title, value, icon: Icon, alert, danger }) {
-    let textColor = "text-[#1A1A2E]";
+    let textColor = "text-[#282c3f]";
     if (alert) textColor = "text-orange-500";
     if (danger) textColor = "text-red-500";
 

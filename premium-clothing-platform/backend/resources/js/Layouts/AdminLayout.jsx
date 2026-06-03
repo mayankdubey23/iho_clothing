@@ -82,21 +82,21 @@ export default function AdminLayout({ active = '', children }) {
     }, [active]);
 
     return (
-      <div ref={sidebarRef} className="flex flex-col h-full bg-[#0F172A] text-slate-300 shadow-2xl border-r border-slate-800 relative overflow-hidden">
+      <div ref={sidebarRef} className="flex flex-col h-full bg-[#282c3f] text-slate-300 shadow-2xl border-r border-slate-800 relative overflow-hidden">
         {/* ❄️ Subtle Background Glow */}
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-slate-800/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
         {/* Logo Area */}
         <div className="h-24 flex items-center px-8 border-b border-white/5 relative z-10">
           <Link href={isAdmin ? '/franchise-superadmin/command-center' : '/franchise/dashboard'} className="flex items-center gap-4">
-            <div className="grid size-10 place-items-center bg-white text-[#0F172A] font-black text-xs tracking-widest shadow-xl">
+            <div className="grid size-10 place-items-center bg-white text-[#282c3f] font-black text-xs tracking-widest shadow-xl">
               IHO
             </div>
             <div>
               <span className="block text-xl font-black tracking-tighter uppercase leading-none text-white italic">
                 STUDIO<span className="font-light text-slate-400">CTRL</span>
               </span>
-              <span className="text-[8px] font-black tracking-[0.3em] text-[#94A3B8] uppercase mt-1 block">
+              <span className="text-[8px] font-black tracking-[0.3em] text-[#ff3f6c] uppercase mt-1 block">
                 {isAdmin ? 'Global Network' : 'Franchise Partner'}
               </span>
             </div>
@@ -173,7 +173,7 @@ export default function AdminLayout({ active = '', children }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-sans flex"> {/* ❄️ Cool Slate Background */}
+    <div className="min-h-screen bg-[#f5f5f6] font-sans flex"> {/* ❄️ Cool Slate Background */}
 
       {/* 🖥️ DESKTOP SIDEBAR */}
       <aside className="hidden lg:block w-72 h-screen sticky top-0 z-40">
@@ -187,12 +187,12 @@ export default function AdminLayout({ active = '', children }) {
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setIsMobileSidebarOpen(false)}
-              className="fixed inset-0 bg-[#0F172A]/80 backdrop-blur-md z-40 lg:hidden"
+              className="fixed inset-0 bg-[#282c3f]/80 backdrop-blur-md z-40 lg:hidden"
             />
             <motion.aside
               initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }}
               transition={{ type: "spring", bounce: 0, duration: 0.5 }}
-              className="fixed inset-y-0 left-0 w-[85%] max-w-sm bg-[#0F172A] z-50 lg:hidden shadow-2xl border-r border-slate-800"
+              className="fixed inset-y-0 left-0 w-[85%] max-w-sm bg-[#282c3f] z-50 lg:hidden shadow-2xl border-r border-slate-800"
             >
               <SidebarContent />
               <button
@@ -214,7 +214,7 @@ export default function AdminLayout({ active = '', children }) {
           <div className="flex items-center gap-6">
             <button
               onClick={() => setIsMobileSidebarOpen(true)}
-              className="lg:hidden p-3 bg-slate-50 border border-slate-200 text-[#1E293B] hover:bg-slate-100 transition-colors"
+              className="lg:hidden p-3 bg-slate-50 border border-slate-200 text-[#282c3f] hover:bg-slate-100 transition-colors"
             >
               <Menu size={20} strokeWidth={2} />
             </button>
@@ -224,7 +224,7 @@ export default function AdminLayout({ active = '', children }) {
               {active && (
                 <>
                   <ChevronRight size={14} className="text-slate-300" />
-                  <span className="text-[#1E293B]">
+                  <span className="text-[#282c3f]">
                     {active.replace('_', ' ')}
                   </span>
                 </>
@@ -236,7 +236,7 @@ export default function AdminLayout({ active = '', children }) {
             <a
               href="/"
               target="_blank"
-              className="flex items-center gap-3 px-8 py-3.5 bg-black text-white hover:bg-[#1E293B] text-[9px] font-black uppercase tracking-[0.3em] transition-all shadow-xl shadow-black/10"
+              className="flex items-center gap-3 px-8 py-3.5 bg-black text-white hover:bg-[#282c3f] text-[9px] font-black uppercase tracking-[0.3em] transition-all shadow-xl shadow-black/10"
             >
               <Globe size={14} strokeWidth={2} />
               <span className="hidden sm:inline">Live Studio</span>
@@ -253,18 +253,18 @@ export default function AdminLayout({ active = '', children }) {
       {/* LOGOUT CONFIRMATION MODAL (Boutique Style) */}
       <AnimatePresence>
         {isLogoutModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0F172A]/90 backdrop-blur-lg">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#282c3f]/90 backdrop-blur-lg">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               className="bg-white border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden text-center p-12"
             >
-              <div className="size-16 border border-slate-200 text-[#1E293B] flex items-center justify-center mx-auto mb-8 bg-slate-50">
+              <div className="size-16 border border-slate-200 text-[#282c3f] flex items-center justify-center mx-auto mb-8 bg-slate-50">
                 <LogOut size={24} strokeWidth={1.5} className="ml-1" />
               </div>
 
-              <h3 className="font-black text-2xl text-[#1E293B] mb-3 uppercase tracking-tighter italic">
+              <h3 className="font-black text-2xl text-[#282c3f] mb-3 uppercase tracking-tighter italic">
                 Terminate Session?
               </h3>
               <p className="text-[11px] font-bold text-slate-500 mb-10 uppercase tracking-widest leading-relaxed">
@@ -274,13 +274,13 @@ export default function AdminLayout({ active = '', children }) {
               <div className="flex flex-col gap-4">
                 <button
                   onClick={handleLogout}
-                  className="w-full bg-black text-white py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-[#1E293B] transition-all shadow-2xl shadow-black/20"
+                  className="w-full bg-black text-white py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-[#282c3f] transition-all shadow-2xl shadow-black/20"
                 >
                   Confirm Exit
                 </button>
                 <button
                   onClick={() => setIsLogoutModalOpen(false)}
-                  className="w-full bg-white border border-slate-200 text-[#1E293B] py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:border-black transition-all"
+                  className="w-full bg-white border border-slate-200 text-[#282c3f] py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:border-black transition-all"
                 >
                   Return to Dashboard
                 </button>

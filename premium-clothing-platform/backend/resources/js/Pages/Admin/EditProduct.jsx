@@ -89,14 +89,14 @@ export default function EditProduct({ product, categories = [], brands = [], col
                 {/* Header */}
                 <div className="mb-10 mt-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
-                        <Link href="/franchise-superadmin/products" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-[#94A3B8] hover:text-[#1E293B] mb-4">
+                        <Link href="/franchise-superadmin/products" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-[#ff3f6c] hover:text-[#282c3f] mb-4">
                             <ChevronLeft size={14} /> Back to Catalog
                         </Link>
-                        <h1 className="text-3xl font-black text-[#1E293B] uppercase tracking-tighter italic border-l-4 border-[#1E293B] pl-4">
+                        <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter italic border-l-4 border-[#282c3f] pl-4">
                             Edit Product: {product.name}
                         </h1>
                     </div>
-                    <button onClick={submit} disabled={processing} className="flex items-center gap-3 bg-[#1A1A2E] text-white px-8 py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-[#E94E3C] transition-all disabled:opacity-50">
+                    <button onClick={submit} disabled={processing} className="flex items-center gap-3 bg-[#282c3f] text-white px-8 py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-[#ff3f6c] transition-all disabled:opacity-50">
                         <Save size={16} /> {processing ? 'Updating...' : 'Apply Changes'}
                     </button>
                 </div>
@@ -106,7 +106,7 @@ export default function EditProduct({ product, categories = [], brands = [], col
                     <div className="lg:col-span-8 space-y-10">
                         {/* Basic Info & Taxonomy */}
                         <div className="bg-white border border-slate-200 p-8 shadow-sm">
-                            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#1E293B] mb-8 border-b border-slate-100 pb-4">Taxonomy & Identity</h3>
+                            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#282c3f] mb-8 border-b border-slate-100 pb-4">Taxonomy & Identity</h3>
                             <div className="grid gap-6">
                                 <FormField label="Product Name *" error={errors.name}>
                                     <input type="text" value={data.name} onChange={e => setData('name', e.target.value)} className="form-input" />
@@ -175,7 +175,7 @@ export default function EditProduct({ product, categories = [], brands = [], col
 
                         {/* Pricing Logic */}
                         <div className="bg-white border border-slate-200 p-8 shadow-sm">
-                            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#1E293B] mb-8 border-b border-slate-100 pb-4">Revenue Architecture</h3>
+                            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#282c3f] mb-8 border-b border-slate-100 pb-4">Revenue Architecture</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <FormField label="Retail MRP (₹) *" error={errors.mrp}>
                                     <input type="number" value={data.mrp} onChange={e => setData('mrp', e.target.value)} className="form-input" />
@@ -192,8 +192,8 @@ export default function EditProduct({ product, categories = [], brands = [], col
                         {/* Variants Management */}
                         <div className="bg-white border border-slate-200 p-8 shadow-sm">
                             <div className="flex justify-between items-center mb-8 border-b border-slate-100 pb-4">
-                                <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#1E293B]">Active Variants</h3>
-                                <button type="button" onClick={() => setData('variants', [...data.variants, { size: '', color: '', qty: 0 }])} className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#E94E3C] hover:text-[#1E293B] transition-colors"><Plus size={14} /> Add Variant</button>
+                                <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#282c3f]">Active Variants</h3>
+                                <button type="button" onClick={() => setData('variants', [...data.variants, { size: '', color: '', qty: 0 }])} className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#ff3f6c] hover:text-[#282c3f] transition-colors"><Plus size={14} /> Add Variant</button>
                             </div>
                             <div className="space-y-4">
                                 {data.variants.map((v, i) => (
@@ -239,11 +239,11 @@ export default function EditProduct({ product, categories = [], brands = [], col
                     <div className="lg:col-span-4 space-y-10">
                         {/* Visual Assets */}
                         <div className="bg-white border border-slate-200 p-8 shadow-sm">
-                            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#1E293B] mb-6 border-b border-slate-100 pb-4">Studio Visuals</h3>
+                            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#282c3f] mb-6 border-b border-slate-100 pb-4">Studio Visuals</h3>
 
-                            <label className="relative flex flex-col items-center justify-center w-full h-40 border-2 border-slate-300 border-dashed bg-slate-50 hover:bg-slate-100 hover:border-[#1E293B] transition-colors cursor-pointer mb-6 group">
-                                <UploadCloud size={24} className="text-slate-400 mb-2 group-hover:text-[#1E293B] transition-colors" />
-                                <span className="text-[9px] font-black uppercase tracking-widest text-[#1E293B]">Add More Images</span>
+                            <label className="relative flex flex-col items-center justify-center w-full h-40 border-2 border-slate-300 border-dashed bg-slate-50 hover:bg-slate-100 hover:border-[#282c3f] transition-colors cursor-pointer mb-6 group">
+                                <UploadCloud size={24} className="text-slate-400 mb-2 group-hover:text-[#282c3f] transition-colors" />
+                                <span className="text-[9px] font-black uppercase tracking-widest text-[#282c3f]">Add More Images</span>
                                 <input type="file" multiple className="hidden" onChange={handleImageUpload} />
                             </label>
 
@@ -252,8 +252,8 @@ export default function EditProduct({ product, categories = [], brands = [], col
                                 {data.existing_images.map((img, idx) => (
                                     <div key={idx} className="relative aspect-[3/4] border border-slate-200 group overflow-hidden bg-slate-100">
                                         <img src={img.image_path} className="w-full h-full object-cover" />
-                                        <button type="button" className="absolute top-2 right-2 bg-white/90 p-1.5 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-[#E94E3C] hover:text-white"><X size={14} /></button>
-                                        <div className="absolute bottom-0 left-0 w-full bg-[#1E293B]/90 text-white text-[7px] font-black text-center py-1.5 uppercase tracking-widest">Active</div>
+                                        <button type="button" className="absolute top-2 right-2 bg-white/90 p-1.5 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-[#ff3f6c] hover:text-white"><X size={14} /></button>
+                                        <div className="absolute bottom-0 left-0 w-full bg-[#282c3f]/90 text-white text-[7px] font-black text-center py-1.5 uppercase tracking-widest">Active</div>
                                     </div>
                                 ))}
                                 {/* New Previews */}
@@ -261,7 +261,7 @@ export default function EditProduct({ product, categories = [], brands = [], col
                                     <div key={idx} className="relative aspect-[3/4] border border-slate-200 group overflow-hidden bg-slate-100">
                                         <img src={URL.createObjectURL(file)} className="w-full h-full object-cover opacity-60" />
                                         <button type="button" onClick={() => setData('new_images', data.new_images.filter((_, i) => i !== idx))} className="absolute top-2 right-2 bg-red-500 p-1.5 text-white hover:bg-red-600 transition-colors"><X size={14} /></button>
-                                        <div className="absolute bottom-0 left-0 w-full bg-[#E94E3C]/90 text-white text-[7px] font-black text-center py-1.5 uppercase tracking-widest">Queued</div>
+                                        <div className="absolute bottom-0 left-0 w-full bg-[#ff3f6c]/90 text-white text-[7px] font-black text-center py-1.5 uppercase tracking-widest">Queued</div>
                                     </div>
                                 ))}
                             </div>
@@ -269,7 +269,7 @@ export default function EditProduct({ product, categories = [], brands = [], col
 
                         {/* Visibility Controller */}
                         <div className="bg-white border border-slate-200 p-8 shadow-sm">
-                            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#1E293B] mb-8 border-b border-slate-100 pb-4">Storefront Controls</h3>
+                            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#282c3f] mb-8 border-b border-slate-100 pb-4">Storefront Controls</h3>
                             <div className="space-y-6">
                                 <VisibilityToggle label="Visible on Storefront" checked={data.status === 'active'} onChange={v => setData('status', v ? 'active' : 'inactive')} />
                                 <VisibilityToggle label="Feature on Homepage" checked={data.is_featured} onChange={v => setData('is_featured', v)} />
@@ -282,8 +282,8 @@ export default function EditProduct({ product, categories = [], brands = [], col
 
                 <style dangerouslySetInnerHTML={{
                     __html: `
-                    .form-input { width: 100%; background: #F8FAFC; border: 1px solid #E2E8F0; padding: 0.8rem 1rem; font-size: 0.8rem; font-weight: 700; color: #1E293B; outline: none; border-radius: 0; transition: all 0.2s; }
-                    .form-input:focus { border-color: #0F172A; background: #FFF; box-shadow: 0 0 0 1px #0F172A; }
+                    .form-input { width: 100%; background: #f5f5f6; border: 1px solid #fff0f4; padding: 0.8rem 1rem; font-size: 0.8rem; font-weight: 700; color: #282c3f; outline: none; border-radius: 0; transition: all 0.2s; }
+                    .form-input:focus { border-color: #282c3f; background: #FFF; box-shadow: 0 0 0 1px #282c3f; }
                 `}} />
             </div>
         </AdminLayout>
@@ -294,7 +294,7 @@ export default function EditProduct({ product, categories = [], brands = [], col
 function FormField({ label, error, children }) {
     return (
         <label className="flex flex-col gap-2 relative">
-            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#1E293B]">{label}</span>
+            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#282c3f]">{label}</span>
             {children}
             {error && <span className="absolute -bottom-4 text-[8px] font-black text-red-500 uppercase tracking-widest">{error}</span>}
         </label>
@@ -321,7 +321,7 @@ function VisibilityToggle({ label, checked, onChange }) {
     return (
         <label className="flex items-center justify-between cursor-pointer group">
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:text-black transition-colors">{label}</span>
-            <div onClick={() => onChange(!checked)} className={`w-10 h-5 border flex items-center p-0.5 transition-colors ${checked ? 'bg-[#1E293B] border-[#1E293B]' : 'bg-white border-slate-200'}`}>
+            <div onClick={() => onChange(!checked)} className={`w-10 h-5 border flex items-center p-0.5 transition-colors ${checked ? 'bg-[#282c3f] border-[#282c3f]' : 'bg-white border-slate-200'}`}>
                 <div className={`w-3.5 h-3.5 transition-transform ${checked ? 'translate-x-5 bg-white' : 'translate-x-0 bg-slate-200'}`} />
             </div>
         </label>

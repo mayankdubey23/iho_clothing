@@ -32,7 +32,7 @@ export default function OffersSection({ offers = [] }) {
 
             {/* ❄️ Scrolling Ticker (For Free Delivery etc.) */}
             {tickerOffers.length > 0 && (
-                <div className="bg-[#1E293B] text-white py-3 mb-10 overflow-hidden flex whitespace-nowrap">
+                <div className="bg-[#282c3f] text-white py-3 mb-10 overflow-hidden flex whitespace-nowrap">
                     <motion.div
                         initial={{ x: 0 }}
                         animate={{ x: "-50%" }}
@@ -51,8 +51,8 @@ export default function OffersSection({ offers = [] }) {
 
             <div className="max-w-[1400px] mx-auto px-6">
                 <div className="flex items-center gap-4 mb-8">
-                    <div className="h-[1px] w-8 bg-[#1E293B]" />
-                    <span className="text-[10px] font-black tracking-[0.4em] uppercase text-[#1E293B] flex items-center gap-2">
+                    <div className="h-[1px] w-8 bg-[#282c3f]" />
+                    <span className="text-[10px] font-black tracking-[0.4em] uppercase text-[#282c3f] flex items-center gap-2">
                         <Tag size={12} /> Studio Privileges
                     </span>
                 </div>
@@ -76,7 +76,7 @@ export default function OffersSection({ offers = [] }) {
                             <p className="text-slate-300 text-sm font-bold uppercase tracking-widest max-w-md mb-8">
                                 {heroOffer.subtitle}
                             </p>
-                            <Link href="/shop?sale=true" className="inline-flex items-center gap-3 bg-[#E94E3C] text-white px-8 py-4 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all">
+                            <Link href="/shop?sale=true" className="inline-flex items-center gap-3 bg-[#ff3f6c] text-white px-8 py-4 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all">
                                 Access Sale <ArrowRight size={14} strokeWidth={3} />
                             </Link>
                         </div>
@@ -88,9 +88,9 @@ export default function OffersSection({ offers = [] }) {
                             <motion.div
                                 key={offer.id || index}
                                 initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.1 }}
-                                className="flex-1 bg-slate-50 border border-slate-100 p-6 md:p-8 flex flex-col justify-center relative group hover:border-[#1E293B] transition-colors"
+                                className="flex-1 bg-slate-50 border border-slate-100 p-6 md:p-8 flex flex-col justify-center relative group hover:border-[#282c3f] transition-colors"
                             >
-                                <h3 className="text-2xl font-black text-[#1E293B] uppercase tracking-tight italic mb-2">
+                                <h3 className="text-2xl font-black text-[#282c3f] uppercase tracking-tight italic mb-2">
                                     {offer.title}
                                 </h3>
                                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-6">
@@ -99,16 +99,16 @@ export default function OffersSection({ offers = [] }) {
 
                                 {offer.offer_code ? (
                                     <div className="flex items-center justify-between bg-white border border-slate-200 p-1">
-                                        <span className="pl-4 text-xs font-black tracking-[0.3em] text-[#1E293B]">{offer.offer_code}</span>
+                                        <span className="pl-4 text-xs font-black tracking-[0.3em] text-[#282c3f]">{offer.offer_code}</span>
                                         <button
                                             onClick={() => copyCode(offer.offer_code)}
-                                            className="bg-[#1E293B] text-white px-4 py-3 hover:bg-[#E94E3C] transition-colors flex items-center gap-2"
+                                            className="bg-[#282c3f] text-white px-4 py-3 hover:bg-[#ff3f6c] transition-colors flex items-center gap-2"
                                         >
                                             {copiedCode === offer.offer_code ? <CheckCircle2 size={14} /> : <Copy size={14} />}
                                         </button>
                                     </div>
                                 ) : (
-                                    <Link href="/shop" className="text-[10px] font-black uppercase tracking-widest text-[#1E293B] hover:text-[#E94E3C] inline-flex items-center gap-1 border-b border-[#1E293B] hover:border-[#E94E3C] w-fit pb-0.5">
+                                    <Link href="/shop" className="text-[10px] font-black uppercase tracking-widest text-[#282c3f] hover:text-[#ff3f6c] inline-flex items-center gap-1 border-b border-[#282c3f] hover:border-[#ff3f6c] w-fit pb-0.5">
                                         Shop Now <ArrowRight size={12} />
                                     </Link>
                                 )}

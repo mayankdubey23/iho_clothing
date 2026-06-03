@@ -24,8 +24,8 @@ export default function Customers({ customers, filters }) {
                 {/* 🚀 HEADER & SEARCH */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                     <div>
-                        <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                            <Users className="text-[#E94E3C]" size={32} /> Local Customers
+                        <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                            <Users className="text-[#ff3f6c]" size={32} /> Local Customers
                         </h1>
                         <p className="text-gray-500 font-bold text-sm mt-1">Manage and contact users who have ordered from your hub.</p>
                     </div>
@@ -38,7 +38,7 @@ export default function Customers({ customers, filters }) {
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             onKeyPress={handleSearch}
-                            className="w-full bg-white shadow-sm border border-gray-200 rounded-2xl pl-12 pr-4 py-3.5 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none"
+                            className="w-full bg-white shadow-sm border border-gray-200 rounded-2xl pl-12 pr-4 py-3.5 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none"
                         />
                     </div>
                 </div>
@@ -70,41 +70,41 @@ export default function Customers({ customers, filters }) {
                                     <tr key={customer.id} className="hover:bg-gray-50/80 transition-colors">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="size-10 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center font-black text-[#1A1A2E] shadow-inner">
+                                                <div className="size-10 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center font-black text-[#282c3f] shadow-inner">
                                                     {customer.name?.substring(0, 2).toUpperCase() || 'GU'}
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-[#1A1A2E] text-sm">{customer.name || 'Guest User'}</p>
+                                                    <p className="font-bold text-[#282c3f] text-sm">{customer.name || 'Guest User'}</p>
                                                     <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-0.5">ID: CUST-{customer.id}</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 space-y-1">
-                                            <a href={`tel:${customer.phone}`} className="flex items-center gap-2 text-xs font-bold text-[#1A1A2E] hover:text-[#E94E3C] transition-colors w-max">
+                                            <a href={`tel:${customer.phone}`} className="flex items-center gap-2 text-xs font-bold text-[#282c3f] hover:text-[#ff3f6c] transition-colors w-max">
                                                 <Phone size={12} className="text-gray-400" /> {customer.phone || 'N/A'}
                                             </a>
-                                            <a href={`mailto:${customer.email}`} className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-[#E94E3C] transition-colors w-max">
+                                            <a href={`mailto:${customer.email}`} className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-[#ff3f6c] transition-colors w-max">
                                                 <Mail size={12} className="text-gray-400" /> {customer.email || 'N/A'}
                                             </a>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-start gap-2 max-w-[250px]">
-                                                <MapPin size={14} className="text-[#E94E3C] mt-0.5 shrink-0" />
+                                                <MapPin size={14} className="text-[#ff3f6c] mt-0.5 shrink-0" />
                                                 <p className="text-xs font-bold text-gray-600 line-clamp-2">
                                                     {customer.address ? `${customer.address.address_line}, ${customer.address.city}, ${customer.address.pincode}` : customer.fallback_address}
                                                 </p>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-center space-y-1">
-                                            <p className="text-sm font-black text-[#1A1A2E] flex items-center justify-center gap-1.5">
-                                                <ShoppingBag size={14} className="text-[#E94E3C]" /> {customer.total_orders} Orders
+                                            <p className="text-sm font-black text-[#282c3f] flex items-center justify-center gap-1.5">
+                                                <ShoppingBag size={14} className="text-[#ff3f6c]" /> {customer.total_orders} Orders
                                             </p>
                                             <p className="text-[10px] font-bold text-gray-500 flex items-center justify-center gap-1">
                                                 <CalendarDays size={12} /> Last: {new Date(customer.last_order_date).toLocaleDateString()}
                                             </p>
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <Link href={`/franchise/orders?search=${customer.phone}`} className="inline-flex items-center gap-1.5 text-[10px] bg-gray-100 text-[#1A1A2E] hover:bg-[#1A1A2E] hover:text-white font-black uppercase tracking-widest px-3 py-2 rounded-lg transition-all">
+                                            <Link href={`/franchise/orders?search=${customer.phone}`} className="inline-flex items-center gap-1.5 text-[10px] bg-gray-100 text-[#282c3f] hover:bg-[#282c3f] hover:text-white font-black uppercase tracking-widest px-3 py-2 rounded-lg transition-all">
                                                 View Orders <ExternalLink size={12} />
                                             </Link>
                                         </td>
@@ -114,7 +114,7 @@ export default function Customers({ customers, filters }) {
                                     <tr>
                                         <td colSpan="5" className="px-6 py-16 text-center">
                                             <Users size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} />
-                                            <p className="text-[#1A1A2E] font-black text-lg">No Customers Found</p>
+                                            <p className="text-[#282c3f] font-black text-lg">No Customers Found</p>
                                             <p className="text-gray-500 text-sm font-bold mt-1">When users place orders in your area, they will appear here.</p>
                                         </td>
                                     </tr>

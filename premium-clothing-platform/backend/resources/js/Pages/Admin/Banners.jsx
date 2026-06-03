@@ -36,8 +36,8 @@ export default function Banners({ banners }) {
             <div className="max-w-[1400px] mx-auto px-6 py-8">
 
                 <div className="mb-10">
-                    <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                        <LayoutTemplate className="text-[#E94E3C]" size={32} /> Dynamic Banners
+                    <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                        <LayoutTemplate className="text-[#ff3f6c]" size={32} /> Dynamic Banners
                     </h1>
                     <p className="text-gray-500 font-bold text-sm mt-1">Control your storefront's visual campaigns in real-time.</p>
                 </div>
@@ -47,17 +47,17 @@ export default function Banners({ banners }) {
                     {/* 📤 UPLOAD FORM */}
                     <div className="lg:col-span-4 space-y-6">
                         <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-                            <h3 className="font-black text-[#1A1A2E] uppercase tracking-widest mb-6">Create Campaign</h3>
+                            <h3 className="font-black text-[#282c3f] uppercase tracking-widest mb-6">Create Campaign</h3>
                             <form onSubmit={submit} className="space-y-4">
                                 <div>
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Campaign Title</label>
-                                    <input type="text" value={data.title} onChange={e => setData('title', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] outline-none focus:ring-2 focus:ring-[#E94E3C]" placeholder="e.g. Summer Drop" />
+                                    <input type="text" value={data.title} onChange={e => setData('title', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] outline-none focus:ring-2 focus:ring-[#ff3f6c]" placeholder="e.g. Summer Drop" />
                                     {errors.title && <span className="text-red-500 text-[9px] uppercase">{errors.title}</span>}
                                 </div>
 
                                 <div>
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Placement</label>
-                                    <select value={data.placement_type} onChange={e => setData('placement_type', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] outline-none cursor-pointer focus:ring-2 focus:ring-[#E94E3C]">
+                                    <select value={data.placement_type} onChange={e => setData('placement_type', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] outline-none cursor-pointer focus:ring-2 focus:ring-[#ff3f6c]">
                                         <option value="main_hero_slider">Main Hero Slider (Top)</option>
                                         <option value="mid_page_banner">Mid Page Banner</option>
                                         <option value="category_banner">Category Collection</option>
@@ -83,10 +83,10 @@ export default function Banners({ banners }) {
 
                                 <div>
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Target URL (Optional)</label>
-                                    <input type="text" value={data.target_url} onChange={e => setData('target_url', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] outline-none focus:ring-2 focus:ring-[#E94E3C]" placeholder="/shop?category=gym" />
+                                    <input type="text" value={data.target_url} onChange={e => setData('target_url', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] outline-none focus:ring-2 focus:ring-[#ff3f6c]" placeholder="/shop?category=gym" />
                                 </div>
 
-                                <button disabled={processing} className="w-full bg-[#1A1A2E] text-white py-3.5 rounded-xl font-black uppercase tracking-widest flex justify-center items-center gap-2 hover:bg-[#E94E3C] transition-colors disabled:opacity-70 active:scale-95">
+                                <button disabled={processing} className="w-full bg-[#282c3f] text-white py-3.5 rounded-xl font-black uppercase tracking-widest flex justify-center items-center gap-2 hover:bg-[#ff3f6c] transition-colors disabled:opacity-70 active:scale-95">
                                     <Upload size={16} /> {processing ? 'Uploading...' : 'Publish Banner'}
                                 </button>
                             </form>
@@ -96,12 +96,12 @@ export default function Banners({ banners }) {
                     {/* 🖥️ LIVE PREVIEW GRID */}
                     <div className="lg:col-span-8">
                         <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-h-[500px]">
-                            <h3 className="font-black text-[#1A1A2E] uppercase tracking-widest mb-6 border-b border-gray-100 pb-4">Live Banners</h3>
+                            <h3 className="font-black text-[#282c3f] uppercase tracking-widest mb-6 border-b border-gray-100 pb-4">Live Banners</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {banners.length === 0 ? (
                                     <div className="col-span-2 text-center py-20">
                                         <ImageIcon size={48} className="mx-auto text-gray-200 mb-4" strokeWidth={1} />
-                                        <p className="font-black text-[#1A1A2E] uppercase tracking-widest">No Active Campaigns</p>
+                                        <p className="font-black text-[#282c3f] uppercase tracking-widest">No Active Campaigns</p>
                                         <p className="text-xs font-bold text-gray-400 mt-1">Upload your first banner from the left panel.</p>
                                     </div>
                                 ) : (
@@ -118,13 +118,13 @@ export default function Banners({ banners }) {
                                             {/* Admin Controls */}
                                             <div className="p-4 flex items-center justify-between bg-white border-t border-gray-100">
                                                 <div>
-                                                    <p className="text-xs font-black uppercase tracking-widest text-[#1A1A2E] truncate w-32">{banner.title}</p>
+                                                    <p className="text-xs font-black uppercase tracking-widest text-[#282c3f] truncate w-32">{banner.title}</p>
                                                     <span className={`text-[8px] font-black uppercase tracking-widest ${banner.is_active ? 'text-green-500' : 'text-red-500'}`}>
                                                         {banner.is_active ? 'Live' : 'Hidden'}
                                                     </span>
                                                 </div>
                                                 <div className="flex gap-2">
-                                                    <button onClick={() => toggleStatus(banner.id)} className="p-2 bg-gray-50 hover:bg-gray-200 rounded-lg text-[#1A1A2E] transition-colors">
+                                                    <button onClick={() => toggleStatus(banner.id)} className="p-2 bg-gray-50 hover:bg-gray-200 rounded-lg text-[#282c3f] transition-colors">
                                                         {banner.is_active ? <EyeOff size={16} /> : <Eye size={16} />}
                                                     </button>
                                                     <button onClick={() => deleteBanner(banner.id)} className="p-2 bg-red-50 hover:bg-red-500 hover:text-white rounded-lg text-red-500 transition-colors">

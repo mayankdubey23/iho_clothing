@@ -40,8 +40,8 @@ export default function FranchiseManagement({ tabData, activeTab, stats, filters
                 {/* 🚀 HEADER */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                     <div>
-                        <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                            <Store className="text-[#E94E3C]" /> Franchise Management
+                        <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                            <Store className="text-[#ff3f6c]" /> Franchise Management
                         </h1>
                         <p className="text-gray-500 font-bold text-sm mt-1">Unified command center for global partners & requests.</p>
                     </div>
@@ -57,17 +57,17 @@ export default function FranchiseManagement({ tabData, activeTab, stats, filters
                                 <button
                                     key={tab.id}
                                     onClick={() => switchTab(tab.id)}
-                                    className={`relative flex items-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${isActive ? 'text-[#1A1A2E] bg-gray-50' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-700'}`}
+                                    className={`relative flex items-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${isActive ? 'text-[#282c3f] bg-gray-50' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-700'}`}
                                 >
                                     <Icon size={16} className={isActive ? tab.color : ''} />
                                     {tab.label}
                                     {tab.count > 0 && (
-                                        <span className={`ml-2 px-2 py-0.5 rounded-md text-[10px] ${isActive ? 'bg-[#1A1A2E] text-white' : 'bg-gray-200 text-gray-600'}`}>
+                                        <span className={`ml-2 px-2 py-0.5 rounded-md text-[10px] ${isActive ? 'bg-[#282c3f] text-white' : 'bg-gray-200 text-gray-600'}`}>
                                             {tab.count}
                                         </span>
                                     )}
                                     {isActive && (
-                                        <motion.div layoutId="activeTab" className="absolute bottom-0 left-4 right-4 h-0.5 bg-[#E94E3C] rounded-t-full" />
+                                        <motion.div layoutId="activeTab" className="absolute bottom-0 left-4 right-4 h-0.5 bg-[#ff3f6c] rounded-t-full" />
                                     )}
                                 </button>
                             );
@@ -81,7 +81,7 @@ export default function FranchiseManagement({ tabData, activeTab, stats, filters
                     <input
                         type="text" placeholder={`Search in ${tabs.find(t => t.id === activeTab)?.label}...`}
                         value={search} onChange={e => setSearch(e.target.value)} onKeyPress={handleSearch}
-                        className="w-full bg-white shadow-sm border border-gray-100 rounded-2xl pl-12 pr-4 py-4 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none"
+                        className="w-full bg-white shadow-sm border border-gray-100 rounded-2xl pl-12 pr-4 py-4 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none"
                     />
                 </div>
 
@@ -104,15 +104,15 @@ export default function FranchiseManagement({ tabData, activeTab, stats, filters
                                         <tr key={f.id} className="hover:bg-gray-50/80 transition-colors">
                                             <td className="px-6 py-5">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="size-10 bg-[#1A1A2E] text-white rounded-xl flex items-center justify-center font-black text-xs">{f.name[0]}</div>
+                                                    <div className="size-10 bg-[#282c3f] text-white rounded-xl flex items-center justify-center font-black text-xs">{f.name[0]}</div>
                                                     <div>
-                                                        <p className="font-black text-[#1A1A2E] text-sm">{f.name}</p>
+                                                        <p className="font-black text-[#282c3f] text-sm">{f.name}</p>
                                                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{f.email}</p>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5">
-                                                <p className="text-xs font-black text-gray-600 flex items-center gap-1"><MapPin size={12} className="text-[#E94E3C]" /> {f.franchise_detail?.city || 'Unassigned'}</p>
+                                                <p className="text-xs font-black text-gray-600 flex items-center gap-1"><MapPin size={12} className="text-[#ff3f6c]" /> {f.franchise_detail?.city || 'Unassigned'}</p>
                                             </td>
                                             <td className="px-6 py-5 text-right">
                                                 <button onClick={() => router.post(`/franchise-superadmin/franchises/${f.id}/toggle-status`)} className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors ${f.status === 'active' ? 'text-red-500 bg-red-50 hover:bg-red-100' : 'text-green-600 bg-green-50 hover:bg-green-100'}`}>
@@ -142,7 +142,7 @@ export default function FranchiseManagement({ tabData, activeTab, stats, filters
                                     {tabData.data?.length > 0 ? tabData.data.map((req) => (
                                         <tr key={req.id} className="hover:bg-gray-50/80 transition-colors">
                                             <td className="px-6 py-5">
-                                                <p className="font-black text-[#1A1A2E] text-sm">{req.name}</p>
+                                                <p className="font-black text-[#282c3f] text-sm">{req.name}</p>
                                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{req.email} • {req.phone}</p>
                                             </td>
                                             <td className="px-6 py-5"><p className="text-xs font-bold text-gray-600">{req.city}, {req.state}</p></td>
@@ -150,7 +150,7 @@ export default function FranchiseManagement({ tabData, activeTab, stats, filters
                                             <td className="px-6 py-5 text-right">
                                                 {activeTab === 'pending_requests' && (
                                                     <div className="flex justify-end gap-2">
-                                                        <button className="px-4 py-2 bg-[#1A1A2E] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-colors">Review & Approve</button>
+                                                        <button className="px-4 py-2 bg-[#282c3f] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#ff3f6c] transition-colors">Review & Approve</button>
                                                     </div>
                                                 )}
                                             </td>
@@ -165,7 +165,7 @@ export default function FranchiseManagement({ tabData, activeTab, stats, filters
                     {['service_areas', 'documents', 'performance'].includes(activeTab) && (
                         <div className="flex flex-col items-center justify-center p-20 text-center">
                             <Store size={48} className="text-gray-200 mb-4" strokeWidth={1} />
-                            <h3 className="font-black text-[#1A1A2E] text-xl uppercase tracking-widest mb-2">{tabs.find(t => t.id === activeTab)?.label} Module</h3>
+                            <h3 className="font-black text-[#282c3f] text-xl uppercase tracking-widest mb-2">{tabs.find(t => t.id === activeTab)?.label} Module</h3>
                             <p className="text-sm font-bold text-gray-400 max-w-md">Backend table connection is ready. The UI components for this specific tab will be rendered here.</p>
                         </div>
                     )}
@@ -182,7 +182,7 @@ function EmptyState({ message }) {
         <tr>
             <td colSpan="100%" className="px-6 py-16 text-center">
                 <Search size={32} className="mx-auto text-gray-300 mb-3" strokeWidth={1.5} />
-                <p className="text-[#1A1A2E] font-black text-sm uppercase tracking-widest">{message}</p>
+                <p className="text-[#282c3f] font-black text-sm uppercase tracking-widest">{message}</p>
             </td>
         </tr>
     );

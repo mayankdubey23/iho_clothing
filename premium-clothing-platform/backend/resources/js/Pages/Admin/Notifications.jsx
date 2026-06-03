@@ -49,8 +49,8 @@ export default function Notifications({ tabData, activeTab, stats }) {
 
                 {/* 🚀 HEADER & STATS */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                        <BellRing className="text-[#E94E3C]" size={32} /> Communication Hub
+                    <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                        <BellRing className="text-[#ff3f6c]" size={32} /> Communication Hub
                     </h1>
                     <p className="text-gray-500 font-bold text-sm mt-1">Omnichannel messaging for Franchises and Customers.</p>
                 </div>
@@ -68,10 +68,10 @@ export default function Notifications({ tabData, activeTab, stats }) {
                             const Icon = tab.icon;
                             const isActive = activeTab === tab.id;
                             return (
-                                <button key={tab.id} onClick={() => switchTab(tab.id)} className={`relative flex items-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${isActive ? 'text-[#1A1A2E] bg-gray-50' : 'text-gray-400 hover:bg-gray-50'}`}>
-                                    <Icon size={16} className={isActive ? 'text-[#E94E3C]' : ''} />
+                                <button key={tab.id} onClick={() => switchTab(tab.id)} className={`relative flex items-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${isActive ? 'text-[#282c3f] bg-gray-50' : 'text-gray-400 hover:bg-gray-50'}`}>
+                                    <Icon size={16} className={isActive ? 'text-[#ff3f6c]' : ''} />
                                     {tab.label}
-                                    {isActive && <motion.div layoutId="activeNotifTab" className="absolute bottom-0 left-4 right-4 h-0.5 bg-[#E94E3C] rounded-t-full" />}
+                                    {isActive && <motion.div layoutId="activeNotifTab" className="absolute bottom-0 left-4 right-4 h-0.5 bg-[#ff3f6c] rounded-t-full" />}
                                 </button>
                             );
                         })}
@@ -88,7 +88,7 @@ export default function Notifications({ tabData, activeTab, stats }) {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Target Audience *</label>
-                                    <select required value={data.target_audience} onChange={e => setData('target_audience', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none cursor-pointer">
+                                    <select required value={data.target_audience} onChange={e => setData('target_audience', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none cursor-pointer">
                                         <option value="All Customers">All Customers (B2C)</option>
                                         <option value="All Franchises">All Franchises (B2B)</option>
                                         <option value="Specific User" disabled>Specific User (Coming Soon)</option>
@@ -96,7 +96,7 @@ export default function Notifications({ tabData, activeTab, stats }) {
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Notification Type *</label>
-                                    <select required value={data.type} onChange={e => setData('type', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none cursor-pointer">
+                                    <select required value={data.type} onChange={e => setData('type', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none cursor-pointer">
                                         <option value="Offer Alert">Promotional / Offer Alert</option>
                                         <option value="Franchise Announcement">Franchise Announcement</option>
                                         <option value="Stock Alert">Stock / Restock Alert</option>
@@ -108,12 +108,12 @@ export default function Notifications({ tabData, activeTab, stats }) {
 
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Message Title / Subject *</label>
-                                <input required type="text" value={data.title} onChange={e => setData('title', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none" placeholder="e.g. FLASH SALE: 50% OFF on Gym Wear!" />
+                                <input required type="text" value={data.title} onChange={e => setData('title', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none" placeholder="e.g. FLASH SALE: 50% OFF on Gym Wear!" />
                             </div>
 
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Message Body *</label>
-                                <textarea required rows="4" value={data.message} onChange={e => setData('message', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none resize-none" placeholder="Write your message here..."></textarea>
+                                <textarea required rows="4" value={data.message} onChange={e => setData('message', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none resize-none" placeholder="Write your message here..."></textarea>
                             </div>
 
                             <div className="space-y-3">
@@ -128,7 +128,7 @@ export default function Notifications({ tabData, activeTab, stats }) {
                             </div>
 
                             <div className="pt-4 border-t border-gray-100 text-right">
-                                <button disabled={processing || data.channels.length === 0} type="submit" className="bg-[#1A1A2E] text-white px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-all disabled:opacity-50 flex items-center gap-2 ml-auto shadow-xl shadow-black/10">
+                                <button disabled={processing || data.channels.length === 0} type="submit" className="bg-[#282c3f] text-white px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#ff3f6c] transition-all disabled:opacity-50 flex items-center gap-2 ml-auto shadow-xl shadow-black/10">
                                     <Send size={16} /> {processing ? 'Broadcasting...' : 'Blast Notification'}
                                 </button>
                             </div>
@@ -151,11 +151,11 @@ export default function Notifications({ tabData, activeTab, stats }) {
                                     {tabData?.data?.map((log, i) => (
                                         <tr key={i} className="hover:bg-gray-50 transition-colors">
                                             <td className="px-6 py-4">
-                                                <p className="font-black text-[#1A1A2E] text-sm">{new Date(log.created_at).toLocaleDateString()}</p>
+                                                <p className="font-black text-[#282c3f] text-sm">{new Date(log.created_at).toLocaleDateString()}</p>
                                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{new Date(log.created_at).toLocaleTimeString()}</p>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <p className="font-black text-[#1A1A2E] text-sm truncate max-w-sm">{log.title || log.subject || log.message}</p>
+                                                <p className="font-black text-[#282c3f] text-sm truncate max-w-sm">{log.title || log.subject || log.message}</p>
                                                 {log.type && <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{log.type}</p>}
                                             </td>
                                             <td className="px-6 py-4 text-xs font-bold text-gray-600">
@@ -169,7 +169,7 @@ export default function Notifications({ tabData, activeTab, stats }) {
                                         </tr>
                                     ))}
                                     {tabData?.data?.length === 0 && (
-                                        <tr><td colSpan="4" className="px-6 py-16 text-center"><History size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} /><p className="text-[#1A1A2E] font-black text-lg">No Logs Found</p></td></tr>
+                                        <tr><td colSpan="4" className="px-6 py-16 text-center"><History size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} /><p className="text-[#282c3f] font-black text-lg">No Logs Found</p></td></tr>
                                     )}
                                 </tbody>
                             </table>
@@ -188,14 +188,14 @@ function StatCard({ title, value, icon: Icon, color }) {
         <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
             <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{title}</p>
-                <h4 className="text-2xl font-black text-[#1A1A2E]">{value?.toLocaleString() || 0}</h4>
+                <h4 className="text-2xl font-black text-[#282c3f]">{value?.toLocaleString() || 0}</h4>
             </div>
             <div className={`size-12 rounded-2xl flex items-center justify-center bg-gray-50 ${color}`}><Icon size={20} strokeWidth={2.5} /></div>
         </div>
     );
 }
 
-function ChannelButton({ icon: Icon, label, active, onClick, color = "bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100", activeColor = "bg-[#1A1A2E] text-white border-[#1A1A2E]" }) {
+function ChannelButton({ icon: Icon, label, active, onClick, color = "bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100", activeColor = "bg-[#282c3f] text-white border-[#282c3f]" }) {
     return (
         <button type="button" onClick={onClick} className={`flex items-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all border-2 ${active ? activeColor + ' shadow-md scale-105' : color}`}>
             <Icon size={16} /> {label} {active && <CheckCircle2 size={14} className="ml-1" />}

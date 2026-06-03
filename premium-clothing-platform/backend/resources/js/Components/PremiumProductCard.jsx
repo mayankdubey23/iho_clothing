@@ -60,14 +60,14 @@ export default function PremiumProductCard({ product }) {
         >
             <div className="relative aspect-[4/5] w-full overflow-hidden bg-slate-50">
                 {product.badge && (
-                    <div className="absolute left-4 top-4 z-20 bg-[#1A1A2E] px-3 py-1 text-[9px] font-black uppercase tracking-widest text-white">
+                    <div className="absolute left-4 top-4 z-20 bg-[#282c3f] px-3 py-1 text-[9px] font-black uppercase tracking-widest text-white">
                         {product.badge}
                     </div>
                 )}
 
                 {!inStock && (
                     <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/70 backdrop-blur-[2px]">
-                        <span className="border-2 border-[#1A1A2E] bg-white px-4 py-2 text-xs font-black uppercase tracking-widest text-[#1A1A2E]">
+                        <span className="border-2 border-[#282c3f] bg-white px-4 py-2 text-xs font-black uppercase tracking-widest text-[#282c3f]">
                             Out of Stock
                         </span>
                     </div>
@@ -97,17 +97,17 @@ export default function PremiumProductCard({ product }) {
                                     <div key={color.id} className="size-3 rounded-full border border-slate-200" style={{ backgroundColor: color.hex_code }} title={color.name} />
                                 ))}
                             </div>
-                            <div className="text-[9px] font-black uppercase tracking-widest text-[#1A1A2E]">
+                            <div className="text-[9px] font-black uppercase tracking-widest text-[#282c3f]">
                                 {product.available_sizes?.slice(0, 3).map(s => s.code).join(' / ')}
                             </div>
                         </div>
                     )}
 
                     <div className="flex gap-2">
-                        <button onClick={handleQuickAdd} disabled={!inStock} className="flex flex-1 items-center justify-center gap-2 bg-[#1A1A2E] py-3 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-[#E94E3C] disabled:bg-slate-300">
+                        <button onClick={handleQuickAdd} disabled={!inStock} className="flex flex-1 items-center justify-center gap-2 bg-[#282c3f] py-3 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-[#ff3f6c] disabled:bg-slate-300">
                             <ShoppingBag size={14} /> {quickAddLabel}
                         </button>
-                        <button onClick={handleWishlist} className={`flex items-center justify-center bg-white p-3 transition-colors hover:bg-slate-100 ${saved ? 'text-red-500' : 'text-[#1A1A2E]'}`} aria-label={saved ? 'Remove from wishlist' : 'Add to wishlist'}>
+                        <button onClick={handleWishlist} className={`flex items-center justify-center bg-white p-3 transition-colors hover:bg-slate-100 ${saved ? 'text-red-500' : 'text-[#282c3f]'}`} aria-label={saved ? 'Remove from wishlist' : 'Add to wishlist'}>
                             <Heart size={16} fill={saved ? 'currentColor' : 'none'} />
                         </button>
                     </div>
@@ -123,18 +123,18 @@ export default function PremiumProductCard({ product }) {
                             </p>
                         )}
                         <Link href={productUrl}>
-                            <h3 className="text-sm font-black uppercase tracking-tight text-[#1A1A2E] transition-colors group-hover:text-[#E94E3C]">
+                            <h3 className="text-sm font-black uppercase tracking-tight text-[#282c3f] transition-colors group-hover:text-[#ff3f6c]">
                                 {product.name}
                             </h3>
                         </Link>
                     </div>
-                    <Link href={productUrl} className="text-slate-300 transition-colors group-hover:text-[#1A1A2E]">
+                    <Link href={productUrl} className="text-slate-300 transition-colors group-hover:text-[#282c3f]">
                         <ArrowUpRight size={18} />
                     </Link>
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <span className="text-sm font-black text-[#1A1A2E]">₹{product.price}</span>
+                    <span className="text-sm font-black text-[#282c3f]">₹{product.price}</span>
                     {hasDiscount && (
                         <span className="text-xs font-bold text-slate-400 line-through">₹{product.compare_at_price}</span>
                     )}

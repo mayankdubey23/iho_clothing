@@ -201,8 +201,8 @@ export default function ProductDetail({
                             )}
                             {/* Product Tags */}
                             <div className="absolute top-4 left-4 flex flex-col gap-2">
-                                {product.is_best_seller && <span className="bg-[#1E293B] text-white text-[8px] font-black uppercase tracking-widest px-3 py-1.5 shadow-lg">Best Seller</span>}
-                                {product.is_featured && <span className="bg-[#E94E3C] text-white text-[8px] font-black uppercase tracking-widest px-3 py-1.5 shadow-lg">New Arrival</span>}
+                                {product.is_best_seller && <span className="bg-[#282c3f] text-white text-[8px] font-black uppercase tracking-widest px-3 py-1.5 shadow-lg">Best Seller</span>}
+                                {product.is_featured && <span className="bg-[#ff3f6c] text-white text-[8px] font-black uppercase tracking-widest px-3 py-1.5 shadow-lg">New Arrival</span>}
                             </div>
                         </div>
 
@@ -235,13 +235,13 @@ export default function ProductDetail({
                             <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">{product.brand?.name || 'IHO STUDIO'}</h2>
                             <div className="flex items-center gap-1 cursor-pointer hover:opacity-70 transition-opacity" onClick={() => document.getElementById('reviews-section').scrollIntoView({ behavior: 'smooth' })}>
                                 {[1, 2, 3, 4, 5].map(star => (
-                                    <Star key={star} size={12} fill={ratingValue >= star ? "#F59E0B" : "transparent"} color={ratingValue >= star ? "#F59E0B" : "#CBD5E1"} />
+                                    <Star key={star} size={12} fill={ratingValue >= star ? "#F59E0B" : "transparent"} color={ratingValue >= star ? "#F59E0B" : "#ffe1e8"} />
                                 ))}
                                 <span className="text-[10px] font-bold text-slate-400 ml-1 underline decoration-dotted">({reviewCount} Reviews)</span>
                             </div>
                         </div>
 
-                        <h1 className="text-2xl md:text-4xl lg:text-5xl font-black uppercase tracking-tighter italic text-[#1E293B] mb-6 leading-none">
+                        <h1 className="text-2xl md:text-4xl lg:text-5xl font-black uppercase tracking-tighter italic text-[#282c3f] mb-6 leading-none">
                             {product.name}
                         </h1>
 
@@ -252,7 +252,7 @@ export default function ProductDetail({
                                 {discountPercent > 0 && (
                                     <>
                                         <span className="text-sm md:text-base font-bold text-slate-400 line-through mb-1">MRP ₹{mrp}</span>
-                                        <span className="text-[10px] md:text-xs font-black text-[#E94E3C] uppercase tracking-widest mb-1.5 px-2 py-0.5 border border-[#E94E3C]">{discountPercent}% OFF</span>
+                                        <span className="text-[10px] md:text-xs font-black text-[#ff3f6c] uppercase tracking-widest mb-1.5 px-2 py-0.5 border border-[#ff3f6c]">{discountPercent}% OFF</span>
                                     </>
                                 )}
                             </div>
@@ -269,7 +269,7 @@ export default function ProductDetail({
                         {/* Color Selector */}
                         <div className="mb-8">
                             <div className="flex justify-between items-center mb-4">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-[#1E293B]">Select Color *</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-[#282c3f]">Select Color *</span>
                                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{selectedColor || 'None'}</span>
                             </div>
                             <div className="flex flex-wrap gap-2 md:gap-3">
@@ -282,7 +282,7 @@ export default function ProductDetail({
                         {/* Size Selector */}
                         <div className="mb-8">
                             <div className="flex justify-between items-center mb-4">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-[#1E293B]">Select Size *</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-[#282c3f]">Select Size *</span>
                                 <button className="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-black transition-colors underline decoration-dotted"><Ruler size={12} /> Size Guide</button>
                             </div>
                             <div className="flex flex-wrap gap-2 md:gap-3">
@@ -294,22 +294,22 @@ export default function ProductDetail({
 
                         {/* Error & Out of Stock Messaging */}
                         {error && <div className="text-red-500 text-[10px] font-black uppercase tracking-widest mb-4 bg-red-50 p-4 border border-red-100">{error}</div>}
-                        {isOutOfStock && <div className="text-[#E94E3C] text-[10px] font-black uppercase tracking-widest mb-4 bg-red-50/50 p-4 border border-red-100 flex items-center gap-2"><Star size={14} /> Currently Out of Stock for this variant.</div>}
+                        {isOutOfStock && <div className="text-[#ff3f6c] text-[10px] font-black uppercase tracking-widest mb-4 bg-red-50/50 p-4 border border-red-100 flex items-center gap-2"><Star size={14} /> Currently Out of Stock for this variant.</div>}
 
                         {/* Action Buttons */}
                         <div className="flex flex-col gap-3 mt-auto sticky bottom-4 z-40 bg-white/95 backdrop-blur-sm p-2 -mx-2 md:static md:bg-transparent md:p-0 md:mx-0 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] md:shadow-none border-t md:border-none border-slate-100">
                             <div className="flex gap-3">
-                                <button onClick={() => addToCart(false)} disabled={isOutOfStock} className={`flex-1 flex items-center justify-center gap-3 py-4 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] transition-all active:scale-[0.98] ${isOutOfStock ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-white border border-[#1E293B] text-[#1E293B] hover:bg-slate-50'}`}>
+                                <button onClick={() => addToCart(false)} disabled={isOutOfStock} className={`flex-1 flex items-center justify-center gap-3 py-4 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] transition-all active:scale-[0.98] ${isOutOfStock ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-white border border-[#282c3f] text-[#282c3f] hover:bg-slate-50'}`}>
                                     <ShoppingBag size={16} /> Add to Bag
                                 </button>
                                 <button className="w-14 md:w-16 flex items-center justify-center border border-slate-200 hover:border-black text-slate-400 hover:text-black transition-all active:scale-[0.98] bg-white"><Heart size={20} /></button>
                             </div>
                             {!isOutOfStock ? (
-                                <button onClick={() => addToCart(true)} className="w-full bg-[#1E293B] text-white py-4 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#E94E3C] hover:shadow-xl hover:shadow-[#E94E3C]/20 transition-all active:scale-[0.98]">
+                                <button onClick={() => addToCart(true)} className="w-full bg-[#282c3f] text-white py-4 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#ff3f6c] hover:shadow-xl hover:shadow-[#ff3f6c]/20 transition-all active:scale-[0.98]">
                                     Buy It Now
                                 </button>
                             ) : (
-                                <button className="w-full bg-transparent border border-dashed border-[#E94E3C] text-[#E94E3C] py-4 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] hover:bg-red-50 transition-all active:scale-[0.98]">
+                                <button className="w-full bg-transparent border border-dashed border-[#ff3f6c] text-[#ff3f6c] py-4 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] hover:bg-red-50 transition-all active:scale-[0.98]">
                                     Notify Me When Available
                                 </button>
                             )}
@@ -317,7 +317,7 @@ export default function ProductDetail({
 
                         {/* Delivery Section (API Connected) */}
                         <div className="mt-10 p-5 bg-slate-50 border border-slate-100">
-                            <h3 className="text-[10px] font-black uppercase tracking-widest text-[#1E293B] mb-4 flex items-center gap-2">
+                            <h3 className="text-[10px] font-black uppercase tracking-widest text-[#282c3f] mb-4 flex items-center gap-2">
                                 <Truck size={14} /> Check Delivery & ETA
                             </h3>
                             <div className="flex gap-2">
@@ -336,7 +336,7 @@ export default function ProductDetail({
                                 <button
                                     onClick={handlePincodeCheck}
                                     disabled={isCheckingPin || pincode.length !== 6}
-                                    className="px-6 min-w-[100px] flex items-center justify-center bg-[#1E293B] text-white text-[9px] font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="px-6 min-w-[100px] flex items-center justify-center bg-[#282c3f] text-white text-[9px] font-black uppercase tracking-widest hover:bg-[#ff3f6c] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isCheckingPin ? (
                                         <span className="flex items-center gap-2">
@@ -361,7 +361,7 @@ export default function ProductDetail({
                         {/* Information Accordions */}
                         <div className="mt-8 space-y-1 border-t border-slate-100 pt-4">
                             <details id="product-details" className="group cursor-pointer overflow-hidden scroll-mt-24" open>
-                                <summary className="py-4 text-[10px] font-black uppercase tracking-widest text-[#1E293B] list-none flex justify-between items-center select-none">
+                                <summary className="py-4 text-[10px] font-black uppercase tracking-widest text-[#282c3f] list-none flex justify-between items-center select-none">
                                     Description <ChevronRight size={14} className="group-open:rotate-90 transition-transform" />
                                 </summary>
                                 <div className="text-xs text-slate-500 pb-6 leading-relaxed font-medium space-y-4">
@@ -374,7 +374,7 @@ export default function ProductDetail({
                                 </div>
                             </details>
                             <details className="group border-t border-slate-100 cursor-pointer overflow-hidden">
-                                <summary className="py-4 text-[10px] font-black uppercase tracking-widest text-[#1E293B] list-none flex justify-between items-center select-none">
+                                <summary className="py-4 text-[10px] font-black uppercase tracking-widest text-[#282c3f] list-none flex justify-between items-center select-none">
                                     Shipping & Returns <ChevronRight size={14} className="group-open:rotate-90 transition-transform" />
                                 </summary>
                                 <p className="text-xs text-slate-500 pb-6 leading-relaxed font-medium">Free premium shipping on orders over ₹3000. Hassle-free 7-day returns for unworn items with original tags attached.</p>
@@ -393,7 +393,7 @@ export default function ProductDetail({
                             <a
                                 key={label}
                                 href={href}
-                                className="px-2 py-4 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 transition-colors hover:bg-slate-50 hover:text-[#1E293B] md:text-[10px]"
+                                className="px-2 py-4 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 transition-colors hover:bg-slate-50 hover:text-[#282c3f] md:text-[10px]"
                             >
                                 {label}
                             </a>
@@ -405,8 +405,8 @@ export default function ProductDetail({
                 <section id="reviews-section" className="max-w-[1000px] mx-auto px-4 md:px-6 py-16 border-t border-slate-100">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
                         <div>
-                            <h2 className="flex items-center gap-2 text-2xl font-black uppercase tracking-tighter text-[#1E293B] mb-2">
-                                Ratings <Star size={22} className="text-[#1E293B]" />
+                            <h2 className="flex items-center gap-2 text-2xl font-black uppercase tracking-tighter text-[#282c3f] mb-2">
+                                Ratings <Star size={22} className="text-[#282c3f]" />
                             </h2>
                             <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Verified purchase feedback</p>
                         </div>
@@ -414,14 +414,14 @@ export default function ProductDetail({
                             {canReview ? (
                                 <button
                                     onClick={() => setShowReviewForm(!showReviewForm)}
-                                    className="px-8 py-4 bg-white border-2 border-[#1E293B] text-[#1E293B] text-[10px] font-black uppercase tracking-widest hover:bg-[#1E293B] hover:text-white transition-colors"
+                                    className="px-8 py-4 bg-white border-2 border-[#282c3f] text-[#282c3f] text-[10px] font-black uppercase tracking-widest hover:bg-[#282c3f] hover:text-white transition-colors"
                                 >
                                     {showReviewForm ? 'Cancel Review' : 'Write a Review'}
                                 </button>
                             ) : (
                                 <Link
                                     href="/login"
-                                    className="px-8 py-4 bg-slate-100 border-2 border-slate-200 text-slate-400 text-[10px] font-black uppercase tracking-widest hover:border-[#1E293B] hover:text-[#1E293B] transition-colors"
+                                    className="px-8 py-4 bg-slate-100 border-2 border-slate-200 text-slate-400 text-[10px] font-black uppercase tracking-widest hover:border-[#282c3f] hover:text-[#282c3f] transition-colors"
                                 >
                                     Write a Review
                                 </Link>
@@ -434,10 +434,10 @@ export default function ProductDetail({
 
                     <div className="mb-12 grid gap-8 border-y border-slate-200 py-8 md:grid-cols-[0.9fr_1.4fr] md:items-center">
                         <div className="flex items-end gap-3 md:border-r md:border-slate-200 md:pr-8">
-                            <span className="text-6xl font-medium leading-none tracking-tight text-[#1E293B]">{ratingValue.toFixed(1)}</span>
+                            <span className="text-6xl font-medium leading-none tracking-tight text-[#282c3f]">{ratingValue.toFixed(1)}</span>
                             <div className="pb-2">
                                 <Star size={34} className="fill-teal-600 text-teal-600" />
-                                <p className="mt-4 text-xl font-medium text-[#1E293B]">{verifiedBuyerText}</p>
+                                <p className="mt-4 text-xl font-medium text-[#282c3f]">{verifiedBuyerText}</p>
                             </div>
                         </div>
 
@@ -447,7 +447,7 @@ export default function ProductDetail({
                                 const barColor = row.star >= 4 ? 'bg-teal-600' : row.star === 3 ? 'bg-slate-300' : row.star === 2 ? 'bg-amber-400' : 'bg-red-400';
 
                                 return (
-                                    <div key={row.star} className="grid grid-cols-[30px_1fr_48px] items-center gap-2 text-sm font-medium text-[#1E293B]">
+                                    <div key={row.star} className="grid grid-cols-[30px_1fr_48px] items-center gap-2 text-sm font-medium text-[#282c3f]">
                                         <span className="flex items-center gap-0.5 text-slate-400">{row.star} <Star size={11} className="fill-slate-300 text-slate-300" /></span>
                                         <div className="h-1.5 overflow-hidden bg-slate-100">
                                             <div className={`h-full ${barColor}`} style={{ width }} />
@@ -460,25 +460,25 @@ export default function ProductDetail({
                     </div>
 
                     <div className="mb-12 border-b border-slate-200 pb-8">
-                        <h3 className="mb-5 flex items-center gap-2 text-2xl font-black uppercase tracking-tighter text-[#1E293B]">
-                            What Customers Said <Star size={22} className="text-[#1E293B]" />
+                        <h3 className="mb-5 flex items-center gap-2 text-2xl font-black uppercase tracking-tighter text-[#282c3f]">
+                            What Customers Said <Star size={22} className="text-[#282c3f]" />
                         </h3>
                         <div className="grid gap-5 sm:grid-cols-2">
                             {insightRows.map((item) => (
                                 <div key={item.label}>
-                                    <p className="mb-2 text-lg font-medium text-[#1E293B]">{item.label}</p>
+                                    <p className="mb-2 text-lg font-medium text-[#282c3f]">{item.label}</p>
                                     <div className="flex items-center gap-5">
                                         <div className="h-1.5 w-full max-w-[210px] overflow-hidden bg-slate-100">
                                             <div className="h-full bg-teal-600" style={{ width: `${item.percent}%` }} />
                                         </div>
-                                        <span className="whitespace-nowrap text-sm font-black text-[#1E293B]">
+                                        <span className="whitespace-nowrap text-sm font-black text-[#282c3f]">
                                             {item.value} ({item.percent}%)
                                         </span>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                        <button type="button" className="mt-6 text-sm font-black text-[#E94E3C] transition-colors hover:text-[#1E293B]">
+                        <button type="button" className="mt-6 text-sm font-black text-[#ff3f6c] transition-colors hover:text-[#282c3f]">
                             View Details
                         </button>
                     </div>
@@ -504,7 +504,7 @@ export default function ProductDetail({
                                                 onClick={() => setReviewData('rating', star)}
                                                 className="hover:scale-110 transition-transform"
                                             >
-                                                <Star size={24} fill={reviewData.rating >= star ? '#F59E0B' : 'transparent'} color={reviewData.rating >= star ? '#F59E0B' : '#CBD5E1'} />
+                                                <Star size={24} fill={reviewData.rating >= star ? '#F59E0B' : 'transparent'} color={reviewData.rating >= star ? '#F59E0B' : '#ffe1e8'} />
                                             </button>
                                         ))}
                                     </div>
@@ -540,7 +540,7 @@ export default function ProductDetail({
                                 <button
                                     type="submit"
                                     disabled={reviewProcessing}
-                                    className="px-8 py-4 bg-[#1E293B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-colors disabled:opacity-50"
+                                    className="px-8 py-4 bg-[#282c3f] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#ff3f6c] transition-colors disabled:opacity-50"
                                 >
                                     {reviewProcessing ? 'Submitting...' : 'Submit Review'}
                                 </button>
@@ -557,7 +557,7 @@ export default function ProductDetail({
                                         <div>
                                             <div className="flex gap-1 mb-2">
                                                 {[1, 2, 3, 4, 5].map(star => (
-                                                    <Star key={star} size={12} fill={review.rating >= star ? "#F59E0B" : "transparent"} color={review.rating >= star ? "#F59E0B" : "#CBD5E1"} />
+                                                    <Star key={star} size={12} fill={review.rating >= star ? "#F59E0B" : "transparent"} color={review.rating >= star ? "#F59E0B" : "#ffe1e8"} />
                                                 ))}
                                             </div>
                                             <h4 className="text-[11px] font-black uppercase tracking-widest text-black flex items-center gap-2">
@@ -587,7 +587,7 @@ export default function ProductDetail({
                 {relatedProducts && relatedProducts.length > 0 && (
                     <section id="similar-products" className="max-w-[1400px] mx-auto px-4 md:px-6 py-16 border-t border-slate-100 scroll-mt-24">
                         <div className="flex justify-between items-end mb-8 md:mb-10">
-                            <h2 className="text-2xl font-black uppercase tracking-tighter italic text-[#1E293B]">You May Also Like</h2>
+                            <h2 className="text-2xl font-black uppercase tracking-tighter italic text-[#282c3f]">You May Also Like</h2>
                             <Link href={`/shop?category=${product.category?.slug}`} className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-black underline decoration-dotted transition-colors">View All</Link>
                         </div>
                         <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:gap-6 md:grid md:grid-cols-4 no-scrollbar pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
@@ -609,13 +609,13 @@ export default function ProductDetail({
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                             />
                                             {related.is_featured && (
-                                                <div className="absolute top-3 left-3 bg-[#E94E3C] text-white text-[8px] font-black uppercase tracking-widest px-2 py-1">
+                                                <div className="absolute top-3 left-3 bg-[#ff3f6c] text-white text-[8px] font-black uppercase tracking-widest px-2 py-1">
                                                     Trending
                                                 </div>
                                             )}
                                         </div>
                                         <div className="flex flex-col">
-                                            <h3 className="text-[10px] md:text-xs font-black uppercase tracking-widest text-[#1E293B] mb-1 truncate">
+                                            <h3 className="text-[10px] md:text-xs font-black uppercase tracking-widest text-[#282c3f] mb-1 truncate">
                                                 {related.name}
                                             </h3>
                                             <div className="flex items-center gap-2">

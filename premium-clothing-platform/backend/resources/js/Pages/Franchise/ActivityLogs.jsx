@@ -34,8 +34,8 @@ export default function ActivityLogs({ logs, filters }) {
                 {/* 🚀 HEADER & FILTER */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
                     <div>
-                        <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                            <Activity className="text-[#E94E3C]" size={32} /> Audit Trail
+                        <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                            <Activity className="text-[#ff3f6c]" size={32} /> Audit Trail
                         </h1>
                         <p className="text-gray-500 font-bold text-sm mt-1">Track your account activity, actions, and system logs.</p>
                     </div>
@@ -45,7 +45,7 @@ export default function ActivityLogs({ logs, filters }) {
                         <select
                             value={filters.module}
                             onChange={updateFilter}
-                            className="bg-transparent border-none text-sm font-bold text-[#1A1A2E] focus:ring-0 outline-none cursor-pointer py-2 pr-8"
+                            className="bg-transparent border-none text-sm font-bold text-[#282c3f] focus:ring-0 outline-none cursor-pointer py-2 pr-8"
                         >
                             <option value="All">All Activities</option>
                             <option value="Orders">Orders</option>
@@ -77,7 +77,7 @@ export default function ActivityLogs({ logs, filters }) {
                                                     <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${bg} ${color}`}>
                                                         {log.module}
                                                     </span>
-                                                    <h4 className="font-black text-[#1A1A2E] text-sm mt-2">{log.action}</h4>
+                                                    <h4 className="font-black text-[#282c3f] text-sm mt-2">{log.action}</h4>
                                                 </div>
                                                 <div className="text-left sm:text-right">
                                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
@@ -104,7 +104,7 @@ export default function ActivityLogs({ logs, filters }) {
                     ) : (
                         <div className="py-16 text-center">
                             <Activity size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} />
-                            <h3 className="text-[#1A1A2E] font-black text-lg uppercase">No Activity Found</h3>
+                            <h3 className="text-[#282c3f] font-black text-lg uppercase">No Activity Found</h3>
                             <p className="text-gray-500 text-sm font-bold mt-1">Actions performed by your account will appear here.</p>
                         </div>
                     )}

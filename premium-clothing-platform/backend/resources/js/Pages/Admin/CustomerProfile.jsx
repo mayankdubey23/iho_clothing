@@ -10,23 +10,23 @@ export default function CustomerProfile({ customer }) {
 
             <div className="max-w-[1000px] mx-auto px-6 py-8">
                 {/* Back Button */}
-                <Link href="/franchise-superadmin/customers" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-[#0B5CAD] transition-colors mb-8">
+                <Link href="/franchise-superadmin/customers" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-[#ff3f6c] transition-colors mb-8">
                     <ArrowLeft size={14} /> Back to Customers
                 </Link>
 
                 <div className="mb-8">
-                    <h1 className="text-3xl font-black text-[#1E293B] uppercase tracking-tighter italic flex items-center gap-3">
-                        <User className="text-[#0B5CAD]" size={32} /> Customer Profile
+                    <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter italic flex items-center gap-3">
+                        <User className="text-[#ff3f6c]" size={32} /> Customer Profile
                     </h1>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Customer Info Card */}
                     <div className="md:col-span-1 bg-white/95 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-slate-100 h-fit">
-                        <div className="grid size-20 place-items-center rounded-2xl bg-slate-100 text-[#1E293B] mx-auto mb-4">
+                        <div className="grid size-20 place-items-center rounded-2xl bg-slate-100 text-[#282c3f] mx-auto mb-4">
                             <User size={40} />
                         </div>
-                        <h2 className="text-xl font-black text-center text-[#1E293B] uppercase tracking-tight">{customer.name}</h2>
+                        <h2 className="text-xl font-black text-center text-[#282c3f] uppercase tracking-tight">{customer.name}</h2>
                         <span className={`block text-center text-[10px] font-black uppercase tracking-widest mt-2 ${customer.status === 'active' ? 'text-green-500' : 'text-red-500'}`}>
                             {customer.status}
                         </span>
@@ -45,8 +45,8 @@ export default function CustomerProfile({ customer }) {
                     <div className="md:col-span-2 space-y-6">
                         {/* Recent Orders */}
                         <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-slate-100">
-                            <h3 className="text-sm font-black uppercase tracking-widest text-[#1E293B] flex items-center gap-2 mb-4">
-                                <Package size={16} className="text-[#0B5CAD]" /> Recent Orders
+                            <h3 className="text-sm font-black uppercase tracking-widest text-[#282c3f] flex items-center gap-2 mb-4">
+                                <Package size={16} className="text-[#ff3f6c]" /> Recent Orders
                             </h3>
                             {customer.orders && customer.orders.length > 0 ? (
                                 <ul className="divide-y divide-slate-100">

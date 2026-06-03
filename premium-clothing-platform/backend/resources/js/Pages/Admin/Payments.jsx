@@ -51,8 +51,8 @@ export default function Payments({ tabData, activeTab, stats, filters }) {
 
                 {/* 🚀 HEADER */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                        <Banknote className="text-[#E94E3C]" /> Global Financial Ledger
+                    <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                        <Banknote className="text-[#ff3f6c]" /> Global Financial Ledger
                     </h1>
                     <p className="text-gray-500 font-bold text-sm mt-1">Track D2C sales, B2B settlements, and COD collections.</p>
                 </div>
@@ -71,10 +71,10 @@ export default function Payments({ tabData, activeTab, stats, filters }) {
                             const Icon = tab.icon;
                             const isActive = activeTab === tab.id;
                             return (
-                                <button key={tab.id} onClick={() => switchTab(tab.id)} className={`relative flex items-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${isActive ? 'text-[#1A1A2E] bg-gray-50' : 'text-gray-400 hover:bg-gray-50'}`}>
-                                    <Icon size={16} className={isActive ? 'text-[#E94E3C]' : ''} />
+                                <button key={tab.id} onClick={() => switchTab(tab.id)} className={`relative flex items-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${isActive ? 'text-[#282c3f] bg-gray-50' : 'text-gray-400 hover:bg-gray-50'}`}>
+                                    <Icon size={16} className={isActive ? 'text-[#ff3f6c]' : ''} />
                                     {tab.label}
-                                    {isActive && <motion.div layoutId="activePayTab" className="absolute bottom-0 left-4 right-4 h-0.5 bg-[#E94E3C] rounded-t-full" />}
+                                    {isActive && <motion.div layoutId="activePayTab" className="absolute bottom-0 left-4 right-4 h-0.5 bg-[#ff3f6c] rounded-t-full" />}
                                 </button>
                             );
                         })}
@@ -84,7 +84,7 @@ export default function Payments({ tabData, activeTab, stats, filters }) {
                 {/* 🚀 SEARCH BAR */}
                 <div className="relative mb-6">
                     <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input type="text" placeholder="Search Transaction ID or Name..." value={search} onChange={e => setSearch(e.target.value)} onKeyPress={handleSearch} className="w-full bg-white shadow-sm border border-gray-100 rounded-2xl pl-12 pr-4 py-4 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none" />
+                    <input type="text" placeholder="Search Transaction ID or Name..." value={search} onChange={e => setSearch(e.target.value)} onKeyPress={handleSearch} className="w-full bg-white shadow-sm border border-gray-100 rounded-2xl pl-12 pr-4 py-4 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none" />
                 </div>
 
                 {/* 🚀 DYNAMIC DATA TABLE */}
@@ -106,15 +106,15 @@ export default function Payments({ tabData, activeTab, stats, filters }) {
                                 {(activeTab === 'customer' || activeTab === 'pending') && tabData?.data?.map((payment) => (
                                     <tr key={payment.id} className="hover:bg-gray-50/80 transition-colors group">
                                         <td className="px-6 py-4">
-                                            <p className="font-black text-[#1A1A2E] text-sm">{payment.transaction_id || `ORD-${payment.order_id}`}</p>
+                                            <p className="font-black text-[#282c3f] text-sm">{payment.transaction_id || `ORD-${payment.order_id}`}</p>
                                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{new Date(payment.created_at).toLocaleDateString()}</p>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <p className="font-bold text-[#1A1A2E] text-sm">{payment.customer_name || 'Guest User'}</p>
+                                            <p className="font-bold text-[#282c3f] text-sm">{payment.customer_name || 'Guest User'}</p>
                                             <p className="text-[10px] font-bold text-gray-400">D2C Order</p>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <p className="font-black text-[#1A1A2E]">₹{Number(payment.amount).toLocaleString()}</p>
+                                            <p className="font-black text-[#282c3f]">₹{Number(payment.amount).toLocaleString()}</p>
                                             <span className="text-[9px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-1 mt-1">
                                                 {payment.method === 'Online' ? <CreditCard size={10} /> : <Banknote size={10} />} {payment.method}
                                             </span>
@@ -125,7 +125,7 @@ export default function Payments({ tabData, activeTab, stats, filters }) {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right relative">
-                                            <button onClick={() => setOpenActionMenu(openActionMenu === payment.id ? null : payment.id)} className="p-2 text-gray-400 hover:text-[#1A1A2E] hover:bg-gray-100 rounded-xl transition-colors">
+                                            <button onClick={() => setOpenActionMenu(openActionMenu === payment.id ? null : payment.id)} className="p-2 text-gray-400 hover:text-[#282c3f] hover:bg-gray-100 rounded-xl transition-colors">
                                                 <MoreVertical size={20} />
                                             </button>
                                             <AnimatePresence>
@@ -148,15 +148,15 @@ export default function Payments({ tabData, activeTab, stats, filters }) {
                                 {activeTab === 'franchise' && tabData?.data?.map((payment) => (
                                     <tr key={payment.id} className="hover:bg-gray-50/80 transition-colors">
                                         <td className="px-6 py-4">
-                                            <p className="font-black text-[#1A1A2E] text-sm">{payment.reference_number || `B2B-${payment.id}`}</p>
+                                            <p className="font-black text-[#282c3f] text-sm">{payment.reference_number || `B2B-${payment.id}`}</p>
                                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{new Date(payment.created_at).toLocaleDateString()}</p>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <p className="font-bold text-[#1A1A2E] text-sm flex items-center gap-1"><Store size={14} className="text-[#E94E3C]" /> {payment.franchise_name}</p>
+                                            <p className="font-bold text-[#282c3f] text-sm flex items-center gap-1"><Store size={14} className="text-[#ff3f6c]" /> {payment.franchise_name}</p>
                                             <p className="text-[10px] font-bold text-gray-400">{payment.type}</p>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <p className="font-black text-[#1A1A2E]">₹{Number(payment.amount).toLocaleString()}</p>
+                                            <p className="font-black text-[#282c3f]">₹{Number(payment.amount).toLocaleString()}</p>
                                             <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">{payment.method}</span>
                                         </td>
                                         <td className="px-6 py-4">
@@ -164,7 +164,7 @@ export default function Payments({ tabData, activeTab, stats, filters }) {
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             {payment.status === 'Pending' && (
-                                                <button onClick={() => updateStatus(payment.id, 'Paid', 'franchise')} className="px-3 py-2 bg-[#1A1A2E] text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-colors">Verify Receipt</button>
+                                                <button onClick={() => updateStatus(payment.id, 'Paid', 'franchise')} className="px-3 py-2 bg-[#282c3f] text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-[#ff3f6c] transition-colors">Verify Receipt</button>
                                             )}
                                         </td>
                                     </tr>
@@ -174,11 +174,11 @@ export default function Payments({ tabData, activeTab, stats, filters }) {
                                 {activeTab === 'wallets' && tabData?.data?.map((txn) => (
                                     <tr key={txn.id} className="hover:bg-gray-50/80 transition-colors">
                                         <td className="px-6 py-4">
-                                            <p className="font-black text-[#1A1A2E] text-sm">WTXN-{txn.id}</p>
+                                            <p className="font-black text-[#282c3f] text-sm">WTXN-{txn.id}</p>
                                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{new Date(txn.created_at).toLocaleDateString()}</p>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <p className="font-bold text-[#1A1A2E] text-sm">{txn.user_name}</p>
+                                            <p className="font-bold text-[#282c3f] text-sm">{txn.user_name}</p>
                                             <p className="text-[10px] font-bold text-gray-400 uppercase">{txn.role}</p>
                                         </td>
                                         <td className="px-6 py-4">
@@ -194,7 +194,7 @@ export default function Payments({ tabData, activeTab, stats, filters }) {
 
                                 {/* EMPTY STATE */}
                                 {tabData?.data?.length === 0 && (
-                                    <tr><td colSpan="5" className="px-6 py-16 text-center"><Banknote size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} /><p className="text-[#1A1A2E] font-black text-lg">No Financial Records</p></td></tr>
+                                    <tr><td colSpan="5" className="px-6 py-16 text-center"><Banknote size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} /><p className="text-[#282c3f] font-black text-lg">No Financial Records</p></td></tr>
                                 )}
                             </tbody>
                         </table>
@@ -212,7 +212,7 @@ function StatCard({ title, value, icon: Icon, color, alert }) {
         <div className={`bg-white p-6 rounded-3xl border ${alert ? 'border-orange-200 shadow-orange-500/10' : 'border-gray-100 shadow-black/5'} shadow-sm flex items-center justify-between`}>
             <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">{title}</p>
-                <h4 className="text-3xl font-black text-[#1A1A2E]">{value}</h4>
+                <h4 className="text-3xl font-black text-[#282c3f]">{value}</h4>
             </div>
             <div className={`size-14 rounded-2xl flex items-center justify-center ${alert ? 'bg-orange-50' : 'bg-gray-50'} ${color}`}><Icon size={24} strokeWidth={2.5} /></div>
         </div>

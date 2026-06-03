@@ -34,7 +34,7 @@ export default function MainCarousel({ products }) {
                             <Link href={`/product/${product.slug || product.id}`} className="block relative bg-white rounded-3xl overflow-hidden h-[500px] shadow-sm transition-all duration-500 ease-out group-hover:shadow-[0_20px_50px_rgba(59,130,246,0.15)] group-hover:-translate-y-2 group-hover:scale-[1.02]">
 
                                 {/* Product Image Container - Pops out on hover */}
-                                <div className="absolute inset-0 bg-[#F1F5F9] overflow-hidden">
+                                <div className="absolute inset-0 bg-[#fff0f4] overflow-hidden">
                                     <img
                                         src={product.images?.[0]?.image_path || '/images/placeholder.png'}
                                         alt={product.name}

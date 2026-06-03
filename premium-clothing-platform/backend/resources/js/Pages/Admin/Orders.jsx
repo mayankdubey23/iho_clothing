@@ -19,7 +19,7 @@ const STATUS_COLORS = {
     'Packed': 'bg-indigo-50 text-indigo-600 border-indigo-200',
     'Shipped': 'bg-purple-50 text-purple-600 border-purple-200',
     'Out for Delivery': 'bg-teal-50 text-teal-600 border-teal-200',
-    'Delivered': 'bg-[#1A1A2E] text-white border-[#1A1A2E]',
+    'Delivered': 'bg-[#282c3f] text-white border-[#282c3f]',
     'Cancelled': 'bg-red-50 text-red-600 border-red-200',
     'Returned': 'bg-rose-50 text-rose-600 border-rose-200',
     'Refunded': 'bg-gray-100 text-gray-600 border-gray-300',
@@ -54,7 +54,7 @@ export default function NetworkOrders({ orders, franchises, filters, stats }) {
             <div className="max-w-[1600px] mx-auto pb-20 pt-6 px-4 sm:px-6">
                 {/* 🚀 HEADER & STATS */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter mb-6">Network Orders</h1>
+                    <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter mb-6">Network Orders</h1>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <StatCard title="Total Orders" value={safeStats.total} icon={ShoppingBag} color="text-blue-500" />
@@ -71,17 +71,17 @@ export default function NetworkOrders({ orders, franchises, filters, stats }) {
                         <input
                             type="text" placeholder="Search by Order ID, Customer, or City..."
                             value={search} onChange={e => setSearch(e.target.value)} onKeyPress={handleKeyPress}
-                            className="w-full bg-gray-50 border-none rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none"
+                            className="w-full bg-gray-50 border-none rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none"
                         />
                     </div>
 
                     <div className="flex w-full md:w-auto gap-4">
-                        <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setTimeout(applyFilters, 100); }} className="bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-gray-600 focus:ring-2 focus:ring-[#E94E3C] outline-none cursor-pointer">
+                        <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setTimeout(applyFilters, 100); }} className="bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-gray-600 focus:ring-2 focus:ring-[#ff3f6c] outline-none cursor-pointer">
                             <option value="">All Statuses</option>
                             {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                         </select>
 
-                        <select value={franchiseFilter} onChange={e => { setFranchiseFilter(e.target.value); setTimeout(applyFilters, 100); }} className="bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-gray-600 focus:ring-2 focus:ring-[#E94E3C] outline-none cursor-pointer max-w-[200px] truncate">
+                        <select value={franchiseFilter} onChange={e => { setFranchiseFilter(e.target.value); setTimeout(applyFilters, 100); }} className="bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-gray-600 focus:ring-2 focus:ring-[#ff3f6c] outline-none cursor-pointer max-w-[200px] truncate">
                             <option value="">All Fulfillment</option>
                             <option value="master">Master Warehouse</option>
                             {safeFranchises.map(f => <option key={f.id} value={f.id}>{f.name} ({f.city})</option>)}
@@ -115,7 +115,7 @@ export default function NetworkOrders({ orders, franchises, filters, stats }) {
 
                                         {/* Order ID & Date */}
                                         <td className="px-6 py-4">
-                                            <p className="font-black text-[#1A1A2E] text-sm">#{order.razorpay_order_id ? order.razorpay_order_id.slice(-8).toUpperCase() : order.id}</p>
+                                            <p className="font-black text-[#282c3f] text-sm">#{order.razorpay_order_id ? order.razorpay_order_id.slice(-8).toUpperCase() : order.id}</p>
                                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
                                                 {new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                                             </p>
@@ -123,9 +123,9 @@ export default function NetworkOrders({ orders, franchises, filters, stats }) {
 
                                         {/* Customer Info */}
                                         <td className="px-6 py-4">
-                                            <p className="font-bold text-[#1A1A2E] text-sm">{order.user ? order.user.name : (order.customer_name || 'Guest User')}</p>
+                                            <p className="font-bold text-[#282c3f] text-sm">{order.user ? order.user.name : (order.customer_name || 'Guest User')}</p>
                                             <p className="text-[11px] font-bold text-gray-500 flex items-center gap-1 mt-1 truncate max-w-[200px]">
-                                                <MapPin size={10} className="text-[#E94E3C]" /> {order.city || 'India'}, {order.pincode}
+                                                <MapPin size={10} className="text-[#ff3f6c]" /> {order.city || 'India'}, {order.pincode}
                                             </p>
                                         </td>
 
@@ -135,15 +135,15 @@ export default function NetworkOrders({ orders, franchises, filters, stats }) {
                                                 <div className="flex items-center gap-2">
                                                     <div className="p-1.5 bg-gray-100 rounded-lg text-gray-600"><Box size={14} /></div>
                                                     <div>
-                                                        <p className="text-xs font-black uppercase tracking-widest text-[#1A1A2E]">Master Stock</p>
+                                                        <p className="text-xs font-black uppercase tracking-widest text-[#282c3f]">Master Stock</p>
                                                         <p className="text-[10px] font-bold text-gray-400">HQ Fulfillment</p>
                                                     </div>
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center gap-2">
-                                                    <div className="p-1.5 bg-[#E94E3C]/10 rounded-lg text-[#E94E3C]"><Store size={14} /></div>
+                                                    <div className="p-1.5 bg-[#ff3f6c]/10 rounded-lg text-[#ff3f6c]"><Store size={14} /></div>
                                                     <div>
-                                                        <p className="text-xs font-black uppercase tracking-widest text-[#1A1A2E] truncate max-w-[150px]">{order.franchise?.name || 'Assigned Franchise'}</p>
+                                                        <p className="text-xs font-black uppercase tracking-widest text-[#282c3f] truncate max-w-[150px]">{order.franchise?.name || 'Assigned Franchise'}</p>
                                                         <p className="text-[10px] font-bold text-gray-400">Partner Fulfillment</p>
                                                     </div>
                                                 </div>
@@ -152,7 +152,7 @@ export default function NetworkOrders({ orders, franchises, filters, stats }) {
 
                                         {/* Financials */}
                                         <td className="px-6 py-4">
-                                            <p className="font-black text-[#1A1A2E]">₹{(Number(order.total_amount) || 0).toLocaleString('en-IN')}</p>
+                                            <p className="font-black text-[#282c3f]">₹{(Number(order.total_amount) || 0).toLocaleString('en-IN')}</p>
                                             <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${order.payment?.status === 'captured' ? 'text-green-500' : 'text-orange-500'}`}>
                                                 {order.payment?.method || 'COD'} • {order.payment?.status || 'Pending'}
                                             </p>
@@ -168,7 +168,7 @@ export default function NetworkOrders({ orders, franchises, filters, stats }) {
 
                                         {/* Actions Menu */}
                                         <td className="px-6 py-4 text-right relative">
-                                            <button onClick={() => setOpenActionMenu(openActionMenu === order.id ? null : order.id)} className="p-2 text-gray-400 hover:text-[#1A1A2E] hover:bg-gray-100 rounded-xl transition-colors focus:outline-none">
+                                            <button onClick={() => setOpenActionMenu(openActionMenu === order.id ? null : order.id)} className="p-2 text-gray-400 hover:text-[#282c3f] hover:bg-gray-100 rounded-xl transition-colors focus:outline-none">
                                                 <MoreVertical size={20} />
                                             </button>
 
@@ -180,13 +180,13 @@ export default function NetworkOrders({ orders, franchises, filters, stats }) {
                                                         className="absolute right-12 top-2 w-48 bg-white border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.1)] rounded-2xl z-50 overflow-hidden text-left"
                                                     >
                                                         <div className="p-2 space-y-1">
-                                                            <Link href={`/franchise-superadmin/orders/${order.id}`} className="block w-full px-4 py-2.5 text-xs font-black uppercase tracking-widest text-[#1A1A2E] hover:bg-gray-50 rounded-xl transition-colors">
+                                                            <Link href={`/franchise-superadmin/orders/${order.id}`} className="block w-full px-4 py-2.5 text-xs font-black uppercase tracking-widest text-[#282c3f] hover:bg-gray-50 rounded-xl transition-colors">
                                                                 View Full Details
                                                             </Link>
                                                             <button onClick={() => router.put(`/franchise-superadmin/orders/${order.id}/status`, { status: 'Shipped' }, { preserveScroll: true, onSuccess: () => setOpenActionMenu(null) })} className="block w-full text-left px-4 py-2.5 text-xs font-black uppercase tracking-widest text-purple-600 hover:bg-purple-50 rounded-xl transition-colors">
                                                                 Mark as Shipped
                                                             </button>
-                                                            <button onClick={() => alert("Reassign modal opening...")} className="block w-full text-left px-4 py-2.5 text-xs font-black uppercase tracking-widest text-[#E94E3C] hover:bg-[#E94E3C]/10 rounded-xl transition-colors">
+                                                            <button onClick={() => alert("Reassign modal opening...")} className="block w-full text-left px-4 py-2.5 text-xs font-black uppercase tracking-widest text-[#ff3f6c] hover:bg-[#ff3f6c]/10 rounded-xl transition-colors">
                                                                 Reassign Route
                                                             </button>
                                                         </div>
@@ -204,7 +204,7 @@ export default function NetworkOrders({ orders, franchises, filters, stats }) {
                                     <tr>
                                         <td colSpan="6" className="px-6 py-16 text-center">
                                             <PackageOpen size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} />
-                                            <p className="text-[#1A1A2E] font-black text-lg">No orders found</p>
+                                            <p className="text-[#282c3f] font-black text-lg">No orders found</p>
                                             <p className="text-gray-400 font-bold text-sm mt-1">Try adjusting your search or filters.</p>
                                         </td>
                                     </tr>
@@ -218,7 +218,7 @@ export default function NetworkOrders({ orders, franchises, filters, stats }) {
                 {orders?.links && orders.links.length > 3 && (
                     <div className="flex justify-center gap-2 mt-8">
                         {orders.links.map((link, k) => (
-                            <Link key={k} href={link.url || '#'} dangerouslySetInnerHTML={{ __html: link.label }} className={`px-4 py-2 rounded-xl text-xs font-black transition-colors ${link.active ? 'bg-[#1A1A2E] text-white shadow-md' : 'bg-white text-gray-500 hover:bg-gray-100 hover:text-[#1A1A2E] border border-gray-200'}`} />
+                            <Link key={k} href={link.url || '#'} dangerouslySetInnerHTML={{ __html: link.label }} className={`px-4 py-2 rounded-xl text-xs font-black transition-colors ${link.active ? 'bg-[#282c3f] text-white shadow-md' : 'bg-white text-gray-500 hover:bg-gray-100 hover:text-[#282c3f] border border-gray-200'}`} />
                         ))}
                     </div>
                 )}
@@ -234,7 +234,7 @@ function StatCard({ title, value, icon: Icon, color, alert }) {
         <div className={`bg-white p-5 rounded-3xl border ${alert ? 'border-orange-200 shadow-orange-500/10' : 'border-gray-100 shadow-black/5'} shadow-sm flex items-center justify-between`}>
             <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{title}</p>
-                <h4 className="text-2xl font-black text-[#1A1A2E]">{value?.toLocaleString() || 0}</h4>
+                <h4 className="text-2xl font-black text-[#282c3f]">{value?.toLocaleString() || 0}</h4>
             </div>
             <div className={`size-12 rounded-2xl flex items-center justify-center ${alert ? 'bg-orange-50' : 'bg-gray-50'} ${color}`}>
                 <Icon size={20} strokeWidth={2.5} />

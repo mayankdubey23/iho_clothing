@@ -69,10 +69,10 @@ const itemVariants = {
 
 export default function BrandTrust() {
     return (
-        <section className="py-24 bg-[#0F172A] relative overflow-hidden">
+        <section className="py-24 bg-[#282c3f] relative overflow-hidden">
 
             {/* ❄️ Subtle Background Glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#1E293B] rounded-full blur-[120px] opacity-50 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#282c3f] rounded-full blur-[120px] opacity-50 pointer-events-none" />
 
             <div className="max-w-[1400px] mx-auto px-6 relative z-10">
 
@@ -100,7 +100,7 @@ export default function BrandTrust() {
                         <motion.div
                             key={index}
                             variants={itemVariants}
-                            className={`group relative overflow-hidden border border-white/10 p-8 flex flex-col justify-between transition-all duration-500 hover:border-white/30 ${feature.colSpan} ${feature.isDark ? 'bg-[#1E293B]' : 'bg-white/5 backdrop-blur-sm'}`}
+                            className={`group relative overflow-hidden border border-white/10 p-8 flex flex-col justify-between transition-all duration-500 hover:border-white/30 ${feature.colSpan} ${feature.isDark ? 'bg-[#282c3f]' : 'bg-white/5 backdrop-blur-sm'}`}
                         >
                             {/* Hero Card Image Background */}
                             {feature.isHero && (
@@ -108,14 +108,14 @@ export default function BrandTrust() {
                                     <div className="absolute inset-0 z-0">
                                         <img src={feature.bgImage} alt="Fabric" className="w-full h-full object-cover opacity-30 group-hover:scale-105 transition-transform duration-[2s] ease-out mix-blend-overlay" />
                                     </div>
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] to-transparent z-0" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#282c3f] to-transparent z-0" />
                                 </>
                             )}
 
                             {/* Content */}
                             <div className="relative z-10">
                                 <div className="mb-8">
-                                    <div className="inline-flex size-12 items-center justify-center bg-white/10 rounded-none border border-white/20 text-white group-hover:bg-white group-hover:text-[#0F172A] transition-colors duration-500">
+                                    <div className="inline-flex size-12 items-center justify-center bg-white/10 rounded-none border border-white/20 text-white group-hover:bg-white group-hover:text-[#282c3f] transition-colors duration-500">
                                         <feature.icon size={20} strokeWidth={2} />
                                     </div>
                                 </div>

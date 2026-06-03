@@ -33,7 +33,7 @@ export default function Returns({ returns, stats, filters }) {
         'Refunded': { color: 'bg-green-50 text-green-700 border-green-200' },
         'Replaced': { color: 'bg-teal-50 text-teal-700 border-teal-200' },
         'Rejected': { color: 'bg-red-50 text-red-600 border-red-200' },
-        'Closed': { color: 'bg-[#1A1A2E] text-white border-[#1A1A2E]' },
+        'Closed': { color: 'bg-[#282c3f] text-white border-[#282c3f]' },
     };
 
     return (
@@ -44,8 +44,8 @@ export default function Returns({ returns, stats, filters }) {
 
                 {/* 🚀 HEADER & STATS */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                        <RotateCcw className="text-[#E94E3C]" /> Reverse Logistics
+                    <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                        <RotateCcw className="text-[#ff3f6c]" /> Reverse Logistics
                     </h1>
                     <p className="text-gray-500 font-bold text-sm mt-1">Manage product returns, inspections, and customer refunds.</p>
                 </div>
@@ -60,9 +60,9 @@ export default function Returns({ returns, stats, filters }) {
                 <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 mb-6 flex flex-col md:flex-row items-center gap-4">
                     <div className="flex-1 w-full relative">
                         <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input type="text" placeholder="Search Return ID, Order ID or Customer..." value={search} onChange={e => setSearch(e.target.value)} onKeyPress={handleKeyPress} className="w-full bg-gray-50 border-none rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none" />
+                        <input type="text" placeholder="Search Return ID, Order ID or Customer..." value={search} onChange={e => setSearch(e.target.value)} onKeyPress={handleKeyPress} className="w-full bg-gray-50 border-none rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none" />
                     </div>
-                    <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setTimeout(applyFilters, 100); }} className="bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-gray-600 focus:ring-2 focus:ring-[#E94E3C] outline-none cursor-pointer">
+                    <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setTimeout(applyFilters, 100); }} className="bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-gray-600 focus:ring-2 focus:ring-[#ff3f6c] outline-none cursor-pointer">
                         <option value="">All Statuses</option>
                         {Object.keys(statusConfig).map(status => <option key={status} value={status}>{status}</option>)}
                     </select>
@@ -87,12 +87,12 @@ export default function Returns({ returns, stats, filters }) {
                                     <tr key={req.id} className="hover:bg-gray-50/80 transition-colors group">
 
                                         <td className="px-6 py-4">
-                                            <p className="font-black text-[#1A1A2E] text-sm">RET-{req.id.toString().padStart(5, '0')}</p>
+                                            <p className="font-black text-[#282c3f] text-sm">RET-{req.id.toString().padStart(5, '0')}</p>
                                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{new Date(req.created_at).toLocaleDateString()}</p>
                                         </td>
 
                                         <td className="px-6 py-4">
-                                            <p className="font-bold text-[#1A1A2E] text-sm">{req.customer_name}</p>
+                                            <p className="font-bold text-[#282c3f] text-sm">{req.customer_name}</p>
                                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">ORD: {req.razorpay_order_id || 'N/A'}</p>
                                         </td>
 
@@ -100,7 +100,7 @@ export default function Returns({ returns, stats, filters }) {
                                             <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md border ${req.type === 'Refund' ? 'bg-orange-50 text-orange-600 border-orange-200' : 'bg-blue-50 text-blue-600 border-blue-200'}`}>
                                                 {req.type}
                                             </span>
-                                            {req.type === 'Refund' && <p className="text-xs font-black text-[#1A1A2E] mt-1.5">₹{Number(req.total_refund_amount).toLocaleString()}</p>}
+                                            {req.type === 'Refund' && <p className="text-xs font-black text-[#282c3f] mt-1.5">₹{Number(req.total_refund_amount).toLocaleString()}</p>}
                                         </td>
 
                                         <td className="px-6 py-4">
@@ -114,7 +114,7 @@ export default function Returns({ returns, stats, filters }) {
                                         </td>
 
                                         <td className="px-6 py-4 text-right relative">
-                                            <button onClick={() => setOpenActionMenu(openActionMenu === req.id ? null : req.id)} className="p-2 text-gray-400 hover:text-[#1A1A2E] hover:bg-gray-100 rounded-xl transition-colors">
+                                            <button onClick={() => setOpenActionMenu(openActionMenu === req.id ? null : req.id)} className="p-2 text-gray-400 hover:text-[#282c3f] hover:bg-gray-100 rounded-xl transition-colors">
                                                 <MoreVertical size={20} />
                                             </button>
 
@@ -139,7 +139,7 @@ export default function Returns({ returns, stats, filters }) {
                                                             )}
 
                                                             {req.status === 'Picked Up' && (
-                                                                <button onClick={() => alert('Inspection Modal Pending (Call processInspection logic here)')} className="block w-full text-left px-4 py-2.5 text-xs font-black uppercase tracking-widest text-[#E94E3C] hover:bg-[#E94E3C]/10 rounded-xl transition-colors flex items-center justify-between">
+                                                                <button onClick={() => alert('Inspection Modal Pending (Call processInspection logic here)')} className="block w-full text-left px-4 py-2.5 text-xs font-black uppercase tracking-widest text-[#ff3f6c] hover:bg-[#ff3f6c]/10 rounded-xl transition-colors flex items-center justify-between">
                                                                     Inspect Item <PackageCheck size={14} />
                                                                 </button>
                                                             )}
@@ -154,7 +154,7 @@ export default function Returns({ returns, stats, filters }) {
                                         </td>
                                     </tr>
                                 )) : (
-                                    <tr><td colSpan="6" className="px-6 py-16 text-center"><RotateCcw size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} /><p className="text-[#1A1A2E] font-black text-lg">No Return Requests</p></td></tr>
+                                    <tr><td colSpan="6" className="px-6 py-16 text-center"><RotateCcw size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} /><p className="text-[#282c3f] font-black text-lg">No Return Requests</p></td></tr>
                                 )}
                             </tbody>
                         </table>
@@ -172,7 +172,7 @@ function StatCard({ title, value, icon: Icon, color, alert }) {
         <div className={`bg-white p-5 rounded-3xl border ${alert ? 'border-orange-200 shadow-orange-500/10' : 'border-gray-100 shadow-black/5'} shadow-sm flex items-center justify-between`}>
             <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{title}</p>
-                <h4 className="text-2xl font-black text-[#1A1A2E]">{value?.toLocaleString() || 0}</h4>
+                <h4 className="text-2xl font-black text-[#282c3f]">{value?.toLocaleString() || 0}</h4>
             </div>
             <div className={`size-12 rounded-2xl flex items-center justify-center ${alert ? 'bg-orange-50' : 'bg-gray-50'} ${color}`}><Icon size={20} strokeWidth={2.5} /></div>
         </div>

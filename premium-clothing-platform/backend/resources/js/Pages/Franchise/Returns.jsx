@@ -59,8 +59,8 @@ export default function Returns({ returns, filters }) {
                 {/* 🚀 HEADER & SEARCH */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                     <div>
-                        <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                            <RotateCcw className="text-[#E94E3C]" size={32} /> Returns & Refunds
+                        <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                            <RotateCcw className="text-[#ff3f6c]" size={32} /> Returns & Refunds
                         </h1>
                         <p className="text-gray-500 font-bold text-sm mt-1">Manage return requests, inspect products, and process inventory.</p>
                     </div>
@@ -73,7 +73,7 @@ export default function Returns({ returns, filters }) {
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             onKeyPress={handleSearch}
-                            className="w-full bg-white shadow-sm border border-gray-200 rounded-2xl pl-12 pr-4 py-3.5 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none"
+                            className="w-full bg-white shadow-sm border border-gray-200 rounded-2xl pl-12 pr-4 py-3.5 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none"
                         />
                     </div>
                 </div>
@@ -95,17 +95,17 @@ export default function Returns({ returns, filters }) {
                                 {returns?.data?.map((ret) => (
                                     <tr key={ret.id} className="hover:bg-gray-50/80 transition-colors">
                                         <td className="px-6 py-4">
-                                            <p className="font-black text-[#1A1A2E] text-sm">{ret.return_number}</p>
+                                            <p className="font-black text-[#282c3f] text-sm">{ret.return_number}</p>
                                             <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md mt-1 inline-block ${ret.return_type === 'Refund' ? 'bg-pink-100 text-pink-700' : 'bg-blue-100 text-blue-700'}`}>
                                                 {ret.return_type}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <p className="font-bold text-[#1A1A2E] text-sm">{ret.customer_name}</p>
+                                            <p className="font-bold text-[#282c3f] text-sm">{ret.customer_name}</p>
                                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">ORD-{ret.order_id}</p>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <p className="text-xs font-bold text-[#1A1A2E] line-clamp-1">{ret.reason}</p>
+                                            <p className="text-xs font-bold text-[#282c3f] line-clamp-1">{ret.reason}</p>
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`text-[10px] border px-3 py-1.5 rounded-md font-black tracking-wider uppercase inline-block ${getStatusColor(ret.status)}`}>
@@ -113,7 +113,7 @@ export default function Returns({ returns, filters }) {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <button onClick={() => openModal(ret)} className="text-[10px] bg-gray-100 text-[#1A1A2E] hover:bg-[#1A1A2E] hover:text-white font-black uppercase tracking-widest px-4 py-2 rounded-lg transition-all">
+                                            <button onClick={() => openModal(ret)} className="text-[10px] bg-gray-100 text-[#282c3f] hover:bg-[#282c3f] hover:text-white font-black uppercase tracking-widest px-4 py-2 rounded-lg transition-all">
                                                 Manage
                                             </button>
                                         </td>
@@ -123,7 +123,7 @@ export default function Returns({ returns, filters }) {
                                     <tr>
                                         <td colSpan="5" className="px-6 py-16 text-center">
                                             <RotateCcw size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} />
-                                            <p className="text-[#1A1A2E] font-black text-lg">No Return Requests</p>
+                                            <p className="text-[#282c3f] font-black text-lg">No Return Requests</p>
                                             <p className="text-gray-500 text-sm font-bold mt-1">Awesome! No customers have requested returns in your area.</p>
                                         </td>
                                     </tr>
@@ -138,10 +138,10 @@ export default function Returns({ returns, filters }) {
             {/* 🚀 MODAL: MANAGE RETURN */}
             <AnimatePresence>
                 {selectedReturn && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-end p-0 md:p-4 bg-[#1A1A2E]/80 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-[100] flex items-center justify-end p-0 md:p-4 bg-[#282c3f]/80 backdrop-blur-sm">
                         <motion.div initial={{ opacity: 0, x: 300 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 300 }} className="bg-gray-50 h-full w-full md:w-[500px] md:rounded-3xl shadow-2xl flex flex-col overflow-hidden">
 
-                            <div className="p-6 bg-[#1A1A2E] text-white flex justify-between items-center shrink-0">
+                            <div className="p-6 bg-[#282c3f] text-white flex justify-between items-center shrink-0">
                                 <div>
                                     <h3 className="font-black uppercase tracking-wider text-xl">Manage Return</h3>
                                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{selectedReturn.return_number}</p>
@@ -153,7 +153,7 @@ export default function Returns({ returns, filters }) {
                                 {/* Customer Reason */}
                                 <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
                                     <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Customer Reason</h4>
-                                    <p className="font-black text-[#1A1A2E] text-sm">{selectedReturn.reason}</p>
+                                    <p className="font-black text-[#282c3f] text-sm">{selectedReturn.reason}</p>
                                     {selectedReturn.customer_notes && <p className="text-xs font-bold text-gray-500 mt-2 bg-gray-50 p-3 rounded-lg border border-gray-100">"{selectedReturn.customer_notes}"</p>}
                                 </div>
 
@@ -164,7 +164,7 @@ export default function Returns({ returns, filters }) {
                                         {selectedReturn.items?.map((item, idx) => (
                                             <div key={idx} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
                                                 <div>
-                                                    <p className="font-bold text-[#1A1A2E] text-sm">{item.name}</p>
+                                                    <p className="font-bold text-[#282c3f] text-sm">{item.name}</p>
                                                     <p className="text-[10px] font-black text-gray-500 uppercase">Qty: {item.quantity}</p>
                                                 </div>
                                             </div>
@@ -178,7 +178,7 @@ export default function Returns({ returns, filters }) {
 
                                     <div className="space-y-1.5">
                                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Current Status</label>
-                                        <select value={data.status} onChange={e => setData('status', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] text-sm focus:ring-2 focus:ring-[#E94E3C] outline-none">
+                                        <select value={data.status} onChange={e => setData('status', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] text-sm focus:ring-2 focus:ring-[#ff3f6c] outline-none">
                                             <option value="Requested">Requested (Pending Action)</option>
                                             <option value="Pickup Scheduled">Pickup Scheduled</option>
                                             <option value="Item Received">Item Received at Franchise</option>
@@ -191,7 +191,7 @@ export default function Returns({ returns, filters }) {
                                     {data.status === 'Item Received' && (
                                         <div className="bg-orange-50 p-4 rounded-xl border border-orange-200 space-y-1.5">
                                             <label className="text-[10px] font-black text-orange-600 uppercase tracking-widest flex items-center gap-1"><ShieldAlert size={12} /> Received Item Condition</label>
-                                            <select value={data.condition} onChange={e => setData('condition', e.target.value)} className="w-full bg-white border border-orange-200 rounded-lg px-4 py-2 font-bold text-[#1A1A2E] text-sm outline-none">
+                                            <select value={data.condition} onChange={e => setData('condition', e.target.value)} className="w-full bg-white border border-orange-200 rounded-lg px-4 py-2 font-bold text-[#282c3f] text-sm outline-none">
                                                 <option value="Sellable">Good / Sellable (Adds to Stock)</option>
                                                 <option value="Damaged">Damaged / Torn (Marks as Damaged)</option>
                                             </select>
@@ -201,10 +201,10 @@ export default function Returns({ returns, filters }) {
 
                                     <div className="space-y-1.5">
                                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Your Notes / Proof</label>
-                                        <textarea rows="2" placeholder="Item received in good condition..." value={data.franchise_notes} onChange={e => setData('franchise_notes', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-sm focus:ring-2 focus:ring-[#E94E3C] outline-none resize-none"></textarea>
+                                        <textarea rows="2" placeholder="Item received in good condition..." value={data.franchise_notes} onChange={e => setData('franchise_notes', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-sm focus:ring-2 focus:ring-[#ff3f6c] outline-none resize-none"></textarea>
                                     </div>
 
-                                    <button disabled={processing} type="submit" className="w-full bg-[#E94E3C] text-white py-3.5 rounded-xl font-black uppercase tracking-widest hover:bg-[#c0392b] transition-colors shadow-lg flex items-center justify-center gap-2">
+                                    <button disabled={processing} type="submit" className="w-full bg-[#ff3f6c] text-white py-3.5 rounded-xl font-black uppercase tracking-widest hover:bg-[#c0392b] transition-colors shadow-lg flex items-center justify-center gap-2">
                                         {processing ? 'Saving...' : 'Update Status'} <Send size={16} />
                                     </button>
                                 </form>

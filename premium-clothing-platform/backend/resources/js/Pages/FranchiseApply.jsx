@@ -169,14 +169,14 @@ export default function FranchiseApply() {
 
   if (recentlySuccessful) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A] px-4 text-center text-white">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#282c3f] px-4 text-center text-white">
         <div className="max-w-xl">
-          <CheckCircle2 size={76} className="mx-auto mb-8 text-[#E94E3C]" />
+          <CheckCircle2 size={76} className="mx-auto mb-8 text-[#ff3f6c]" />
           <h1 className="text-3xl font-black uppercase tracking-tight">Application Received</h1>
           <p className="mt-5 text-sm font-medium leading-7 text-slate-300">
             Thank you for applying for our franchise. Our team will review your details and contact you soon.
           </p>
-          <a href="/" className="mt-9 inline-flex items-center gap-3 bg-white px-8 py-4 text-[10px] font-black uppercase tracking-widest text-[#0F172A] hover:bg-[#E94E3C] hover:text-white">
+          <a href="/" className="mt-9 inline-flex items-center gap-3 bg-white px-8 py-4 text-[10px] font-black uppercase tracking-widest text-[#282c3f] hover:bg-[#ff3f6c] hover:text-white">
             Return to Storefront <ArrowRight size={15} />
           </a>
         </div>
@@ -185,12 +185,12 @@ export default function FranchiseApply() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] px-4 py-10 text-[#1E293B]">
+    <div className="min-h-screen bg-[#f5f5f6] px-4 py-10 text-[#282c3f]">
       <Head title="Apply for Franchise | IHO Studio" />
 
       <div className="mx-auto max-w-5xl">
         <div className="mb-10 text-center">
-          <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#E94E3C]">Business Partnership</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#ff3f6c]">Business Partnership</p>
           <h1 className="mt-4 text-4xl font-black uppercase italic tracking-tight md:text-5xl">Apply for Franchise</h1>
           <p className="mx-auto mt-4 max-w-2xl text-sm font-medium text-slate-500">Submit your details for superadmin review and partner onboarding.</p>
         </div>
@@ -201,7 +201,7 @@ export default function FranchiseApply() {
               key={step}
               type="button"
               onClick={() => index + 1 < currentStep && setCurrentStep(index + 1)}
-              className={`px-3 py-3 text-[8px] font-black uppercase tracking-widest ${currentStep === index + 1 ? 'bg-[#1E293B] text-white' : index + 1 < currentStep ? 'bg-[#E94E3C] text-white' : 'bg-white text-slate-400'}`}
+              className={`px-3 py-3 text-[8px] font-black uppercase tracking-widest ${currentStep === index + 1 ? 'bg-[#282c3f] text-white' : index + 1 < currentStep ? 'bg-[#ff3f6c] text-white' : 'bg-white text-slate-400'}`}
             >
               {index + 1}
             </button>
@@ -325,17 +325,17 @@ export default function FranchiseApply() {
 
           <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50 p-6">
             {currentStep > 1 ? (
-              <button type="button" onClick={prevStep} className="inline-flex items-center gap-2 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-[#1E293B]">
+              <button type="button" onClick={prevStep} className="inline-flex items-center gap-2 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-[#282c3f]">
                 <ChevronLeft size={16} /> Back
               </button>
             ) : <span />}
 
             {currentStep < steps.length ? (
-              <button type="button" onClick={nextStep} className="inline-flex items-center gap-2 bg-[#1E293B] px-7 py-4 text-[10px] font-black uppercase tracking-widest text-white hover:bg-[#E94E3C]">
+              <button type="button" onClick={nextStep} className="inline-flex items-center gap-2 bg-[#282c3f] px-7 py-4 text-[10px] font-black uppercase tracking-widest text-white hover:bg-[#ff3f6c]">
                 Next <ChevronRight size={16} />
               </button>
             ) : (
-              <button type="submit" disabled={processing} className="inline-flex items-center gap-2 bg-[#E94E3C] px-7 py-4 text-[10px] font-black uppercase tracking-widest text-white hover:bg-[#1E293B] disabled:opacity-50">
+              <button type="submit" disabled={processing} className="inline-flex items-center gap-2 bg-[#ff3f6c] px-7 py-4 text-[10px] font-black uppercase tracking-widest text-white hover:bg-[#282c3f] disabled:opacity-50">
                 {processing ? 'Submitting...' : 'Apply for Franchise'} <CheckCircle2 size={16} />
               </button>
             )}
@@ -349,8 +349,8 @@ export default function FranchiseApply() {
 function Input({ label, error, required, className = '', ...props }) {
   return (
     <label className={`grid gap-2 ${className}`}>
-      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{label}{required && <b className="text-[#E94E3C]"> *</b>}</span>
-      <input {...props} className={`w-full border bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-[#1E293B] ${error ? 'border-red-400' : 'border-slate-200'}`} />
+      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{label}{required && <b className="text-[#ff3f6c]"> *</b>}</span>
+      <input {...props} className={`w-full border bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-[#282c3f] ${error ? 'border-red-400' : 'border-slate-200'}`} />
       {error && <ErrorText text={error} />}
     </label>
   );
@@ -359,10 +359,10 @@ function Input({ label, error, required, className = '', ...props }) {
 function PincodeInput({ label, value, onChange, loading, error }) {
   return (
     <label className="grid gap-2">
-      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{label} <b className="text-[#E94E3C]">*</b></span>
+      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{label} <b className="text-[#ff3f6c]">*</b></span>
       <span className="relative">
-        <input value={value} onChange={(e) => onChange(e.target.value.replace(/\D/g, '').slice(0, 6))} className={`w-full border bg-slate-50 px-4 py-3 pr-11 text-sm font-bold outline-none focus:border-[#1E293B] ${error ? 'border-red-400' : 'border-slate-200'}`} />
-        {loading && <Loader2 size={17} className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-[#E94E3C]" />}
+        <input value={value} onChange={(e) => onChange(e.target.value.replace(/\D/g, '').slice(0, 6))} className={`w-full border bg-slate-50 px-4 py-3 pr-11 text-sm font-bold outline-none focus:border-[#282c3f] ${error ? 'border-red-400' : 'border-slate-200'}`} />
+        {loading && <Loader2 size={17} className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-[#ff3f6c]" />}
       </span>
       {error && <ErrorText text={error} />}
     </label>
@@ -372,8 +372,8 @@ function PincodeInput({ label, value, onChange, loading, error }) {
 function Select({ label, value, onChange, options, error, required }) {
   return (
     <label className="grid gap-2">
-      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{label}{required && <b className="text-[#E94E3C]"> *</b>}</span>
-      <select value={value} onChange={onChange} className={`w-full border bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-[#1E293B] ${error ? 'border-red-400' : 'border-slate-200'}`}>
+      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{label}{required && <b className="text-[#ff3f6c]"> *</b>}</span>
+      <select value={value} onChange={onChange} className={`w-full border bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-[#282c3f] ${error ? 'border-red-400' : 'border-slate-200'}`}>
         <option value="">Select option...</option>
         {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
       </select>
@@ -385,8 +385,8 @@ function Select({ label, value, onChange, options, error, required }) {
 function Textarea({ label, value, onChange, error, required }) {
   return (
     <label className="grid gap-2">
-      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{label}{required && <b className="text-[#E94E3C]"> *</b>}</span>
-      <textarea rows="4" value={value} onChange={onChange} className={`w-full resize-none border bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-[#1E293B] ${error ? 'border-red-400' : 'border-slate-200'}`} />
+      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{label}{required && <b className="text-[#ff3f6c]"> *</b>}</span>
+      <textarea rows="4" value={value} onChange={onChange} className={`w-full resize-none border bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-[#282c3f] ${error ? 'border-red-400' : 'border-slate-200'}`} />
       {error && <ErrorText text={error} />}
     </label>
   );
@@ -394,9 +394,9 @@ function Textarea({ label, value, onChange, error, required }) {
 
 function Upload({ label, onChange }) {
   return (
-    <label className="grid cursor-pointer gap-2 border border-dashed border-slate-300 bg-slate-50 p-5 hover:border-[#1E293B]">
-      <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B]"><FileText size={14} /> {label}</span>
-      <input type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => onChange(e.target.files?.[0] || null)} className="text-xs font-bold text-slate-500 file:mr-3 file:border-0 file:bg-[#1E293B] file:px-4 file:py-2 file:text-[10px] file:font-black file:uppercase file:tracking-widest file:text-white" />
+    <label className="grid cursor-pointer gap-2 border border-dashed border-slate-300 bg-slate-50 p-5 hover:border-[#282c3f]">
+      <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#282c3f]"><FileText size={14} /> {label}</span>
+      <input type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => onChange(e.target.files?.[0] || null)} className="text-xs font-bold text-slate-500 file:mr-3 file:border-0 file:bg-[#282c3f] file:px-4 file:py-2 file:text-[10px] file:font-black file:uppercase file:tracking-widest file:text-white" />
     </label>
   );
 }
@@ -404,7 +404,7 @@ function Upload({ label, onChange }) {
 function Checkbox({ label, checked, onChange, error }) {
   return (
     <label className="grid gap-2">
-      <span className="flex cursor-pointer items-center gap-3 text-sm font-black text-[#1E293B]">
+      <span className="flex cursor-pointer items-center gap-3 text-sm font-black text-[#282c3f]">
         <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="size-5" />
         {label}
       </span>

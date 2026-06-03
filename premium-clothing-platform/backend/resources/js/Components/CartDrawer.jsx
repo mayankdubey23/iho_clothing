@@ -44,7 +44,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                     <motion.div
                         key="cart-drawer-overlay"
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-[#1E293B]/20 backdrop-blur-md z-[60]"
+                        className="fixed inset-0 bg-[#282c3f]/20 backdrop-blur-md z-[60]"
                         onClick={onClose}
                     />
 
@@ -58,10 +58,10 @@ export default function CartDrawer({ isOpen, onClose }) {
                         {/* Header */}
                         <div className="p-8 border-b border-slate-50 flex justify-between items-center">
                             <div>
-                                <h2 className="text-2xl font-black tracking-tighter text-[#1E293B] uppercase italic">
+                                <h2 className="text-2xl font-black tracking-tighter text-[#282c3f] uppercase italic">
                                     Your Bag
                                 </h2>
-                                <p className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] mt-1">
+                                <p className="text-[10px] font-black text-[#ff3f6c] uppercase tracking-[0.2em] mt-1">
                                     {items.length} ITEM{items.length !== 1 ? 'S' : ''} SELECTED
                                 </p>
                             </div>
@@ -71,7 +71,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                                         Clear All
                                     </button>
                                 )}
-                                <button onClick={onClose} className="p-2 text-[#94A3B8] hover:text-[#1E293B] transition-colors bg-slate-50 rounded-full">
+                                <button onClick={onClose} className="p-2 text-[#ff3f6c] hover:text-[#282c3f] transition-colors bg-slate-50 rounded-full">
                                     <X size={20} strokeWidth={2.5} />
                                 </button>
                             </div>
@@ -81,17 +81,17 @@ export default function CartDrawer({ isOpen, onClose }) {
                         {items.length > 0 && (
                             <div className="px-8 py-6 bg-slate-50/50 border-b border-slate-100">
                                 <div className="flex justify-between items-center mb-3">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.1em] text-[#1E293B]">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.1em] text-[#282c3f]">
                                         {subtotal >= shippingThreshold
                                             ? 'Complimentary Shipping Unlocked'
                                             : `Spend Rs ${(shippingThreshold - subtotal).toLocaleString('en-IN')} more for Free Shipping`}
                                     </p>
-                                    <span className="text-[10px] font-black text-[#94A3B8]">{Math.round(progressToFreeShipping)}%</span>
+                                    <span className="text-[10px] font-black text-[#ff3f6c]">{Math.round(progressToFreeShipping)}%</span>
                                 </div>
                                 <div className="w-full h-[3px] bg-slate-200 rounded-none overflow-hidden">
                                     <motion.div
                                         initial={{ width: 0 }} animate={{ width: `${progressToFreeShipping}%` }} transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                                        className="h-full bg-[#1E293B]"
+                                        className="h-full bg-[#282c3f]"
                                     />
                                 </div>
                             </div>
@@ -104,8 +104,8 @@ export default function CartDrawer({ isOpen, onClose }) {
                                     <div className="size-20 bg-slate-50 rounded-full flex items-center justify-center mb-6">
                                         <ShoppingBag size={32} className="text-slate-200" strokeWidth={1.5} />
                                     </div>
-                                    <p className="text-[#1E293B] font-black uppercase tracking-[0.2em] text-sm mb-2">Empty Selection</p>
-                                    <p className="text-[#94A3B8] text-xs font-bold uppercase tracking-widest mb-8">Curate your premium collection.</p>
+                                    <p className="text-[#282c3f] font-black uppercase tracking-[0.2em] text-sm mb-2">Empty Selection</p>
+                                    <p className="text-[#ff3f6c] text-xs font-bold uppercase tracking-widest mb-8">Curate your premium collection.</p>
                                     <button onClick={onClose} className="px-10 py-4 bg-black text-white text-[10px] font-black uppercase tracking-[0.3em] hover:bg-slate-800 transition-all">
                                         Browse Studio
                                     </button>
@@ -118,7 +118,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                                         className="flex gap-6 group"
                                     >
                                         {/* Image Container */}
-                                        <div className="w-28 h-36 bg-[#F8FAFC] flex-shrink-0 overflow-hidden border border-slate-100">
+                                        <div className="w-28 h-36 bg-[#f5f5f6] flex-shrink-0 overflow-hidden border border-slate-100">
                                             <img src={item.image} alt={item.name} className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700" />
                                         </div>
 
@@ -126,17 +126,17 @@ export default function CartDrawer({ isOpen, onClose }) {
                                         <div className="flex flex-col justify-between flex-grow py-1">
                                             <div className="space-y-1">
                                                 <div className="flex justify-between items-start gap-4">
-                                                    <h3 className="text-xs font-black text-[#1E293B] uppercase tracking-tight leading-tight group-hover:text-black transition-colors">{item.name}</h3>
+                                                    <h3 className="text-xs font-black text-[#282c3f] uppercase tracking-tight leading-tight group-hover:text-black transition-colors">{item.name}</h3>
                                                     <button onClick={() => removeItem(item.sku_id)} className="text-slate-300 hover:text-red-500 transition-colors p-1">
                                                         <Trash2 size={14} />
                                                     </button>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-[9px] font-black text-[#94A3B8] uppercase tracking-widest">
+                                                    <span className="text-[9px] font-black text-[#ff3f6c] uppercase tracking-widest">
                                                         {item.color} / {item.size}
                                                     </span>
                                                 </div>
-                                                <p className="text-sm font-black text-[#1E293B] pt-2">₹{Number(item.price || 0).toLocaleString('en-IN')}</p>
+                                                <p className="text-sm font-black text-[#282c3f] pt-2">₹{Number(item.price || 0).toLocaleString('en-IN')}</p>
                                             </div>
 
                                             {/* Quantity Controls */}
@@ -144,7 +144,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                                                 <button onClick={() => updateQuantity(item.sku_id, Number(item.quantity || 1) - 1)} className="px-3 py-1.5 text-slate-400 hover:text-black transition-colors">
                                                     <Minus size={12} strokeWidth={3} />
                                                 </button>
-                                                <span className="px-2 text-xs font-black text-[#1E293B] min-w-[24px] text-center">{item.quantity}</span>
+                                                <span className="px-2 text-xs font-black text-[#282c3f] min-w-[24px] text-center">{item.quantity}</span>
                                                 <button onClick={() => updateQuantity(item.sku_id, Number(item.quantity || 1) + 1)} className="px-3 py-1.5 text-slate-400 hover:text-black transition-colors">
                                                     <Plus size={12} strokeWidth={3} />
                                                 </button>
@@ -159,14 +159,14 @@ export default function CartDrawer({ isOpen, onClose }) {
                         {items.length > 0 && (
                             <div className="p-8 bg-white border-t border-slate-100 shadow-[0_-20px_40px_rgba(30,41,59,0.02)]">
                                 <div className="flex justify-between items-center mb-8">
-                                    <span className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.3em]">Estimated Total</span>
-                                    <span className="text-2xl font-black text-[#1E293B]">₹{subtotal.toLocaleString('en-IN')}</span>
+                                    <span className="text-[10px] font-black text-[#ff3f6c] uppercase tracking-[0.3em]">Estimated Total</span>
+                                    <span className="text-2xl font-black text-[#282c3f]">₹{subtotal.toLocaleString('en-IN')}</span>
                                 </div>
                                 <div className="flex flex-col gap-3">
                                     <Link href="/checkout" onClick={onClose} className="w-full bg-black text-white py-5 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-slate-800 transition-all flex items-center justify-center gap-3 shadow-2xl shadow-black/10">
                                         Secure Checkout <ArrowRight size={14} />
                                     </Link>
-                                    <Link href="/cart" onClick={onClose} className="w-full bg-white text-[#1E293B] border border-slate-200 py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:border-black transition-all text-center">
+                                    <Link href="/cart" onClick={onClose} className="w-full bg-white text-[#282c3f] border border-slate-200 py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:border-black transition-all text-center">
                                         View Full Selection
                                     </Link>
                                 </div>
@@ -185,8 +185,8 @@ export default function CartDrawer({ isOpen, onClose }) {
                 __html: `
                 .custom-scrollbar::-webkit-scrollbar { width: 3px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: #fff0f4; }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #ff3f6c; }
             `}} />
         </>
     );

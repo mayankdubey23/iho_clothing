@@ -15,7 +15,7 @@ export default function EditProduct({ product, categories = [], brands = [], siz
     ];
     const fallbackColors = [
         ['White', '#FFFFFF'], ['Blue', '#2563EB'], ['Black', '#000000'], ['Multi', '#8B5CF6'],
-        ['Green', '#16A34A'], ['Grey', '#94A3B8'], ['Navy Blue', '#1E3A8A'], ['Brown', '#7C2D12'], ['Maroon', '#7F1D1D'], ['Pink', '#EC4899'],
+        ['Green', '#16A34A'], ['Grey', '#ff3f6c'], ['Navy Blue', '#1E3A8A'], ['Brown', '#7C2D12'], ['Maroon', '#7F1D1D'], ['Pink', '#EC4899'],
         ['Red', '#DC2626'], ['Beige', '#D6C2A8'], ['Yellow', '#FACC15'], ['Purple', '#7C3AED'], ['Cream', '#FFF7D6'], ['Peach', '#FDBA74'],
         ['Olive', '#6B7D2A'], ['Teal', '#0F766E'], ['Off White', '#F8F4E3'], ['Orange', '#F97316'], ['Sea Green', '#2E8B57'], ['Turquoise Blue', '#06B6D4'],
         ['Lime Green', '#84CC16'], ['Mustard', '#D4A017'], ['Khaki', '#BDB76B'], ['Lavender', '#C4B5FD'], ['Coffee Brown', '#4B2E2A'], ['Rust', '#B45309'],
@@ -141,13 +141,13 @@ export default function EditProduct({ product, categories = [], brands = [], siz
 
             <div className="max-w-7xl mx-auto pb-24">
                 <div className="mb-10">
-                    <Link href="/franchise-superadmin/products" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-[#94A3B8] hover:text-[#1E293B] transition-colors mb-6">
+                    <Link href="/franchise-superadmin/products" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-[#ff3f6c] hover:text-[#282c3f] transition-colors mb-6">
                         <ChevronLeft size={14} /> Back to Inventory
                     </Link>
-                    <h1 className="text-3xl font-black text-[#1E293B] uppercase tracking-tighter italic border-l-4 border-[#1E293B] pl-4">
+                    <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter italic border-l-4 border-[#282c3f] pl-4">
                         Edit Product
                     </h1>
-                    <p className="mt-3 text-[10px] font-black uppercase tracking-[0.2em] text-[#94A3B8]">
+                    <p className="mt-3 text-[10px] font-black uppercase tracking-[0.2em] text-[#ff3f6c]">
                         Update product details, pricing, visibility and master stock
                     </p>
                 </div>
@@ -155,7 +155,7 @@ export default function EditProduct({ product, categories = [], brands = [], siz
                 <form onSubmit={submit} className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                     <div className="lg:col-span-8 space-y-10">
                         <div className="bg-white border border-slate-200 p-8 shadow-sm">
-                            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#1E293B] mb-8 border-b border-slate-100 pb-4">
+                            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#282c3f] mb-8 border-b border-slate-100 pb-4">
                                 Basic Information
                             </h3>
                             <div className="grid gap-6">
@@ -204,7 +204,7 @@ export default function EditProduct({ product, categories = [], brands = [], siz
                         </div>
 
                         <div className="bg-white border border-slate-200 p-8 shadow-sm">
-                            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#1E293B] mb-8 border-b border-slate-100 pb-4">
+                            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#282c3f] mb-8 border-b border-slate-100 pb-4">
                                 Pricing Strategy
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -222,10 +222,10 @@ export default function EditProduct({ product, categories = [], brands = [], siz
 
                         <div className="bg-white border border-slate-200 p-8 shadow-sm">
                             <div className="flex justify-between items-center mb-8 border-b border-slate-100 pb-4">
-                                <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#1E293B]">
+                                <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#282c3f]">
                                     Variants & Master Stock
                                 </h3>
-                                <button type="button" onClick={addVariant} className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#1E293B] hover:text-[#94A3B8] transition-colors">
+                                <button type="button" onClick={addVariant} className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#282c3f] hover:text-[#ff3f6c] transition-colors">
                                     <Plus size={14} strokeWidth={3} /> Add Variant
                                 </button>
                             </div>
@@ -326,7 +326,7 @@ export default function EditProduct({ product, categories = [], brands = [], siz
 
                     <div className="lg:col-span-4 space-y-10">
                         <div className="bg-white border border-slate-200 p-8 shadow-sm">
-                            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#1E293B] mb-6 border-b border-slate-100 pb-4">
+                            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#282c3f] mb-6 border-b border-slate-100 pb-4">
                                 Studio Visuals
                             </h3>
 
@@ -343,7 +343,7 @@ export default function EditProduct({ product, categories = [], brands = [], siz
                                                 {data.remove_media_ids.includes(image.id) ? 'Undo' : 'Remove'}
                                             </button>
                                             {image.is_primary && (
-                                                <span className="absolute bottom-0 left-0 w-full bg-[#1E293B] text-white text-[8px] font-black text-center py-1 uppercase tracking-widest">Main</span>
+                                                <span className="absolute bottom-0 left-0 w-full bg-[#282c3f] text-white text-[8px] font-black text-center py-1 uppercase tracking-widest">Main</span>
                                             )}
                                             {(image.media_type || 'image') === 'video' && (
                                                 <span className="absolute bottom-0 left-0 w-full bg-black text-white text-[8px] font-black text-center py-1 uppercase tracking-widest">Video</span>
@@ -353,9 +353,9 @@ export default function EditProduct({ product, categories = [], brands = [], siz
                                 </div>
                             )}
 
-                            <label className="relative flex flex-col items-center justify-center w-full h-40 border-2 border-slate-300 border-dashed bg-slate-50 hover:bg-slate-100 hover:border-[#1E293B] transition-colors cursor-pointer group mb-6">
-                                <UploadCloud size={28} className="text-slate-400 group-hover:text-[#1E293B] transition-colors mb-3" strokeWidth={1.5} />
-                                <p className="text-[10px] font-black uppercase tracking-widest text-[#1E293B] mb-1">Add more images/videos</p>
+                            <label className="relative flex flex-col items-center justify-center w-full h-40 border-2 border-slate-300 border-dashed bg-slate-50 hover:bg-slate-100 hover:border-[#282c3f] transition-colors cursor-pointer group mb-6">
+                                <UploadCloud size={28} className="text-slate-400 group-hover:text-[#282c3f] transition-colors mb-3" strokeWidth={1.5} />
+                                <p className="text-[10px] font-black uppercase tracking-widest text-[#282c3f] mb-1">Add more images/videos</p>
                                 <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">PNG, JPG, WEBP, MP4, WEBM, MOV up to 50MB</p>
                                 <input type="file" multiple accept="image/*,video/mp4,video/webm,video/quicktime" onChange={handleImageUpload} className="hidden" />
                             </label>
@@ -373,7 +373,7 @@ export default function EditProduct({ product, categories = [], brands = [], siz
                                             <button type="button" onClick={() => removeImage(index)} className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
                                                 <Trash2 size={14} />
                                             </button>
-                                            <span className="absolute bottom-0 left-0 w-full bg-[#1E293B] text-white text-[8px] font-black text-center py-1 uppercase tracking-widest">
+                                            <span className="absolute bottom-0 left-0 w-full bg-[#282c3f] text-white text-[8px] font-black text-center py-1 uppercase tracking-widest">
                                                 {file.type.startsWith('video/') ? 'New Video' : 'New Image'}
                                             </span>
                                         </div>
@@ -387,31 +387,31 @@ export default function EditProduct({ product, categories = [], brands = [], siz
                         </div>
 
                         <div className="bg-white border border-slate-200 p-8 shadow-sm">
-                            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#1E293B] mb-6 border-b border-slate-100 pb-4">
+                            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#282c3f] mb-6 border-b border-slate-100 pb-4">
                                 Visibility
                             </h3>
                             <label className="flex items-start gap-3 cursor-pointer group mb-5">
                                 <input type="checkbox" checked={data.is_featured} onChange={e => setData('is_featured', e.target.checked)} className="mt-0.5 rounded-none text-black border-slate-300 focus:ring-black size-4 transition-all" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B]">Feature this product</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#282c3f]">Feature this product</span>
                             </label>
                             <label className="flex items-start gap-3 cursor-pointer group mb-5">
                                 <input type="checkbox" checked={data.show_on_men_page} onChange={e => setData('show_on_men_page', e.target.checked)} className="mt-0.5 rounded-none text-black border-slate-300 focus:ring-black size-4 transition-all" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B]">Include in Men collection</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#282c3f]">Include in Men collection</span>
                             </label>
                             <label className="flex items-start gap-3 cursor-pointer group mb-5">
                                 <input type="checkbox" checked={data.is_best_seller} onChange={e => setData('is_best_seller', e.target.checked)} className="mt-0.5 rounded-none text-black border-slate-300 focus:ring-black size-4 transition-all" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B]">Best seller</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#282c3f]">Best seller</span>
                             </label>
                             <label className="flex items-start gap-3 cursor-pointer group mb-10">
                                 <input type="checkbox" checked={data.status === 'active'} onChange={e => setData('status', e.target.checked ? 'active' : 'inactive')} className="mt-0.5 rounded-none text-black border-slate-300 focus:ring-black size-4 transition-all" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B]">Visible on storefront</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#282c3f]">Visible on storefront</span>
                             </label>
 
                             <div className="space-y-4">
-                                <button type="submit" disabled={processing} className="w-full bg-[#000000] text-white py-5 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-[#1E293B] transition-all disabled:opacity-50 shadow-xl shadow-black/10">
+                                <button type="submit" disabled={processing} className="w-full bg-[#000000] text-white py-5 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-[#282c3f] transition-all disabled:opacity-50 shadow-xl shadow-black/10">
                                     {processing ? 'Saving...' : 'Update Product'}
                                 </button>
-                                <Link href="/franchise-superadmin/products" className="w-full block text-center bg-white border border-slate-200 text-[#1E293B] py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:border-black transition-all">
+                                <Link href="/franchise-superadmin/products" className="w-full block text-center bg-white border border-slate-200 text-[#282c3f] py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:border-black transition-all">
                                     Cancel
                                 </Link>
                             </div>
@@ -423,12 +423,12 @@ export default function EditProduct({ product, categories = [], brands = [], siz
                     __html: `
                     .form-input {
                         width: 100%;
-                        background-color: #F8FAFC;
-                        border: 1px solid #E2E8F0;
+                        background-color: #f5f5f6;
+                        border: 1px solid #fff0f4;
                         padding: 0.875rem 1.25rem;
                         font-size: 0.875rem;
                         font-weight: 700;
-                        color: #1E293B;
+                        color: #282c3f;
                         outline: none;
                         transition: all 0.3s ease;
                     }
@@ -446,7 +446,7 @@ export default function EditProduct({ product, categories = [], brands = [], siz
 function FormField({ label, error, children }) {
     return (
         <label className="grid gap-2 relative">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B]">{label}</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#282c3f]">{label}</span>
             {children}
             {error && <span className="absolute -bottom-5 left-0 text-[9px] font-black tracking-widest text-red-500 uppercase">{error}</span>}
         </label>
@@ -456,7 +456,7 @@ function FormField({ label, error, children }) {
 function SelectField({ label, value, onChange, options = [], error }) {
     return (
         <div className="space-y-2 relative">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B]">{label}</label>
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#282c3f]">{label}</label>
             <select value={value} onChange={onChange} className="form-input appearance-none cursor-pointer">
                 <option value="" disabled className="text-slate-400">Select an option...</option>
                 {options.map((opt) => (

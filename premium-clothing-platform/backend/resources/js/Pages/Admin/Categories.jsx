@@ -66,8 +66,8 @@ export default function Categories({ categories, parentCategories = [], stats, f
         <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-400">Storefront Taxonomy</p>
-            <h1 className="mt-2 flex items-center gap-3 text-3xl font-black uppercase tracking-tight text-[#1A1A2E]">
-              <Layers3 className="text-[#E94E3C]" /> Collections
+            <h1 className="mt-2 flex items-center gap-3 text-3xl font-black uppercase tracking-tight text-[#282c3f]">
+              <Layers3 className="text-[#ff3f6c]" /> Collections
             </h1>
             <p className="mt-2 max-w-2xl text-sm font-bold text-slate-500">
               These categories power the website navigation, shop filters, and product assignment in the super-admin product form.
@@ -78,14 +78,14 @@ export default function Categories({ categories, parentCategories = [], stats, f
             <button
               type="button"
               onClick={syncDefaults}
-              className="flex items-center justify-center gap-2 border border-slate-200 bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest text-[#1A1A2E] transition-colors hover:border-[#1A1A2E]"
+              className="flex items-center justify-center gap-2 border border-slate-200 bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest text-[#282c3f] transition-colors hover:border-[#282c3f]"
             >
               <RefreshCw size={15} /> Sync Storefront Defaults
             </button>
             <button
               type="button"
               onClick={() => setIsAddModalOpen(true)}
-              className="flex items-center justify-center gap-2 bg-[#1A1A2E] px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-black/10 transition-colors hover:bg-[#E94E3C]"
+              className="flex items-center justify-center gap-2 bg-[#282c3f] px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-black/10 transition-colors hover:bg-[#ff3f6c]"
             >
               <Plus size={16} /> New Collection
             </button>
@@ -107,7 +107,7 @@ export default function Categories({ categories, parentCategories = [], stats, f
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && runSearch()}
-              className="w-full border-0 bg-slate-50 py-4 pl-12 pr-4 text-sm font-bold text-[#1A1A2E] outline-none ring-0 placeholder:text-slate-400 focus:ring-1 focus:ring-[#1A1A2E]"
+              className="w-full border-0 bg-slate-50 py-4 pl-12 pr-4 text-sm font-bold text-[#282c3f] outline-none ring-0 placeholder:text-slate-400 focus:ring-1 focus:ring-[#282c3f]"
             />
           </div>
         </div>
@@ -130,7 +130,7 @@ export default function Categories({ categories, parentCategories = [], stats, f
         ) : (
           <div className="border border-dashed border-slate-200 bg-white py-20 text-center">
             <Layers3 size={42} className="mx-auto mb-4 text-slate-300" strokeWidth={1.5} />
-            <p className="text-lg font-black uppercase tracking-tight text-[#1A1A2E]">No Categories Found</p>
+            <p className="text-lg font-black uppercase tracking-tight text-[#282c3f]">No Categories Found</p>
             <p className="mt-2 text-xs font-bold uppercase tracking-widest text-slate-400">Sync defaults or create your first storefront collection.</p>
           </div>
         )}
@@ -138,7 +138,7 @@ export default function Categories({ categories, parentCategories = [], stats, f
 
       <AnimatePresence>
         {isAddModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/70 p-4 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#282c3f]/70 p-4 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
@@ -148,7 +148,7 @@ export default function Categories({ categories, parentCategories = [], stats, f
               <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white/95 p-6 backdrop-blur">
                 <div>
                   <p className="text-[9px] font-black uppercase tracking-[0.35em] text-slate-400">Storefront Category</p>
-                  <h3 className="mt-1 text-lg font-black uppercase tracking-tight text-[#1A1A2E]">Create Collection</h3>
+                  <h3 className="mt-1 text-lg font-black uppercase tracking-tight text-[#282c3f]">Create Collection</h3>
                 </div>
                 <button type="button" onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-red-500">
                   <X size={20} />
@@ -198,7 +198,7 @@ export default function Categories({ categories, parentCategories = [], stats, f
                   </div>
                 )}
 
-                <button disabled={processing} type="submit" className="w-full bg-[#1A1A2E] py-4 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-[#E94E3C] disabled:opacity-50">
+                <button disabled={processing} type="submit" className="w-full bg-[#282c3f] py-4 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-[#ff3f6c] disabled:opacity-50">
                   {processing ? 'Saving...' : 'Save Category'}
                 </button>
               </form>
@@ -210,18 +210,18 @@ export default function Categories({ categories, parentCategories = [], stats, f
       <style>{`
         .form-input {
           width: 100%;
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
+          background: #f5f5f6;
+          border: 1px solid #fff0f4;
           padding: 0.9rem 1rem;
           font-size: 0.875rem;
           font-weight: 700;
-          color: #1A1A2E;
+          color: #282c3f;
           outline: none;
         }
         .form-input:focus {
-          border-color: #1A1A2E;
+          border-color: #282c3f;
           background: #ffffff;
-          box-shadow: 0 0 0 1px #1A1A2E;
+          box-shadow: 0 0 0 1px #282c3f;
         }
       `}</style>
     </AdminLayout>
@@ -232,7 +232,7 @@ function CategorySection({ title, description, categories, onToggle }) {
   return (
     <section>
       <div className="mb-4 flex flex-col gap-1 border-b border-slate-200 pb-4">
-        <h2 className="text-sm font-black uppercase tracking-widest text-[#1A1A2E]">{title}</h2>
+        <h2 className="text-sm font-black uppercase tracking-widest text-[#282c3f]">{title}</h2>
         <p className="text-xs font-bold text-slate-500">{description}</p>
       </div>
 
@@ -259,14 +259,14 @@ function CategoryCard({ category, onToggle }) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-[#1A1A2E]"
+      className="border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-[#282c3f]"
     >
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
           <p className="mb-2 text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">
             {isSubCategory ? 'Sub Collection' : 'Main Collection'}
           </p>
-          <h3 className="text-xl font-black uppercase tracking-tight text-[#1A1A2E]">{category.name}</h3>
+          <h3 className="text-xl font-black uppercase tracking-tight text-[#282c3f]">{category.name}</h3>
           {category.parent && (
             <p className="mt-2 flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400">
               {category.parent.name} <ChevronRight size={12} /> {category.name}
@@ -284,7 +284,7 @@ function CategoryCard({ category, onToggle }) {
       </div>
 
       <div className="mb-5 flex flex-wrap gap-2">
-        <Link href={`/shop?category=${category.slug}`} className="border border-slate-200 px-3 py-2 text-[9px] font-black uppercase tracking-widest text-slate-500 transition-colors hover:border-[#1A1A2E] hover:text-[#1A1A2E]">
+        <Link href={`/shop?category=${category.slug}`} className="border border-slate-200 px-3 py-2 text-[9px] font-black uppercase tracking-widest text-slate-500 transition-colors hover:border-[#282c3f] hover:text-[#282c3f]">
           View on site
         </Link>
         <span className={`border px-3 py-2 text-[9px] font-black uppercase tracking-widest ${isActive ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-red-100 bg-red-50 text-red-600'}`}>
@@ -302,7 +302,7 @@ function CategoryCard({ category, onToggle }) {
 
 function CountPill({ icon: Icon, label, value, accent = false }) {
   return (
-    <div className={`flex items-center justify-between border p-3 ${accent ? 'border-[#E94E3C]/10 bg-[#E94E3C]/5 text-[#E94E3C]' : 'border-slate-100 bg-slate-50 text-slate-500'}`}>
+    <div className={`flex items-center justify-between border p-3 ${accent ? 'border-[#ff3f6c]/10 bg-[#ff3f6c]/5 text-[#ff3f6c]' : 'border-slate-100 bg-slate-50 text-slate-500'}`}>
       <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest">
         <Icon size={13} /> {label}
       </span>
@@ -340,7 +340,7 @@ function StatCard({ title, value, icon: Icon, color }) {
     <div className="flex items-center justify-between border border-slate-200 bg-white p-5 shadow-sm">
       <div>
         <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-slate-400">{title}</p>
-        <h4 className="text-3xl font-black text-[#1A1A2E]">{Number(value || 0).toLocaleString('en-IN')}</h4>
+        <h4 className="text-3xl font-black text-[#282c3f]">{Number(value || 0).toLocaleString('en-IN')}</h4>
       </div>
       <div className={`grid size-12 place-items-center bg-slate-50 ${color}`}>
         <Icon size={20} strokeWidth={2.5} />

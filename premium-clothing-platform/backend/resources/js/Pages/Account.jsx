@@ -187,12 +187,12 @@ export default function Account({ orders = [], applications = [] }) {
         <AppLayout>
             <Head title="My Account | IHO Clothing" />
 
-            <div className="bg-[#F8FAFC] min-h-screen">
+            <div className="bg-[#f5f5f6] min-h-screen">
                 <section className="border-b border-slate-200 bg-white px-6 py-10 md:py-14">
                     <div className="mx-auto flex max-w-[1400px] flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                         <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#94A3B8]">IHO Account</p>
-                            <h1 className="mt-3 text-4xl font-black uppercase tracking-tight text-[#1E293B] md:text-6xl">
+                            <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#ff3f6c]">IHO Account</p>
+                            <h1 className="mt-3 text-4xl font-black uppercase tracking-tight text-[#282c3f] md:text-6xl">
                                 {user.name}
                             </h1>
                             <p className="mt-3 text-xs font-bold uppercase tracking-widest text-[#64748B]">{user.email}</p>
@@ -210,7 +210,7 @@ export default function Account({ orders = [], applications = [] }) {
                         <div className="border border-slate-200 bg-white">
                             {menuGroups.map((group) => (
                                 <div key={group.title} className="border-b border-slate-100 p-4 last:border-b-0">
-                                    <p className="mb-3 px-2 text-[9px] font-black uppercase tracking-[0.3em] text-[#94A3B8]">{group.title}</p>
+                                    <p className="mb-3 px-2 text-[9px] font-black uppercase tracking-[0.3em] text-[#ff3f6c]">{group.title}</p>
                                     <nav className="space-y-1">
                                         {group.items.map((item) => {
                                             const Icon = item.icon;
@@ -223,17 +223,17 @@ export default function Account({ orders = [], applications = [] }) {
                                                     onClick={() => setActiveTab(item.id)}
                                                     className={`flex w-full items-center justify-between px-3 py-3 text-left transition-colors ${
                                                         isActive
-                                                            ? 'bg-[#1E293B] text-white'
+                                                            ? 'bg-[#282c3f] text-white'
                                                             : item.danger
                                                                 ? 'text-red-500 hover:bg-red-50'
-                                                                : 'text-[#64748B] hover:bg-slate-50 hover:text-[#1E293B]'
+                                                                : 'text-[#64748B] hover:bg-slate-50 hover:text-[#282c3f]'
                                                     }`}
                                                 >
                                                     <span className="flex items-center gap-3 text-[11px] font-black uppercase tracking-widest">
                                                         <Icon size={16} />
                                                         {item.label}
                                                     </span>
-                                                    {isActive && <span className="h-1.5 w-1.5 bg-[#E94E3C]" />}
+                                                    {isActive && <span className="h-1.5 w-1.5 bg-[#ff3f6c]" />}
                                                 </button>
                                             );
                                         })}
@@ -311,8 +311,8 @@ function Overview({ activityFeed, applications, cartItems, orders, setActiveTab,
             <div className="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
                 <div className="border border-slate-200 bg-white p-6">
                     <div className="mb-5 flex items-center justify-between gap-4">
-                        <h3 className="text-sm font-black uppercase tracking-widest text-[#1E293B]">Latest Order</h3>
-                        <button type="button" onClick={() => setActiveTab('orders')} className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] hover:text-[#1E293B]">
+                        <h3 className="text-sm font-black uppercase tracking-widest text-[#282c3f]">Latest Order</h3>
+                        <button type="button" onClick={() => setActiveTab('orders')} className="text-[10px] font-black uppercase tracking-widest text-[#ff3f6c] hover:text-[#282c3f]">
                             View Orders
                         </button>
                     </div>
@@ -325,19 +325,19 @@ function Overview({ activityFeed, applications, cartItems, orders, setActiveTab,
                 </div>
 
                 <div className="border border-slate-200 bg-slate-50 p-6">
-                    <h3 className="mb-5 text-sm font-black uppercase tracking-widest text-[#1E293B]">Real Time Activity</h3>
+                    <h3 className="mb-5 text-sm font-black uppercase tracking-widest text-[#282c3f]">Real Time Activity</h3>
                     {activityFeed.length > 0 ? (
                         <div className="space-y-3">
                             {activityFeed.map((item) => (
                                 <div key={item.id} className="border border-slate-200 bg-white p-4">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-[#1E293B]">{item.label}</p>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-[#282c3f]">{item.label}</p>
                                     <p className="mt-1 text-xs font-semibold text-[#64748B]">{item.detail}</p>
-                                    <p className="mt-2 text-[9px] font-black uppercase tracking-widest text-[#94A3B8]">{item.time}</p>
+                                    <p className="mt-2 text-[9px] font-black uppercase tracking-widest text-[#ff3f6c]">{item.time}</p>
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <p className="border border-dashed border-slate-200 bg-white p-8 text-center text-[10px] font-black uppercase tracking-widest text-[#94A3B8]">
+                        <p className="border border-dashed border-slate-200 bg-white p-8 text-center text-[10px] font-black uppercase tracking-widest text-[#ff3f6c]">
                             Cart, wishlist, and order actions will appear here.
                         </p>
                     )}
@@ -361,12 +361,12 @@ function Overview({ activityFeed, applications, cartItems, orders, setActiveTab,
 
             {applications?.length > 0 && (
                 <div className="border border-slate-200 bg-white p-6">
-                    <h3 className="mb-4 text-sm font-black uppercase tracking-widest text-[#1E293B]">Franchise Applications</h3>
+                    <h3 className="mb-4 text-sm font-black uppercase tracking-widest text-[#282c3f]">Franchise Applications</h3>
                     <div className="grid gap-3 md:grid-cols-2">
                         {applications.map((application) => (
                             <div key={application.id} className="border border-slate-100 p-4">
-                                <p className="text-xs font-black uppercase tracking-widest text-[#1E293B]">{application.franchise_plan?.name || 'Application'}</p>
-                                <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-[#94A3B8]">{application.status || 'Submitted'}</p>
+                                <p className="text-xs font-black uppercase tracking-widest text-[#282c3f]">{application.franchise_plan?.name || 'Application'}</p>
+                                <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-[#ff3f6c]">{application.status || 'Submitted'}</p>
                             </div>
                         ))}
                     </div>
@@ -399,8 +399,8 @@ function OrderCard({ order, compact = false }) {
         <div className="border border-slate-200 bg-white p-5">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#94A3B8]">Order #{order.order_number || order.id}</p>
-                    <h3 className="mt-2 text-xl font-black uppercase tracking-tight text-[#1E293B]">Rs {Number(order.total_amount || 0).toLocaleString('en-IN')}</h3>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#ff3f6c]">Order #{order.order_number || order.id}</p>
+                    <h3 className="mt-2 text-xl font-black uppercase tracking-tight text-[#282c3f]">Rs {Number(order.total_amount || 0).toLocaleString('en-IN')}</h3>
                     <p className="mt-1 text-xs font-bold text-[#64748B]">{formatDate(order.created_at)}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -418,15 +418,15 @@ function OrderCard({ order, compact = false }) {
                     {items.length > 0 ? items.map((item) => (
                         <div key={item.id} className="flex items-center justify-between gap-4">
                             <div>
-                                <p className="text-xs font-black uppercase tracking-widest text-[#1E293B]">{item.product?.name || `Product #${item.product_id}`}</p>
-                                <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-[#94A3B8]">
+                                <p className="text-xs font-black uppercase tracking-widest text-[#282c3f]">{item.product?.name || `Product #${item.product_id}`}</p>
+                                <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-[#ff3f6c]">
                                     {item.sku?.size || 'Size'} / {item.sku?.color || 'Color'} x {item.quantity}
                                 </p>
                             </div>
-                            <p className="text-sm font-black text-[#1E293B]">Rs {Number(item.total_price || (Number(item.price || item.unit_price || 0) * Number(item.quantity || 1))).toLocaleString('en-IN')}</p>
+                            <p className="text-sm font-black text-[#282c3f]">Rs {Number(item.total_price || (Number(item.price || item.unit_price || 0) * Number(item.quantity || 1))).toLocaleString('en-IN')}</p>
                         </div>
                     )) : (
-                        <p className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8]">Items are being prepared.</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-[#ff3f6c]">Items are being prepared.</p>
                     )}
                 </div>
             )}
@@ -446,8 +446,8 @@ function CartPanel({ items, total }) {
                         ))}
                     </div>
                     <div className="flex flex-col gap-4 border border-slate-200 bg-slate-50 p-5 sm:flex-row sm:items-center sm:justify-between">
-                        <p className="text-sm font-black uppercase tracking-widest text-[#1E293B]">Cart Total: Rs {total.toLocaleString('en-IN')}</p>
-                        <Link href="/checkout" className="inline-flex items-center justify-center gap-2 bg-black px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-[#1E293B]">
+                        <p className="text-sm font-black uppercase tracking-widest text-[#282c3f]">Cart Total: Rs {total.toLocaleString('en-IN')}</p>
+                        <Link href="/checkout" className="inline-flex items-center justify-center gap-2 bg-black px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-[#282c3f]">
                             Checkout <ArrowRight size={14} />
                         </Link>
                     </div>
@@ -471,8 +471,8 @@ function WishlistPanel({ items, onRemove }) {
                                 {item.image && <img src={item.image} alt={item.name} className="h-full w-full object-cover" />}
                             </Link>
                             <div className="p-4">
-                                <h3 className="line-clamp-2 text-xs font-black uppercase tracking-widest text-[#1E293B]">{item.name}</h3>
-                                <p className="mt-2 text-sm font-black text-[#1E293B]">Rs {Number(item.price || item.base_price || 0).toLocaleString('en-IN')}</p>
+                                <h3 className="line-clamp-2 text-xs font-black uppercase tracking-widest text-[#282c3f]">{item.name}</h3>
+                                <p className="mt-2 text-sm font-black text-[#282c3f]">Rs {Number(item.price || item.base_price || 0).toLocaleString('en-IN')}</p>
                                 <button type="button" onClick={() => onRemove(item.id)} className="mt-4 text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-700">
                                     Remove
                                 </button>
@@ -494,9 +494,9 @@ function ProductMiniCard({ item }) {
                 {item.image && <img src={item.image} alt={item.name} className="h-full w-full object-cover" />}
             </div>
             <div className="flex min-w-0 flex-1 flex-col justify-center">
-                <p className="line-clamp-2 text-xs font-black uppercase tracking-widest text-[#1E293B]">{item.name}</p>
-                <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#94A3B8]">{item.size} / {item.color} x {item.quantity}</p>
-                <p className="mt-2 text-sm font-black text-[#1E293B]">Rs {(Number(item.price || 0) * Number(item.quantity || 1)).toLocaleString('en-IN')}</p>
+                <p className="line-clamp-2 text-xs font-black uppercase tracking-widest text-[#282c3f]">{item.name}</p>
+                <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#ff3f6c]">{item.size} / {item.color} x {item.quantity}</p>
+                <p className="mt-2 text-sm font-black text-[#282c3f]">Rs {(Number(item.price || 0) * Number(item.quantity || 1)).toLocaleString('en-IN')}</p>
             </div>
         </div>
     );
@@ -506,23 +506,23 @@ function MiniList({ action, count, href, items, title }) {
     return (
         <div className="border border-slate-200 bg-white p-6">
             <div className="mb-5 flex items-center justify-between gap-4">
-                <h3 className="text-sm font-black uppercase tracking-widest text-[#1E293B]">{title}</h3>
-                <Link href={href} className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] hover:text-[#1E293B]">{action}</Link>
+                <h3 className="text-sm font-black uppercase tracking-widest text-[#282c3f]">{title}</h3>
+                <Link href={href} className="text-[10px] font-black uppercase tracking-widest text-[#ff3f6c] hover:text-[#282c3f]">{action}</Link>
             </div>
             {count > 0 ? (
                 <div className="space-y-3">
                     {items.slice(0, 3).map((item) => (
                         <div key={item.id} className="flex items-center justify-between gap-4 border-b border-slate-100 pb-3 last:border-b-0 last:pb-0">
                             <div>
-                                <p className="text-xs font-black uppercase tracking-widest text-[#1E293B]">{item.name}</p>
-                                <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-[#94A3B8]">{item.meta}</p>
+                                <p className="text-xs font-black uppercase tracking-widest text-[#282c3f]">{item.name}</p>
+                                <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-[#ff3f6c]">{item.meta}</p>
                             </div>
-                            <p className="text-xs font-black text-[#1E293B]">Rs {item.price.toLocaleString('en-IN')}</p>
+                            <p className="text-xs font-black text-[#282c3f]">Rs {item.price.toLocaleString('en-IN')}</p>
                         </div>
                     ))}
                 </div>
             ) : (
-                <p className="border border-dashed border-slate-200 p-8 text-center text-[10px] font-black uppercase tracking-widest text-[#94A3B8]">Nothing here yet.</p>
+                <p className="border border-dashed border-slate-200 p-8 text-center text-[10px] font-black uppercase tracking-widest text-[#ff3f6c]">Nothing here yet.</p>
             )}
         </div>
     );
@@ -531,8 +531,8 @@ function MiniList({ action, count, href, items, title }) {
 function SectionHeader({ eyebrow, title }) {
     return (
         <div className="border-b border-slate-100 pb-5">
-            <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#94A3B8]">{eyebrow}</p>
-            <h2 className="mt-2 text-2xl font-black uppercase tracking-tight text-[#1E293B] md:text-3xl">{title}</h2>
+            <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#ff3f6c]">{eyebrow}</p>
+            <h2 className="mt-2 text-2xl font-black uppercase tracking-tight text-[#282c3f] md:text-3xl">{title}</h2>
         </div>
     );
 }
@@ -540,11 +540,11 @@ function SectionHeader({ eyebrow, title }) {
 function MetricCard({ icon: Icon, label, value }) {
     return (
         <div className="border border-slate-200 bg-white p-5">
-            <div className="mb-5 flex items-center justify-between text-[#94A3B8]">
+            <div className="mb-5 flex items-center justify-between text-[#ff3f6c]">
                 <Icon size={18} />
-                <span className="h-1.5 w-1.5 bg-[#E94E3C]" />
+                <span className="h-1.5 w-1.5 bg-[#ff3f6c]" />
             </div>
-            <p className="text-3xl font-black tracking-tight text-[#1E293B]">{Number(value || 0).toLocaleString('en-IN')}</p>
+            <p className="text-3xl font-black tracking-tight text-[#282c3f]">{Number(value || 0).toLocaleString('en-IN')}</p>
             <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-[#64748B]">{label}</p>
         </div>
     );
@@ -553,8 +553,8 @@ function MetricCard({ icon: Icon, label, value }) {
 function StatTile({ label, value }) {
     return (
         <div className="min-w-24 border-r border-slate-200 px-5 py-4 last:border-r-0">
-            <p className="text-2xl font-black text-[#1E293B]">{Number(value || 0).toLocaleString('en-IN')}</p>
-            <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-[#94A3B8]">{label}</p>
+            <p className="text-2xl font-black text-[#282c3f]">{Number(value || 0).toLocaleString('en-IN')}</p>
+            <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-[#ff3f6c]">{label}</p>
         </div>
     );
 }
@@ -562,11 +562,11 @@ function StatTile({ label, value }) {
 function EmptyState({ action, href, icon: Icon, message, title }) {
     return (
         <div className="flex flex-col items-center justify-center border border-dashed border-slate-200 bg-slate-50 px-6 py-16 text-center">
-            <Icon size={34} className="mb-5 text-[#94A3B8]" strokeWidth={1.5} />
-            <h3 className="text-lg font-black uppercase tracking-tight text-[#1E293B]">{title}</h3>
+            <Icon size={34} className="mb-5 text-[#ff3f6c]" strokeWidth={1.5} />
+            <h3 className="text-lg font-black uppercase tracking-tight text-[#282c3f]">{title}</h3>
             <p className="mt-2 max-w-sm text-sm font-semibold text-[#64748B]">{message}</p>
             {action && href && (
-                <Link href={href} className="mt-6 bg-black px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-[#1E293B]">
+                <Link href={href} className="mt-6 bg-black px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-[#282c3f]">
                     {action}
                 </Link>
             )}

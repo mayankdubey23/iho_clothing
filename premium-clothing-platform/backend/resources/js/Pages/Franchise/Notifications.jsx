@@ -39,10 +39,10 @@ export default function Notifications({ notifications, unreadCount }) {
                 {/* 🚀 HEADER */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
                     <div>
-                        <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                            <Bell className="text-[#E94E3C]" size={32} /> Notifications
+                        <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                            <Bell className="text-[#ff3f6c]" size={32} /> Notifications
                             {unreadCount > 0 && (
-                                <span className="bg-[#E94E3C] text-white text-xs px-3 py-1 rounded-full font-black ml-2 shadow-lg shadow-[#E94E3C]/20">
+                                <span className="bg-[#ff3f6c] text-white text-xs px-3 py-1 rounded-full font-black ml-2 shadow-lg shadow-[#ff3f6c]/20">
                                     {unreadCount} New
                                 </span>
                             )}
@@ -53,7 +53,7 @@ export default function Notifications({ notifications, unreadCount }) {
                     {unreadCount > 0 && (
                         <button
                             onClick={markAllAsRead}
-                            className="bg-white border border-gray-200 text-[#1A1A2E] px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm"
+                            className="bg-white border border-gray-200 text-[#282c3f] px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm"
                         >
                             <CheckCheck size={16} /> Mark all as read
                         </button>
@@ -78,7 +78,7 @@ export default function Notifications({ notifications, unreadCount }) {
                                         {/* Content */}
                                         <div className="flex-1">
                                             <div className="flex justify-between items-start mb-1">
-                                                <h4 className={`text-sm md:text-base ${note.is_read ? 'font-bold text-gray-700' : 'font-black text-[#1A1A2E]'}`}>
+                                                <h4 className={`text-sm md:text-base ${note.is_read ? 'font-bold text-gray-700' : 'font-black text-[#282c3f]'}`}>
                                                     {note.title}
                                                 </h4>
                                                 <span className="text-[10px] font-black tracking-widest text-gray-400 uppercase ml-4 shrink-0">
@@ -102,7 +102,7 @@ export default function Notifications({ notifications, unreadCount }) {
                                             <button
                                                 onClick={() => markAsRead(note.mapping_id)}
                                                 title="Mark as read"
-                                                className="text-[#E94E3C] hover:text-[#c0392b] transition-colors p-2 shrink-0 self-center"
+                                                className="text-[#ff3f6c] hover:text-[#c0392b] transition-colors p-2 shrink-0 self-center"
                                             >
                                                 <Circle size={16} fill="currentColor" />
                                             </button>
@@ -114,7 +114,7 @@ export default function Notifications({ notifications, unreadCount }) {
                     ) : (
                         <div className="p-16 text-center">
                             <Bell size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} />
-                            <h3 className="text-[#1A1A2E] font-black text-lg uppercase">All Caught Up!</h3>
+                            <h3 className="text-[#282c3f] font-black text-lg uppercase">All Caught Up!</h3>
                             <p className="text-gray-500 text-sm font-bold mt-1">You have no notifications right now.</p>
                         </div>
                     )}

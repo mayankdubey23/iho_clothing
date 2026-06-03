@@ -17,7 +17,7 @@ export default function CreateProduct({ categories = [], brands = [], colors = [
     ];
     const fallbackColors = [
         ['White', '#FFFFFF'], ['Blue', '#2563EB'], ['Black', '#000000'], ['Multi', '#8B5CF6'],
-        ['Green', '#16A34A'], ['Grey', '#94A3B8'], ['Navy Blue', '#1E3A8A'], ['Brown', '#7C2D12'], ['Maroon', '#7F1D1D'], ['Pink', '#EC4899'],
+        ['Green', '#16A34A'], ['Grey', '#ff3f6c'], ['Navy Blue', '#1E3A8A'], ['Brown', '#7C2D12'], ['Maroon', '#7F1D1D'], ['Pink', '#EC4899'],
         ['Red', '#DC2626'], ['Beige', '#D6C2A8'], ['Yellow', '#FACC15'], ['Purple', '#7C3AED'], ['Cream', '#FFF7D6'], ['Peach', '#FDBA74'],
         ['Olive', '#6B7D2A'], ['Teal', '#0F766E'], ['Off White', '#F8F4E3'], ['Orange', '#F97316'], ['Sea Green', '#2E8B57'], ['Turquoise Blue', '#06B6D4'],
         ['Lime Green', '#84CC16'], ['Mustard', '#D4A017'], ['Khaki', '#BDB76B'], ['Lavender', '#C4B5FD'], ['Coffee Brown', '#4B2E2A'], ['Rust', '#B45309'],
@@ -129,15 +129,15 @@ export default function CreateProduct({ categories = [], brands = [], colors = [
                 {/* 🏆 Header Section */}
                 <div className="mb-10 mt-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
-                        <Link href="/franchise-superadmin/products" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-[#94A3B8] hover:text-black mb-4 transition-colors">
+                        <Link href="/franchise-superadmin/products" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-[#ff3f6c] hover:text-black mb-4 transition-colors">
                             <ChevronLeft size={14} /> Return to Inventory
                         </Link>
-                        <h1 className="text-4xl font-black text-[#1E293B] uppercase tracking-tighter italic border-l-8 border-[#1E293B] pl-6">
+                        <h1 className="text-4xl font-black text-[#282c3f] uppercase tracking-tighter italic border-l-8 border-[#282c3f] pl-6">
                             Deploy New Product
                         </h1>
                     </div>
                     <div className="flex gap-4">
-                        <button onClick={submit} disabled={processing} className="bg-[#1A1A2E] text-white px-10 py-5 text-[11px] font-black uppercase tracking-[0.3em] hover:bg-[#E94E3C] transition-all flex items-center gap-3 shadow-xl disabled:opacity-50">
+                        <button onClick={submit} disabled={processing} className="bg-[#282c3f] text-white px-10 py-5 text-[11px] font-black uppercase tracking-[0.3em] hover:bg-[#ff3f6c] transition-all flex items-center gap-3 shadow-xl disabled:opacity-50">
                             <Save size={18} /> {processing ? 'UPLOADING ASSETS...' : 'PUSH TO STOREFRONT'}
                         </button>
                     </div>
@@ -150,7 +150,7 @@ export default function CreateProduct({ categories = [], brands = [], colors = [
 
                         {/* Section 1: Taxonomy & Identity */}
                         <div className="bg-white border border-slate-200 p-10 shadow-sm">
-                            <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-[#1E293B] mb-10 border-b border-slate-100 pb-5 flex items-center gap-3">
+                            <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-[#282c3f] mb-10 border-b border-slate-100 pb-5 flex items-center gap-3">
                                 <Info size={16} /> Taxonomy & Identity
                             </h3>
 
@@ -230,7 +230,7 @@ export default function CreateProduct({ categories = [], brands = [], colors = [
 
                         {/* Section 2: Pricing Strategy */}
                         <div className="bg-white border border-slate-200 p-10 shadow-sm">
-                            <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-[#1E293B] mb-10 border-b border-slate-100 pb-5">
+                            <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-[#282c3f] mb-10 border-b border-slate-100 pb-5">
                                 Pricing Strategy
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -241,7 +241,7 @@ export default function CreateProduct({ categories = [], brands = [], colors = [
                                     <input type="number" value={data.d2c_price} onChange={e => setData('d2c_price', e.target.value)} placeholder="2499" className="form-input" />
                                 </FormField>
                                 <FormField label="B2B Franchise Price (₹) *" error={errors.b2b_price}>
-                                    <input type="number" value={data.b2b_price} onChange={e => setData('b2b_price', e.target.value)} placeholder="1800" className="form-input bg-red-50/50 border-red-100 focus:border-[#E94E3C]" />
+                                    <input type="number" value={data.b2b_price} onChange={e => setData('b2b_price', e.target.value)} placeholder="1800" className="form-input bg-red-50/50 border-red-100 focus:border-[#ff3f6c]" />
                                 </FormField>
                             </div>
                         </div>
@@ -250,10 +250,10 @@ export default function CreateProduct({ categories = [], brands = [], colors = [
                         <div className="bg-white border border-slate-200 p-10 shadow-sm">
                             <div className="flex justify-between items-center mb-10 border-b border-slate-100 pb-5">
                                 <div>
-                                    <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-[#1E293B]">Variants & Master Stock</h3>
+                                    <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-[#282c3f]">Variants & Master Stock</h3>
                                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Manual SKU creation override</p>
                                 </div>
-                                <button type="button" onClick={addVariant} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#E94E3C] hover:text-[#1E293B] transition-colors">
+                                <button type="button" onClick={addVariant} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#ff3f6c] hover:text-[#282c3f] transition-colors">
                                     <Plus size={16} strokeWidth={3} /> Add Variant
                                 </button>
                             </div>
@@ -314,11 +314,11 @@ export default function CreateProduct({ categories = [], brands = [], colors = [
 
                         {/* Studio Visuals */}
                         <div className="bg-white border border-slate-200 p-10 shadow-sm">
-                            <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-[#1E293B] mb-8 border-b border-slate-100 pb-5">Studio Visuals *</h3>
+                            <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-[#282c3f] mb-8 border-b border-slate-100 pb-5">Studio Visuals *</h3>
 
-                            <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-slate-300 border-dashed bg-slate-50 hover:bg-slate-100 hover:border-[#1E293B] transition-all cursor-pointer group mb-8">
-                                <UploadCloud size={32} className="text-slate-300 group-hover:text-[#1E293B] mb-3 transition-colors" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-[#1E293B] mb-1">Click or drag images/videos</span>
+                            <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-slate-300 border-dashed bg-slate-50 hover:bg-slate-100 hover:border-[#282c3f] transition-all cursor-pointer group mb-8">
+                                <UploadCloud size={32} className="text-slate-300 group-hover:text-[#282c3f] mb-3 transition-colors" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-[#282c3f] mb-1">Click or drag images/videos</span>
                                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">PNG, JPG, WEBP, MP4, WEBM, MOV up to 50MB</span>
                                 <input type="file" multiple accept="image/*,video/mp4,video/webm,video/quicktime" className="hidden" onChange={handleImageUpload} />
                             </label>
@@ -333,10 +333,10 @@ export default function CreateProduct({ categories = [], brands = [], colors = [
                                             ) : (
                                                 <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" alt="preview" />
                                             )}
-                                            <button type="button" onClick={() => removeImage(idx)} className="absolute top-2 right-2 bg-white text-red-500 p-1.5 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#E94E3C] hover:text-white">
+                                            <button type="button" onClick={() => removeImage(idx)} className="absolute top-2 right-2 bg-white text-red-500 p-1.5 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#ff3f6c] hover:text-white">
                                                 <X size={14} />
                                             </button>
-                                            <span className="absolute bottom-0 left-0 w-full bg-[#1E293B] text-white text-[8px] font-black text-center py-2 uppercase tracking-widest">
+                                            <span className="absolute bottom-0 left-0 w-full bg-[#282c3f] text-white text-[8px] font-black text-center py-2 uppercase tracking-widest">
                                                 {file.type.startsWith('video/') ? 'Product Video' : idx === 0 ? 'Main Cover' : 'Image'}
                                             </span>
                                         </div>
@@ -351,7 +351,7 @@ export default function CreateProduct({ categories = [], brands = [], colors = [
 
                         {/* Visibility Controls */}
                         <div className="bg-white border border-slate-200 p-10 shadow-sm">
-                            <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-[#1E293B] mb-10 border-b border-slate-100 pb-5">Visibility Attributes</h3>
+                            <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-[#282c3f] mb-10 border-b border-slate-100 pb-5">Visibility Attributes</h3>
                             <div className="space-y-8">
                                 <ToggleButton label="Feature this Product" sub="Appears in hero highlights" checked={data.is_featured} onChange={v => setData('is_featured', v)} />
                                 <ToggleButton label="Include in Men Collection" sub="Auto-on for Men and Unisex products" checked={data.show_on_men_page} onChange={v => setData('show_on_men_page', v)} />
@@ -360,10 +360,10 @@ export default function CreateProduct({ categories = [], brands = [], colors = [
                             </div>
 
                             <div className="mt-12 pt-10 border-t border-slate-100 flex flex-col gap-4">
-                                <button type="submit" disabled={processing} className="w-full bg-[#1A1A2E] text-white py-5 text-[11px] font-black uppercase tracking-[0.3em] hover:bg-[#E94E3C] transition-all disabled:opacity-50">
+                                <button type="submit" disabled={processing} className="w-full bg-[#282c3f] text-white py-5 text-[11px] font-black uppercase tracking-[0.3em] hover:bg-[#ff3f6c] transition-all disabled:opacity-50">
                                     {processing ? 'UPLOADING ASSETS...' : 'SAVE PRODUCT'}
                                 </button>
-                                <Link href="/franchise-superadmin/products" className="w-full text-center border border-slate-200 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-[#1E293B] hover:border-[#1E293B] transition-colors">
+                                <Link href="/franchise-superadmin/products" className="w-full text-center border border-slate-200 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-[#282c3f] hover:border-[#282c3f] transition-colors">
                                     Cancel & Return
                                 </Link>
                             </div>
@@ -375,23 +375,23 @@ export default function CreateProduct({ categories = [], brands = [], colors = [
                     __html: `
                     .form-input { 
                         width: 100%; 
-                        background: #F8FAFC; 
-                        border: 1px solid #E2E8F0; 
+                        background: #f5f5f6; 
+                        border: 1px solid #fff0f4; 
                         padding: 1rem 1.25rem; 
                         font-size: 0.875rem; 
                         font-weight: 700; 
-                        color: #1E293B; 
+                        color: #282c3f; 
                         outline: none; 
                         border-radius: 0; 
                         transition: all 0.3s; 
                     }
                     .form-input:focus { 
-                        border-color: #0F172A; 
+                        border-color: #282c3f; 
                         background: #FFFFFF; 
-                        box-shadow: 0 0 0 1px #0F172A; 
+                        box-shadow: 0 0 0 1px #282c3f; 
                     }
                     .form-input::placeholder {
-                        color: #CBD5E1;
+                        color: #ffe1e8;
                         font-weight: 500;
                     }
                 `}} />
@@ -404,7 +404,7 @@ export default function CreateProduct({ categories = [], brands = [], colors = [
 function FormField({ label, error, children }) {
     return (
         <label className="flex flex-col gap-3 relative">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B]">{label}</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#282c3f]">{label}</span>
             {children}
             {error && <span className="absolute -bottom-5 text-[9px] font-black text-red-500 uppercase tracking-widest">{error}</span>}
         </label>
@@ -431,10 +431,10 @@ function ToggleButton({ label, sub, checked, onChange }) {
     return (
         <label className="flex items-center justify-between cursor-pointer group">
             <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-black uppercase tracking-widest text-[#1E293B] group-hover:text-black transition-colors">{label}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#282c3f] group-hover:text-black transition-colors">{label}</span>
                 <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{sub}</span>
             </div>
-            <div onClick={() => onChange(!checked)} className={`w-12 h-6 border flex items-center p-1 transition-all ${checked ? 'bg-[#1E293B] border-[#1E293B]' : 'bg-white border-slate-300'}`}>
+            <div onClick={() => onChange(!checked)} className={`w-12 h-6 border flex items-center p-1 transition-all ${checked ? 'bg-[#282c3f] border-[#282c3f]' : 'bg-white border-slate-300'}`}>
                 <div className={`w-4 h-4 transition-transform ${checked ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-200'}`} />
             </div>
         </label>

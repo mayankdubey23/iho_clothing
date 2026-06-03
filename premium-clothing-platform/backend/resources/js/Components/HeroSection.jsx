@@ -22,7 +22,7 @@ export default function HeroSection({ offers = [] }) {
 
     return (
         <section className="overflow-hidden bg-white">
-            <div className="h-8 overflow-hidden border-b border-slate-200 bg-[#1E293B] text-white">
+            <div className="h-8 overflow-hidden border-b border-slate-200 bg-[#282c3f] text-white">
                 <div className="flex h-full w-max animate-thin-offer-marquee items-center gap-10">
                     {offerRail.map((item, index) => (
                         <span key={`${item}-${index}`} className="text-[9px] font-black uppercase tracking-[0.28em] text-white/85">

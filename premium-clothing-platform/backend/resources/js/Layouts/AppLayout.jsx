@@ -26,31 +26,31 @@ export function stockFor(product) { return product?.skus?.reduce((t, s) => t + N
 export function SectionHeading({ title, description }) {
     return (
         <div className="mb-10 text-center md:text-left">
-            <h2 className="text-4xl font-black text-[#1E293B] uppercase tracking-tighter italic border-l-4 border-black pl-4">
+            <h2 className="text-4xl font-black text-[#282c3f] uppercase tracking-tighter italic border-l-4 border-black pl-4">
                 {title}
             </h2>
-            {description && <p className="mt-2 text-xs font-bold text-[#94A3B8] uppercase tracking-[0.2em]">{description}</p>}
+            {description && <p className="mt-2 text-xs font-bold text-[#ff3f6c] uppercase tracking-[0.2em]">{description}</p>}
         </div>
     );
 }
 
 export function EmptyState({ text }) {
-    return <div className="p-16 text-center text-[#94A3B8] font-bold uppercase tracking-widest text-xs border border-dashed border-gray-200 rounded-3xl">{text}</div>;
+    return <div className="p-16 text-center text-[#ff3f6c] font-bold uppercase tracking-widest text-xs border border-dashed border-gray-200 rounded-3xl">{text}</div>;
 }
 
 // 💎 Glassmorphic Stat Card
 export function Stat({ label, value }) {
     return (
         <div className="p-6 bg-white/40 backdrop-blur-[10px] border border-white/20 shadow-sm rounded-none hover:shadow-xl transition-all duration-500">
-            <p className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] mb-1">{label}</p>
-            <strong className="text-3xl font-black text-[#1E293B]">{value}</strong>
+            <p className="text-[10px] font-black text-[#ff3f6c] uppercase tracking-[0.2em] mb-1">{label}</p>
+            <strong className="text-3xl font-black text-[#282c3f]">{value}</strong>
         </div>
     );
 }
 
 export function Field({ label, error, children }) {
     return (
-        <label className="grid gap-2 text-[10px] font-black uppercase tracking-widest text-[#1E293B]">
+        <label className="grid gap-2 text-[10px] font-black uppercase tracking-widest text-[#282c3f]">
             {label}
             {children}
             {error && <span className="text-red-500 normal-case tracking-normal font-bold">{error}</span>}
@@ -69,20 +69,20 @@ export default function AppLayout({ children, admin = false, verticalNav = false
     ];
 
     return (
-        <div className="min-h-screen flex flex-col bg-white text-[#1E293B] selection:bg-[#1E293B] selection:text-white relative overflow-hidden">
+        <div className="min-h-screen flex flex-col bg-white text-[#282c3f] selection:bg-[#282c3f] selection:text-white relative overflow-hidden">
 
             {/* ❄️ Titanium Frost Orbs (Silver & Slate tones) */}
             {!admin && (
                 <>
-                    <div className="absolute top-[-10%] left-[-5%] w-[40vw] h-[40vw] bg-[#F1F5F9] rounded-full blur-[120px] opacity-60 pointer-events-none" />
-                    <div className="absolute bottom-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-[#E2E8F0] rounded-full blur-[120px] opacity-60 pointer-events-none" />
+                    <div className="absolute top-[-10%] left-[-5%] w-[40vw] h-[40vw] bg-[#fff0f4] rounded-full blur-[120px] opacity-60 pointer-events-none" />
+                    <div className="absolute bottom-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-[#fff0f4] rounded-full blur-[120px] opacity-60 pointer-events-none" />
                     <div className="absolute top-[30%] right-[10%] w-[20vw] h-[20vw] bg-slate-100 rounded-full blur-[100px] opacity-40 pointer-events-none" />
                 </>
             )}
 
             {!admin && <Navbar navLinks={navLinks} vertical={verticalNav} />}
 
-            <main className={`flex-grow w-full relative z-10 ${verticalNav ? 'pt-24 lg:pt-0 lg:pl-20' : 'pt-24'}`}>
+            <main className={`flex-grow w-full relative z-10 ${verticalNav ? 'pt-16 lg:pt-0 lg:pl-20' : 'pt-16'}`}>
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={typeof window !== 'undefined' ? window.location.pathname : 'page'}
@@ -102,9 +102,9 @@ export default function AppLayout({ children, admin = false, verticalNav = false
                 __html: `
                 /* Minimalist Custom Scrollbar */
                 ::-webkit-scrollbar { width: 4px; }
-                ::-webkit-scrollbar-track { background: #f8fafc; }
-                ::-webkit-scrollbar-thumb { background: #94a3b8; }
-                ::-webkit-scrollbar-thumb:hover { background: #1e293b; }
+                ::-webkit-scrollbar-track { background: #f5f5f6; }
+                ::-webkit-scrollbar-thumb { background: #ff3f6c; }
+                ::-webkit-scrollbar-thumb:hover { background: #282c3f; }
             `}} />
         </div>
     );

@@ -68,36 +68,36 @@ export default function CustomerReviews({ reviews = [] }) {
         : '5.0';
 
     return (
-        <section className="py-24 bg-[#F8FAFC] border-t border-slate-200 overflow-hidden relative">
+        <section className="py-24 bg-[#f5f5f6] border-t border-slate-200 overflow-hidden relative">
             <div className="max-w-[1400px] mx-auto px-6 mb-16 relative z-10">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                     <div>
                         <div className="flex items-center gap-4 mb-4">
-                            <div className="h-[1px] w-8 bg-[#1E293B]" />
-                            <span className="text-[10px] font-black tracking-[0.4em] uppercase text-[#1E293B] flex items-center gap-2">
+                            <div className="h-[1px] w-8 bg-[#282c3f]" />
+                            <span className="text-[10px] font-black tracking-[0.4em] uppercase text-[#282c3f] flex items-center gap-2">
                                 <MessageSquareQuote size={12} /> Community Voice
                             </span>
                         </div>
-                        <h2 className="text-4xl md:text-5xl font-black text-[#1E293B] uppercase tracking-tighter italic">
+                        <h2 className="text-4xl md:text-5xl font-black text-[#282c3f] uppercase tracking-tighter italic">
                             Athlete Feedback.
                         </h2>
                     </div>
 
                     <div className="flex items-center gap-4 bg-white px-6 py-4 border border-slate-200 shadow-sm">
-                        <div className="flex text-[#1E293B]">
-                            {[...Array(5)].map((_, i) => <Star key={i} size={18} className="fill-[#1E293B]" />)}
+                        <div className="flex text-[#282c3f]">
+                            {[...Array(5)].map((_, i) => <Star key={i} size={18} className="fill-[#282c3f]" />)}
                         </div>
                         <div className="h-8 w-[1px] bg-slate-200" />
                         <div>
-                            <p className="text-xl font-black tracking-tight text-[#1E293B]">{averageRating}/5</p>
+                            <p className="text-xl font-black tracking-tight text-[#282c3f]">{averageRating}/5</p>
                             <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Based on customer reviews</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="absolute left-0 top-0 bottom-0 w-12 md:w-32 bg-gradient-to-r from-[#F8FAFC] to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-12 md:w-32 bg-gradient-to-l from-[#F8FAFC] to-transparent z-10 pointer-events-none" />
+            <div className="absolute left-0 top-0 bottom-0 w-12 md:w-32 bg-gradient-to-r from-[#f5f5f6] to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-12 md:w-32 bg-gradient-to-l from-[#f5f5f6] to-transparent z-10 pointer-events-none" />
 
             <div className="flex overflow-hidden">
                 <motion.div
@@ -116,7 +116,7 @@ export default function CustomerReviews({ reviews = [] }) {
 
 function ReviewCard({ review }) {
     return (
-        <div className="w-[350px] md:w-[450px] bg-white border border-slate-200 p-8 shadow-sm shrink-0 flex flex-col justify-between group hover:border-[#1E293B] transition-colors">
+        <div className="w-[350px] md:w-[450px] bg-white border border-slate-200 p-8 shadow-sm shrink-0 flex flex-col justify-between group hover:border-[#282c3f] transition-colors">
             <div className="mb-6 border-b border-slate-100 pb-4">
                 <div className="flex items-start justify-between mb-3">
                     <div className="flex gap-1">
@@ -124,7 +124,7 @@ function ReviewCard({ review }) {
                             <Star
                                 key={i}
                                 size={14}
-                                className={i < review.rating ? 'text-[#1E293B] fill-[#1E293B]' : 'text-slate-200 fill-slate-200'}
+                                className={i < review.rating ? 'text-[#282c3f] fill-[#282c3f]' : 'text-slate-200 fill-slate-200'}
                             />
                         ))}
                     </div>
@@ -133,7 +133,7 @@ function ReviewCard({ review }) {
                     </span>
                 </div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 truncate">
-                    Purchased: <span className="text-[#1E293B]">{review.product}</span>
+                    Purchased: <span className="text-[#282c3f]">{review.product}</span>
                 </p>
             </div>
 
@@ -142,17 +142,17 @@ function ReviewCard({ review }) {
                     "{review.text}"
                 </p>
                 {review.image && (
-                    <div className="w-20 h-20 shrink-0 bg-slate-100 overflow-hidden border border-slate-200 relative group-hover:border-[#1E293B] transition-colors">
+                    <div className="w-20 h-20 shrink-0 bg-slate-100 overflow-hidden border border-slate-200 relative group-hover:border-[#282c3f] transition-colors">
                         <img src={review.image} alt="Customer review" className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all" />
                     </div>
                 )}
             </div>
 
             <div className="flex items-center gap-3">
-                <div className="size-8 bg-[#1E293B] text-white flex items-center justify-center text-xs font-black uppercase rounded-none">
+                <div className="size-8 bg-[#282c3f] text-white flex items-center justify-center text-xs font-black uppercase rounded-none">
                     {review.name.charAt(0)}
                 </div>
-                <h4 className="text-xs font-black text-[#1E293B] uppercase tracking-widest">
+                <h4 className="text-xs font-black text-[#282c3f] uppercase tracking-widest">
                     {review.name}
                 </h4>
             </div>

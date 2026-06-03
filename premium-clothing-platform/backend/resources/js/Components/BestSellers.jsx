@@ -58,12 +58,12 @@ export default function BestSellers({ products = [] }) {
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
                     <div>
                         <div className="flex items-center gap-4 mb-3">
-                            <div className="h-[1px] w-8 bg-[#1E293B]" />
-                            <span className="text-[10px] font-black tracking-[0.4em] uppercase text-[#1E293B] flex items-center gap-2">
+                            <div className="h-[1px] w-8 bg-[#282c3f]" />
+                            <span className="text-[10px] font-black tracking-[0.4em] uppercase text-[#282c3f] flex items-center gap-2">
                                 <TrendingUp size={12} strokeWidth={3} /> Top Performing Gear
                             </span>
                         </div>
-                        <h2 className="text-4xl font-black text-[#1E293B] uppercase tracking-tighter italic">
+                        <h2 className="text-4xl font-black text-[#282c3f] uppercase tracking-tighter italic">
                             Best Sellers
                         </h2>
                     </div>
@@ -74,14 +74,14 @@ export default function BestSellers({ products = [] }) {
                             <button
                                 key={category}
                                 onClick={() => setActiveTab(category)}
-                                className={`relative pb-2 text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap transition-colors ${activeTab === category ? 'text-[#1E293B]' : 'text-slate-400 hover:text-slate-600'
+                                className={`relative pb-2 text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap transition-colors ${activeTab === category ? 'text-[#282c3f]' : 'text-slate-400 hover:text-slate-600'
                                     }`}
                             >
                                 {category}
                                 {activeTab === category && (
                                     <motion.div
                                         layoutId="bestseller-tab"
-                                        className="absolute bottom-0 left-0 w-full h-[2px] bg-[#1E293B]"
+                                        className="absolute bottom-0 left-0 w-full h-[2px] bg-[#282c3f]"
                                     />
                                 )}
                             </button>
@@ -121,7 +121,7 @@ export default function BestSellers({ products = [] }) {
 
                                         {/* Badges */}
                                         <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
-                                            <span className="bg-white border border-slate-200 text-[#1E293B] text-[8px] font-black uppercase tracking-widest px-2 py-1 shadow-sm flex items-center gap-1">
+                                            <span className="bg-white border border-slate-200 text-[#282c3f] text-[8px] font-black uppercase tracking-widest px-2 py-1 shadow-sm flex items-center gap-1">
                                                 <TrendingUp size={10} /> Hot
                                             </span>
                                             {discountPrice && (
@@ -150,7 +150,7 @@ export default function BestSellers({ products = [] }) {
                                     {/* Product Details */}
                                     <div className="flex flex-col px-1">
                                         <div className="flex justify-between items-start gap-4 mb-2">
-                                            <h3 className="text-xs font-black text-[#1E293B] uppercase tracking-tight leading-snug line-clamp-2">
+                                            <h3 className="text-xs font-black text-[#282c3f] uppercase tracking-tight leading-snug line-clamp-2">
                                                 <Link href={productUrl} className="hover:text-slate-500 transition-colors">
                                                     {product.name}
                                                 </Link>
@@ -158,8 +158,8 @@ export default function BestSellers({ products = [] }) {
 
                                             {/* Rating Minimalist */}
                                             <div className="flex items-center gap-1 shrink-0 bg-slate-50 border border-slate-100 px-1.5 py-0.5">
-                                                <span className="text-[10px] font-bold text-[#1E293B]">{product.rating || 4.8}</span>
-                                                <Star size={10} className="text-[#1E293B] fill-[#1E293B]" />
+                                                <span className="text-[10px] font-bold text-[#282c3f]">{product.rating || 4.8}</span>
+                                                <Star size={10} className="text-[#282c3f] fill-[#282c3f]" />
                                             </div>
                                         </div>
 
@@ -175,7 +175,7 @@ export default function BestSellers({ products = [] }) {
                                                     <span className="text-[10px] font-bold text-slate-400 line-through decoration-slate-300">₹{price.toLocaleString('en-IN')}</span>
                                                 </>
                                             ) : (
-                                                <span className="text-sm font-black text-[#1E293B]">₹{price.toLocaleString('en-IN')}</span>
+                                                <span className="text-sm font-black text-[#282c3f]">₹{price.toLocaleString('en-IN')}</span>
                                             )}
                                         </div>
                                     </div>
@@ -187,7 +187,7 @@ export default function BestSellers({ products = [] }) {
 
                 {/* View All Best Sellers Button */}
                 <div className="mt-12 flex justify-center">
-                    <Link href="/shop?sort=bestselling" className="bg-white border border-slate-200 text-[#1E293B] px-10 py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:border-black transition-all rounded-none">
+                    <Link href="/shop?sort=bestselling" className="bg-white border border-slate-200 text-[#282c3f] px-10 py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:border-black transition-all rounded-none">
                         View All Best Sellers
                     </Link>
                 </div>

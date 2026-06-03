@@ -249,14 +249,6 @@ class StorefrontController extends Controller
         ]);
     }
 
-    public function offers()
-    {
-        return Inertia::render('Offers', [
-            'offers' => $this->activePublicOffers(),
-            'cms' => $this->storefrontSettings(),
-        ]);
-    }
-
     // ========================================================
     // 🏋️‍♂️ SPORTS WEAR CUSTOM PAGE LOGIC
     // ========================================================
@@ -386,6 +378,7 @@ class StorefrontController extends Controller
 
         $query = DB::table('store_offers')
             ->when(Schema::hasColumn('store_offers', 'is_active'), fn ($offers) => $offers->where('is_active', 1))
+            ->when(Schema::hasColumn('store_offers', 'sort_order'), fn ($offers) => $offers->orderBy('sort_order'))
             ->latest();
 
         if ($limit) {

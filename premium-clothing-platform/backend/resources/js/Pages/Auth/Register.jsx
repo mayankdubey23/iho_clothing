@@ -73,10 +73,10 @@ export default function Register() {
   };
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-[1fr_500px] xl:grid-cols-[1fr_600px] bg-white font-sans selection:bg-[#1E293B] selection:text-white">
+    <div className="grid min-h-screen lg:grid-cols-[1fr_500px] xl:grid-cols-[1fr_600px] bg-white font-sans selection:bg-[#282c3f] selection:text-white">
 
       {/* 🚀 Premium Brand Panel (Left Side - Deep Slate) */}
-      <div className="relative hidden overflow-hidden bg-[#0F172A] lg:flex lg:flex-col lg:justify-between lg:p-16 border-r border-slate-800">
+      <div className="relative hidden overflow-hidden bg-[#282c3f] lg:flex lg:flex-col lg:justify-between lg:p-16 border-r border-slate-800">
 
         {/* ❄️ Subtle Metallic Background Glow */}
         <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-white/5 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
@@ -96,20 +96,20 @@ export default function Register() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="grid size-12 place-items-center bg-white text-[#0F172A] font-black text-xs tracking-widest shadow-xl">
+          <div className="grid size-12 place-items-center bg-white text-[#282c3f] font-black text-xs tracking-widest shadow-xl">
             IHO
           </div>
           <div>
             <p className="font-black text-white text-2xl tracking-tighter uppercase leading-none italic">
               IHO<span className="font-light text-slate-400">STUDIO</span>
             </p>
-            <p className="text-[8px] font-black tracking-[0.4em] text-[#94A3B8] uppercase mt-1">Retail & Franchise Network</p>
+            <p className="text-[8px] font-black tracking-[0.4em] text-[#ff3f6c] uppercase mt-1">Retail & Franchise Network</p>
           </div>
         </motion.div>
 
         {/* Main Content */}
         <motion.div className="relative z-10" variants={stagger} initial="hidden" animate="visible">
-          <motion.p className="mb-6 text-[10px] font-black uppercase tracking-[0.4em] text-[#94A3B8]" variants={fadeUp}>
+          <motion.p className="mb-6 text-[10px] font-black uppercase tracking-[0.4em] text-[#ff3f6c]" variants={fadeUp}>
             Initiation Protocol
           </motion.p>
 
@@ -126,7 +126,7 @@ export default function Register() {
             {brandFeatures.map(({ icon: Icon, text }) => (
               <motion.li key={text} className="flex items-center gap-5 group" variants={fadeUp}>
                 <div className="grid size-12 place-items-center border border-slate-700 bg-white/5 group-hover:bg-white group-hover:border-white transition-all duration-500">
-                  <Icon size={18} className="text-slate-400 group-hover:text-[#0F172A] transition-colors duration-500" strokeWidth={1.5} />
+                  <Icon size={18} className="text-slate-400 group-hover:text-[#282c3f] transition-colors duration-500" strokeWidth={1.5} />
                 </div>
                 <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-300 group-hover:text-white transition-colors duration-500">{text}</span>
               </motion.li>
@@ -149,7 +149,7 @@ export default function Register() {
         {/* Subtle background geometric pattern */}
         <div className="absolute inset-0 z-[0] pointer-events-none opacity-[0.03]"
           style={{
-            backgroundImage: `linear-gradient(#1E293B 1px, transparent 1px), linear-gradient(90deg, #1E293B 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(#282c3f 1px, transparent 1px), linear-gradient(90deg, #282c3f 1px, transparent 1px)`,
             backgroundSize: '40px 40px'
           }}
         />
@@ -162,19 +162,19 @@ export default function Register() {
         >
           {/* Mobile Logo */}
           <Link href="/" className="mb-12 flex items-center gap-4 lg:hidden">
-            <div className="grid size-10 place-items-center bg-[#0F172A] text-white font-black text-xs tracking-widest shadow-xl">
+            <div className="grid size-10 place-items-center bg-[#282c3f] text-white font-black text-xs tracking-widest shadow-xl">
               IHO
             </div>
-            <span className="font-black text-[#1E293B] text-2xl tracking-tighter uppercase leading-none italic">
+            <span className="font-black text-[#282c3f] text-2xl tracking-tighter uppercase leading-none italic">
               STUDIO
             </span>
           </Link>
 
           <div className="mb-12">
-            <h2 className="text-3xl font-black text-[#1E293B] tracking-tighter uppercase italic border-l-4 border-black pl-4">
+            <h2 className="text-3xl font-black text-[#282c3f] tracking-tighter uppercase italic border-l-4 border-black pl-4">
               Registration
             </h2>
-            <p className="mt-3 text-[10px] font-black uppercase tracking-[0.2em] text-[#94A3B8]">
+            <p className="mt-3 text-[10px] font-black uppercase tracking-[0.2em] text-[#ff3f6c]">
               Establish your digital identity
             </p>
           </div>
@@ -182,7 +182,7 @@ export default function Register() {
           <form onSubmit={submit} className="grid gap-7">
             <FormField label="Full Name" error={errors.name}>
               <input
-                className={`w-full bg-slate-50 border ${errors.name ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} rounded-none px-5 py-3.5 focus:ring-1 focus:ring-black focus:border-black transition-all outline-none font-bold text-[#1E293B] placeholder:text-slate-300 text-sm`}
+                className={`w-full bg-slate-50 border ${errors.name ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} rounded-none px-5 py-3.5 focus:ring-1 focus:ring-black focus:border-black transition-all outline-none font-bold text-[#282c3f] placeholder:text-slate-300 text-sm`}
                 type="text"
                 name="name"
                 value={data.name}
@@ -195,7 +195,7 @@ export default function Register() {
 
             <FormField label="Email Address" error={errors.email}>
               <input
-                className={`w-full bg-slate-50 border ${errors.email ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} rounded-none px-5 py-3.5 focus:ring-1 focus:ring-black focus:border-black transition-all outline-none font-bold text-[#1E293B] placeholder:text-slate-300 text-sm`}
+                className={`w-full bg-slate-50 border ${errors.email ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} rounded-none px-5 py-3.5 focus:ring-1 focus:ring-black focus:border-black transition-all outline-none font-bold text-[#282c3f] placeholder:text-slate-300 text-sm`}
                 type="email"
                 name="email"
                 value={data.email}
@@ -208,7 +208,7 @@ export default function Register() {
 
             <FormField label="Mobile Number" error={errors.mobile_number}>
               <input
-                className={`w-full bg-slate-50 border ${errors.mobile_number ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} rounded-none px-5 py-3.5 focus:ring-1 focus:ring-black focus:border-black transition-all outline-none font-bold text-[#1E293B] placeholder:text-slate-300 text-sm tracking-widest`}
+                className={`w-full bg-slate-50 border ${errors.mobile_number ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} rounded-none px-5 py-3.5 focus:ring-1 focus:ring-black focus:border-black transition-all outline-none font-bold text-[#282c3f] placeholder:text-slate-300 text-sm tracking-widest`}
                 type="tel"
                 name="mobile_number"
                 value={data.mobile_number}
@@ -221,7 +221,7 @@ export default function Register() {
 
             <FormField label="Password" error={errors.password}>
               <input
-                className={`w-full bg-slate-50 border ${errors.password ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} rounded-none px-5 py-3.5 focus:ring-1 focus:ring-black focus:border-black transition-all outline-none font-black text-[#1E293B] placeholder:text-slate-300 tracking-[0.3em] text-sm`}
+                className={`w-full bg-slate-50 border ${errors.password ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} rounded-none px-5 py-3.5 focus:ring-1 focus:ring-black focus:border-black transition-all outline-none font-black text-[#282c3f] placeholder:text-slate-300 tracking-[0.3em] text-sm`}
                 type="password"
                 name="password"
                 value={data.password}
@@ -234,7 +234,7 @@ export default function Register() {
 
             <FormField label="Confirm Password" error={errors.password_confirmation}>
               <input
-                className={`w-full bg-slate-50 border ${errors.password_confirmation ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} rounded-none px-5 py-3.5 focus:ring-1 focus:ring-black focus:border-black transition-all outline-none font-black text-[#1E293B] placeholder:text-slate-300 tracking-[0.3em] text-sm`}
+                className={`w-full bg-slate-50 border ${errors.password_confirmation ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'} rounded-none px-5 py-3.5 focus:ring-1 focus:ring-black focus:border-black transition-all outline-none font-black text-[#282c3f] placeholder:text-slate-300 tracking-[0.3em] text-sm`}
                 type="password"
                 name="password_confirmation"
                 value={data.password_confirmation}
@@ -247,7 +247,7 @@ export default function Register() {
 
             <button
               disabled={processing}
-              className="mt-4 flex min-h-[56px] w-full items-center justify-center gap-3 rounded-none bg-[#000000] px-6 text-[10px] font-black tracking-[0.3em] uppercase text-white transition-all duration-500 hover:bg-[#1E293B] disabled:opacity-50 shadow-2xl shadow-black/10 group"
+              className="mt-4 flex min-h-[56px] w-full items-center justify-center gap-3 rounded-none bg-[#000000] px-6 text-[10px] font-black tracking-[0.3em] uppercase text-white transition-all duration-500 hover:bg-[#282c3f] disabled:opacity-50 shadow-2xl shadow-black/10 group"
               type="submit"
             >
               {processing ? 'Establishing Identity…' : 'Create Profile'}
@@ -257,9 +257,9 @@ export default function Register() {
 
           {/* 🟢 ALREADY REGISTERED */}
           <div className="mt-10 text-center">
-            <p className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8]">
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#ff3f6c]">
               Existing Client?{' '}
-              <Link href="/login" className="text-[#1E293B] hover:text-slate-500 transition-colors border-b border-[#1E293B] hover:border-slate-500 pb-0.5 ml-1">
+              <Link href="/login" className="text-[#282c3f] hover:text-slate-500 transition-colors border-b border-[#282c3f] hover:border-slate-500 pb-0.5 ml-1">
                 Authenticate Here
               </Link>
             </p>
@@ -272,16 +272,16 @@ export default function Register() {
           </div>
 
           {/* 🟢 FRANCHISE APPLICATION HIGHLIGHT BOX (Boutique Style) */}
-          <div className="mt-10 border border-slate-200 bg-slate-50/50 p-8 text-center group hover:border-[#1E293B] transition-colors duration-500">
-            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#94A3B8] mb-2">Partner Program</p>
-            <p className="text-sm font-black text-[#1E293B] uppercase tracking-wide mb-6">Operate an IHO Studio</p>
-            <Link href="/franchise/apply" className="inline-flex items-center justify-center gap-3 text-[10px] font-black tracking-[0.2em] text-[#1E293B] uppercase border border-[#1E293B] px-8 py-3.5 hover:bg-[#1E293B] hover:text-white transition-all w-full">
+          <div className="mt-10 border border-slate-200 bg-slate-50/50 p-8 text-center group hover:border-[#282c3f] transition-colors duration-500">
+            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#ff3f6c] mb-2">Partner Program</p>
+            <p className="text-sm font-black text-[#282c3f] uppercase tracking-wide mb-6">Operate an IHO Studio</p>
+            <Link href="/franchise/apply" className="inline-flex items-center justify-center gap-3 text-[10px] font-black tracking-[0.2em] text-[#282c3f] uppercase border border-[#282c3f] px-8 py-3.5 hover:bg-[#282c3f] hover:text-white transition-all w-full">
               Submit Application
             </Link>
           </div>
 
           <p className="mt-12 text-center pb-10">
-            <Link href="/" className="inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] text-[#94A3B8] hover:text-[#1E293B] transition-colors">
+            <Link href="/" className="inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] text-[#ff3f6c] hover:text-[#282c3f] transition-colors">
               <ChevronLeft size={14} strokeWidth={2.5} /> Return to Storefront
             </Link>
           </p>
@@ -293,8 +293,8 @@ export default function Register() {
         __html: `
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #ffe1e8; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #ff3f6c; }
       `}} />
     </div>
   );
@@ -304,7 +304,7 @@ export default function Register() {
 function FormField({ label, error, children }) {
   return (
     <label className="grid gap-2.5 relative">
-      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B]">{label}</span>
+      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#282c3f]">{label}</span>
       {children}
       {error && (
         <span className="absolute -bottom-5 left-0 text-[9px] font-black tracking-widest text-red-500 flex items-center gap-1.5 uppercase">

@@ -29,7 +29,7 @@ export default function FeaturedCategories({ categories = [] }) {
             <div
                 className="absolute inset-0 z-[0] pointer-events-none opacity-[0.02]"
                 style={{
-                    backgroundImage: `linear-gradient(#1E293B 1px, transparent 1px), linear-gradient(90deg, #1E293B 1px, transparent 1px)`,
+                    backgroundImage: `linear-gradient(#282c3f 1px, transparent 1px), linear-gradient(90deg, #282c3f 1px, transparent 1px)`,
                     backgroundSize: '40px 40px',
                 }}
             />
@@ -39,14 +39,14 @@ export default function FeaturedCategories({ categories = [] }) {
                     <div>
                         <div className="flex items-center gap-4 mb-3">
                             <div className="h-[1px] w-8 bg-slate-300" />
-                            <span className="text-[10px] font-black tracking-[0.4em] uppercase text-[#94A3B8]">Browse By Discipline</span>
+                            <span className="text-[10px] font-black tracking-[0.4em] uppercase text-[#ff3f6c]">Browse By Discipline</span>
                         </div>
-                        <h2 className="text-4xl md:text-5xl font-black text-[#1E293B] uppercase tracking-tighter italic leading-none">
+                        <h2 className="text-4xl md:text-5xl font-black text-[#282c3f] uppercase tracking-tighter italic leading-none">
                             The Collections
                         </h2>
                     </div>
 
-                    <Link href="/shop" className="hidden md:flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B] hover:text-slate-400 transition-colors pb-1 border-b border-[#1E293B] hover:border-slate-400">
+                    <Link href="/shop" className="hidden md:flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#282c3f] hover:text-slate-400 transition-colors pb-1 border-b border-[#282c3f] hover:border-slate-400">
                         View Complete Catalog <ArrowUpRight size={14} strokeWidth={2.5} />
                     </Link>
                 </div>
@@ -87,7 +87,7 @@ export default function FeaturedCategories({ categories = [] }) {
                                     </div>
                                 )}
 
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/90 via-[#0F172A]/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#282c3f]/90 via-[#282c3f]/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
 
                                 <div className="absolute inset-x-0 bottom-0 p-6 md:p-8 flex items-end justify-between z-10 translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-out">
                                     <div>
@@ -98,7 +98,7 @@ export default function FeaturedCategories({ categories = [] }) {
                                             {cat.name}
                                         </h3>
                                     </div>
-                                    <div className="size-10 rounded-none bg-white flex items-center justify-center text-[#1E293B] opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100 shadow-xl">
+                                    <div className="size-10 rounded-none bg-white flex items-center justify-center text-[#282c3f] opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100 shadow-xl">
                                         <ArrowUpRight size={18} strokeWidth={2.5} />
                                     </div>
                                 </div>
@@ -108,7 +108,7 @@ export default function FeaturedCategories({ categories = [] }) {
                 </motion.div>
 
                 <div className="mt-10 flex justify-center md:hidden">
-                    <Link href="/shop" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B] border border-[#1E293B] px-8 py-4 w-full justify-center">
+                    <Link href="/shop" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#282c3f] border border-[#282c3f] px-8 py-4 w-full justify-center">
                         View Complete Catalog <ArrowUpRight size={14} strokeWidth={2} />
                     </Link>
                 </div>

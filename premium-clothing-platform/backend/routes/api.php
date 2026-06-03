@@ -11,13 +11,15 @@ use App\Http\Controllers\AdminProductController;
 use App\Http\Controllers\AdminCategoryController;
 use App\Http\Controllers\AdminSkuController;
 use App\Http\Controllers\AdminInventoryController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\Api\StorefrontController; // 🚀 Added our new Mobile Storefront Controller
 use App\Models\Product;
 use App\Models\StorefrontSetting;
 use Illuminate\Support\Facades\Schema;
 
-// ============== PUBLIC ROUTES ==============
+// ============== PUBLIC API ROUTES ==============
 
-// Authentication Routes
+// 🔑 Authentication Routes (Mobile App Login/Register)
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:5,1');
@@ -26,12 +28,17 @@ Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])->m
 Route::post('/auth/mobile-otp', [AuthController::class, 'requestMobileOtp'])->middleware('throttle:5,1');
 Route::post('/auth/mobile-login', [AuthController::class, 'verifyMobileLogin'])->middleware('throttle:5,1');
 
-// Customer Routes
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
+// 🛍️ Public Store Data
 Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{product:slug}', [ProductController::class, 'show']);
+Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/franchise-plans', [FranchisePlanController::class, 'index']);
+Route::get('/franchise-plans/{franchisePlan}', [FranchisePlanController::class, 'show']);
+
+// 🎬 Mobile App Cinematic Hero Stack
+Route::get('/hero-slides', [StorefrontController::class, 'getHeroSlides']); // 🚀 Route to feed the vertical scrolling UI
+
+// 🎯 Custom Mobile Homepage / Men Section (Retained for other components)
 Route::get('/men', function () {
     $categories = [
         ['name' => 'Men T-Shirts', 'slug' => 't-shirts', 'href' => '/shop?gender=men&subcategory=t-shirts'],
@@ -68,25 +75,36 @@ Route::get('/men', function () {
         ],
     ]);
 });
-Route::get('/products/{product:slug}', [ProductController::class, 'show']);
-Route::get('/categories', [CategoryController::class, 'index']);
-Route::get('/franchise-plans', [FranchisePlanController::class, 'index']);
-Route::get('/franchise-plans/{franchisePlan}', [FranchisePlanController::class, 'show']);
 
+// ============== PROTECTED ROUTES (Requires Token from App) ==============
 Route::middleware('auth:sanctum')->group(function () {
+    // Current User Data
+    Route::get('/user', function (Request $request) {
+        return response()->json([
+            'success' => true,
+            'user' => $request->user()
+        ]);
+    });
+
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::get('/auth/login-activity', [AuthController::class, 'loginActivity']);
 
+    // Franchise Application System
     Route::get('/franchise-applications', [UserFranchiseController::class, 'index']);
     Route::post('/franchise-applications', [UserFranchiseController::class, 'store']);
     Route::get('/franchise-applications/{userFranchise}', [UserFranchiseController::class, 'show']);
 });
 
-// ============== ADMIN ROUTES ==============
+// ============== APP ADMIN ROUTES ==============
+Route::middleware(['auth:sanctum', \App\Http\Middleware\AdminMiddleware::class])->group(function () {
+    
+    // 👥 Customer Management API (For Mobile App Admin Panel)
+    Route::get('/admin/customers', [CustomerController::class, 'index']);
+    Route::get('/admin/customers/{id}', [CustomerController::class, 'show']);
+    Route::post('/admin/customers/{id}/toggle-status', [CustomerController::class, 'toggleStatus']);
 
-Route::middleware('auth:sanctum', \App\Http\Middleware\AdminMiddleware::class)->group(function () {
-    // Products Management
+    // 📦 Products Management API
     Route::get('/admin/products', [AdminProductController::class, 'index']);
     Route::post('/admin/products', [AdminProductController::class, 'store']);
     Route::get('/admin/products/{product}', [AdminProductController::class, 'show']);
@@ -94,20 +112,20 @@ Route::middleware('auth:sanctum', \App\Http\Middleware\AdminMiddleware::class)->
     Route::delete('/admin/products/{product}', [AdminProductController::class, 'destroy']);
     Route::post('/admin/products/bulk-status', [AdminProductController::class, 'bulkUpdateStatus']);
 
-    // Categories Management
+    // 🏷️ Categories Management API
     Route::get('/admin/categories', [AdminCategoryController::class, 'index']);
     Route::post('/admin/categories', [AdminCategoryController::class, 'store']);
     Route::get('/admin/categories/{category}', [AdminCategoryController::class, 'show']);
     Route::put('/admin/categories/{category}', [AdminCategoryController::class, 'update']);
     Route::delete('/admin/categories/{category}', [AdminCategoryController::class, 'destroy']);
 
-    // SKUs Management
+    // 🔖 SKUs Management API
     Route::get('/admin/products/{product}/skus', [AdminSkuController::class, 'index']);
     Route::post('/admin/products/{product}/skus', [AdminSkuController::class, 'store']);
     Route::put('/admin/products/{product}/skus/{sku}', [AdminSkuController::class, 'update']);
     Route::delete('/admin/products/{product}/skus/{sku}', [AdminSkuController::class, 'destroy']);
 
-    // Inventory Management
+    // 📊 Inventory Management API
     Route::get('/admin/skus/{sku}/inventory', [AdminInventoryController::class, 'show']);
     Route::put('/admin/skus/{sku}/inventory', [AdminInventoryController::class, 'updateStock']);
     Route::get('/admin/inventory/status', [AdminInventoryController::class, 'status']);

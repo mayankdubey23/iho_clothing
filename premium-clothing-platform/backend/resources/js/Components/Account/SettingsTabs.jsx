@@ -6,8 +6,8 @@ import { Bell, CreditCard, RefreshCcw, Download, ShieldAlert } from 'lucide-reac
 
 // 💎 THEME CLASSES
 const btnDark = "bg-[#000000] text-white px-10 py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-slate-800 transition-all disabled:opacity-50 rounded-none shadow-xl shadow-black/10";
-const btnLight = "bg-white text-[#1E293B] border border-slate-200 px-10 py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:border-black transition-all disabled:opacity-50 rounded-none";
-const sectionHeader = "text-2xl font-black text-[#1E293B] uppercase tracking-tighter italic border-b border-slate-100 pb-4 mb-8 flex items-center gap-3";
+const btnLight = "bg-white text-[#282c3f] border border-slate-200 px-10 py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:border-black transition-all disabled:opacity-50 rounded-none";
+const sectionHeader = "text-2xl font-black text-[#282c3f] uppercase tracking-tighter italic border-b border-slate-100 pb-4 mb-8 flex items-center gap-3";
 
 // 1. PROFILE DETAILS COMPONENT
 export function ProfileSettings({ user }) {
@@ -43,7 +43,7 @@ export function ProfileSettings({ user }) {
             <h3 className={sectionHeader}>Profile Identity</h3>
 
             {recentlySuccessful && (
-                <div className="bg-slate-50 border border-slate-200 text-[#1E293B] p-4 text-xs font-bold uppercase tracking-widest flex items-center gap-3">
+                <div className="bg-slate-50 border border-slate-200 text-[#282c3f] p-4 text-xs font-bold uppercase tracking-widest flex items-center gap-3">
                     <CheckCircle2 size={16} /> Profile successfully updated.
                 </div>
             )}
@@ -90,7 +90,7 @@ export function SecuritySettings() {
             <h3 className={sectionHeader}>Security & Access</h3>
 
             {recentlySuccessful && (
-                <div className="bg-slate-50 border border-slate-200 text-[#1E293B] p-4 text-xs font-bold uppercase tracking-widest flex items-center gap-3">
+                <div className="bg-slate-50 border border-slate-200 text-[#282c3f] p-4 text-xs font-bold uppercase tracking-widest flex items-center gap-3">
                     <CheckCircle2 size={16} /> Password updated securely.
                 </div>
             )}
@@ -103,7 +103,7 @@ export function SecuritySettings() {
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
                 {data.password && (
-                    <p className={`text-[9px] font-black uppercase tracking-widest ${passwordStrength === 'Strong' ? 'text-[#1E293B]' : passwordStrength === 'Medium' ? 'text-slate-400' : 'text-red-500'}`}>
+                    <p className={`text-[9px] font-black uppercase tracking-widest ${passwordStrength === 'Strong' ? 'text-[#282c3f]' : passwordStrength === 'Medium' ? 'text-slate-400' : 'text-red-500'}`}>
                         Strength: {passwordStrength} <span className="normal-case tracking-normal font-medium text-slate-400 ml-1">(Min 8 chars, 1 uppercase, 1 number, 1 special)</span>
                     </p>
                 )}
@@ -131,8 +131,8 @@ export function DeleteAccount() {
 
     return (
         <form onSubmit={submit} className="py-8 max-w-xl mx-auto text-center border border-slate-100 p-10 bg-slate-50/50">
-            <ShieldAlert size={40} className="mx-auto text-[#1E293B] mb-6" strokeWidth={1.5} />
-            <h3 className="text-2xl font-black text-[#1E293B] uppercase tracking-tighter italic mb-4">Account Deletion</h3>
+            <ShieldAlert size={40} className="mx-auto text-[#282c3f] mb-6" strokeWidth={1.5} />
+            <h3 className="text-2xl font-black text-[#282c3f] uppercase tracking-tighter italic mb-4">Account Deletion</h3>
             <p className="text-slate-500 text-sm font-medium mb-10 leading-relaxed">
                 This action is irreversible. All your order history, privileges, and studio access will be permanently erased from our servers.
             </p>
@@ -149,7 +149,7 @@ export function DeleteAccount() {
 
                 <label className="flex items-start gap-3 mt-8 cursor-pointer text-left group">
                     <input type="checkbox" checked={data.confirm_understand} onChange={e => setData('confirm_understand', e.target.checked)} className="mt-0.5 size-4 text-black border-slate-300 focus:ring-black rounded-none transition-all" required />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:text-[#1E293B] transition-colors">I acknowledge that this action is permanent.</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:text-[#282c3f] transition-colors">I acknowledge that this action is permanent.</span>
                 </label>
             </div>
 
@@ -207,7 +207,7 @@ export function AddressBook() {
     return (
         <div className="space-y-8">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-8">
-                <h3 className="text-2xl font-black text-[#1E293B] uppercase tracking-tighter italic">Address Book</h3>
+                <h3 className="text-2xl font-black text-[#282c3f] uppercase tracking-tighter italic">Address Book</h3>
                 {!isAdding && (
                     <button onClick={() => setIsAdding(true)} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] hover:text-slate-500 transition-colors">
                         <Plus size={14} strokeWidth={2.5} /> New Address
@@ -222,10 +222,10 @@ export function AddressBook() {
                         <InputField label="Mobile Number" value={data.mobile_number} onChange={e => setData('mobile_number', e.target.value.replace(/\D/g, '').slice(0, 10))} required />
 
                         <div className="space-y-2 relative">
-                            <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em]">Pincode *</label>
+                            <label className="text-[10px] font-black text-[#ff3f6c] uppercase tracking-[0.2em]">Pincode *</label>
                             <div className="relative">
-                                <input type="text" value={data.pincode} onChange={handlePincodeChange} placeholder="6-digit pincode" required className="w-full bg-white border border-slate-200 rounded-none px-4 py-3.5 focus:border-black focus:ring-1 focus:ring-black outline-none font-bold text-[#1E293B] transition-all" />
-                                {fetchingPincode && <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-[#1E293B]" size={16} />}
+                                <input type="text" value={data.pincode} onChange={handlePincodeChange} placeholder="6-digit pincode" required className="w-full bg-white border border-slate-200 rounded-none px-4 py-3.5 focus:border-black focus:ring-1 focus:ring-black outline-none font-bold text-[#282c3f] transition-all" />
+                                {fetchingPincode && <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-[#282c3f]" size={16} />}
                             </div>
                             {localErrors.pincode && <p className="text-[9px] font-black text-red-500 uppercase tracking-widest">{localErrors.pincode}</p>}
                         </div>
@@ -240,7 +240,7 @@ export function AddressBook() {
 
                     <label className="flex items-center gap-3 mb-10 cursor-pointer group w-fit">
                         <input type="checkbox" checked={data.is_default} onChange={e => setData('is_default', e.target.checked)} className="rounded-none text-black border-slate-300 focus:ring-black size-4 transition-all" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B] group-hover:text-slate-500 transition-colors">Set as Default Destination</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#282c3f] group-hover:text-slate-500 transition-colors">Set as Default Destination</span>
                     </label>
 
                     <div className="flex gap-4">
@@ -251,17 +251,17 @@ export function AddressBook() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {userAddresses.length > 0 ? userAddresses.map((addr) => (
-                        <div key={addr.id} className="border border-slate-200 p-6 relative group hover:border-[#1E293B] transition-colors bg-white">
-                            {addr.is_default && <span className="absolute top-6 right-6 text-[9px] font-black uppercase tracking-[0.3em] text-[#94A3B8]">Default</span>}
-                            <h4 className="text-sm font-black text-[#1E293B] uppercase tracking-widest mb-2">{addr.full_name}</h4>
+                        <div key={addr.id} className="border border-slate-200 p-6 relative group hover:border-[#282c3f] transition-colors bg-white">
+                            {addr.is_default && <span className="absolute top-6 right-6 text-[9px] font-black uppercase tracking-[0.3em] text-[#ff3f6c]">Default</span>}
+                            <h4 className="text-sm font-black text-[#282c3f] uppercase tracking-widest mb-2">{addr.full_name}</h4>
                             <div className="text-xs text-slate-500 leading-relaxed mb-6 font-medium">
                                 <p>{addr.house_no}, {addr.area_locality}</p>
                                 <p>{addr.city}, {addr.state} - {addr.pincode}</p>
-                                <p className="mt-2 text-[#1E293B] font-bold">T: +91 {addr.mobile_number}</p>
+                                <p className="mt-2 text-[#282c3f] font-bold">T: +91 {addr.mobile_number}</p>
                             </div>
 
                             <div className="flex gap-6 pt-4 border-t border-slate-100">
-                                <button className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-[#1E293B] transition-colors flex items-center gap-1.5"><Edit2 size={12} strokeWidth={2.5} /> Edit</button>
+                                <button className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-[#282c3f] transition-colors flex items-center gap-1.5"><Edit2 size={12} strokeWidth={2.5} /> Edit</button>
                                 <button className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-red-500 transition-colors flex items-center gap-1.5"><Trash2 size={12} strokeWidth={2.5} /> Remove</button>
                             </div>
                         </div>
@@ -302,8 +302,8 @@ export function HelpSupport() {
                         <InputField label="Order Reference (Optional)" placeholder="e.g. ORD-12345" value={data.order_id} onChange={e => setData('order_id', e.target.value)} />
                     </div>
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em]">Detailed Message *</label>
-                        <textarea rows="4" required placeholder="How can we assist you today?" value={data.message} onChange={e => setData('message', e.target.value)} className="w-full bg-white border border-slate-200 rounded-none px-4 py-3.5 focus:border-black focus:ring-1 focus:ring-black outline-none font-medium text-[#1E293B] transition-all resize-none"></textarea>
+                        <label className="text-[10px] font-black text-[#ff3f6c] uppercase tracking-[0.2em]">Detailed Message *</label>
+                        <textarea rows="4" required placeholder="How can we assist you today?" value={data.message} onChange={e => setData('message', e.target.value)} className="w-full bg-white border border-slate-200 rounded-none px-4 py-3.5 focus:border-black focus:ring-1 focus:ring-black outline-none font-medium text-[#282c3f] transition-all resize-none"></textarea>
                     </div>
                     <div>
                         <button disabled={processing} className={btnDark}>Submit Inquiry</button>
@@ -312,17 +312,17 @@ export function HelpSupport() {
             </div>
 
             <div>
-                <h4 className="text-sm font-black text-[#1E293B] uppercase tracking-widest mb-6">Case History</h4>
+                <h4 className="text-sm font-black text-[#282c3f] uppercase tracking-widest mb-6">Case History</h4>
                 <div className="space-y-4">
                     {tickets.length > 0 ? tickets.map((tkt, i) => (
                         <div key={i} className="flex flex-col md:flex-row md:items-center justify-between bg-white border border-slate-200 p-6 hover:border-black transition-colors">
                             <div>
-                                <span className="text-[9px] font-black tracking-[0.3em] text-[#94A3B8] uppercase">{tkt.id}</span>
-                                <h5 className="text-sm font-black text-[#1E293B] mt-1">{tkt.subject}</h5>
+                                <span className="text-[9px] font-black tracking-[0.3em] text-[#ff3f6c] uppercase">{tkt.id}</span>
+                                <h5 className="text-sm font-black text-[#282c3f] mt-1">{tkt.subject}</h5>
                                 <p className="text-[10px] font-bold text-slate-400 mt-2 flex items-center gap-1.5"><Clock size={12} /> {tkt.date}</p>
                             </div>
                             <div className="mt-4 md:mt-0">
-                                <span className="border border-[#1E293B] text-[#1E293B] text-[9px] px-3 py-1.5 font-black uppercase tracking-[0.2em]">
+                                <span className="border border-[#282c3f] text-[#282c3f] text-[9px] px-3 py-1.5 font-black uppercase tracking-[0.2em]">
                                     {tkt.status}
                                 </span>
                             </div>
@@ -344,10 +344,10 @@ function ToggleSwitch({ label, description, checked, onChange }) {
     return (
         <div className="flex items-start justify-between py-5 border-b border-slate-100 last:border-0 group">
             <div className="pr-6">
-                <p className="text-[11px] font-black uppercase tracking-widest text-[#1E293B]">{label}</p>
+                <p className="text-[11px] font-black uppercase tracking-widest text-[#282c3f]">{label}</p>
                 {description && <p className="text-[10px] font-medium text-slate-500 mt-1.5 leading-relaxed">{description}</p>}
             </div>
-            <button type="button" onClick={() => onChange(!checked)} className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-none border border-transparent transition-colors duration-300 ease-in-out focus:outline-none ${checked ? 'bg-[#1E293B]' : 'bg-slate-200'}`}>
+            <button type="button" onClick={() => onChange(!checked)} className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-none border border-transparent transition-colors duration-300 ease-in-out focus:outline-none ${checked ? 'bg-[#282c3f]' : 'bg-slate-200'}`}>
                 <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-none bg-white shadow-sm ring-0 transition duration-300 ease-in-out ${checked ? 'translate-x-5' : 'translate-x-0.5'} mt-0.5`} />
             </button>
         </div>
@@ -377,10 +377,10 @@ export function Notifications() {
     return (
         <form onSubmit={submit} className="space-y-8 max-w-3xl">
             <h3 className={sectionHeader}>Communications</h3>
-            {recentlySuccessful && <div className="bg-slate-50 border border-slate-200 text-[#1E293B] p-4 text-xs font-bold uppercase tracking-widest flex items-center gap-3"><CheckCircle2 size={16} /> Preferences updated.</div>}
+            {recentlySuccessful && <div className="bg-slate-50 border border-slate-200 text-[#282c3f] p-4 text-xs font-bold uppercase tracking-widest flex items-center gap-3"><CheckCircle2 size={16} /> Preferences updated.</div>}
 
             <div className="bg-white border border-slate-200 p-8">
-                <h4 className="text-[9px] font-black uppercase tracking-[0.4em] text-[#94A3B8] mb-6">Content Preferences</h4>
+                <h4 className="text-[9px] font-black uppercase tracking-[0.4em] text-[#ff3f6c] mb-6">Content Preferences</h4>
                 <ToggleSwitch label="Logistics Updates" description="Order confirmations, shipping details, and receipts." checked={data.order_updates} onChange={v => setData('order_updates', v)} />
                 <ToggleSwitch label="Delivery Tracking" description="Out for delivery alerts and real-time tracking links." checked={data.delivery_updates} onChange={v => setData('delivery_updates', v)} />
                 <ToggleSwitch label="Studio Exclusives" description="Private access, seasonal drops, and performance insights." checked={data.offer_alerts} onChange={v => setData('offer_alerts', v)} />
@@ -388,7 +388,7 @@ export function Notifications() {
             </div>
 
             <div className="bg-white border border-slate-200 p-8">
-                <h4 className="text-[9px] font-black uppercase tracking-[0.4em] text-[#94A3B8] mb-6">Delivery Channels</h4>
+                <h4 className="text-[9px] font-black uppercase tracking-[0.4em] text-[#ff3f6c] mb-6">Delivery Channels</h4>
                 <ToggleSwitch label="Email Dispatch" checked={data.email_notif} onChange={v => setData('email_notif', v)} />
                 <ToggleSwitch label="SMS Dispatch" checked={data.sms_notif} onChange={v => setData('sms_notif', v)} />
                 <ToggleSwitch label="WhatsApp Concierge" description="Direct updates to your personal WhatsApp." checked={data.whatsapp_notif} onChange={v => setData('whatsapp_notif', v)} />
@@ -412,14 +412,14 @@ export function PrivacySettings() {
             <h3 className={sectionHeader}>Privacy Controls</h3>
 
             <div className="bg-white border border-slate-200 p-8">
-                <h4 className="text-[9px] font-black uppercase tracking-[0.4em] text-[#94A3B8] mb-6">Data Utilization</h4>
+                <h4 className="text-[9px] font-black uppercase tracking-[0.4em] text-[#ff3f6c] mb-6">Data Utilization</h4>
                 <ToggleSwitch label="Marketing Consent" description="Allow tailored performance gear recommendations via email." checked={data.marketing_consent} onChange={v => setData('marketing_consent', v)} />
                 <ToggleSwitch label="Adaptive Experience" description="Permit browsing history utilization for a bespoke studio experience." checked={data.personalized_recs} onChange={v => setData('personalized_recs', v)} />
                 <ToggleSwitch label="Analytical Sharing" description="Anonymized data contribution for global athletic insights." checked={data.data_sharing} onChange={v => setData('data_sharing', v)} />
             </div>
 
             <div className="space-y-6">
-                <h4 className="text-[9px] font-black uppercase tracking-[0.4em] text-[#94A3B8]">Data Export & Wipe</h4>
+                <h4 className="text-[9px] font-black uppercase tracking-[0.4em] text-[#ff3f6c]">Data Export & Wipe</h4>
                 <div className="flex flex-col sm:flex-row gap-4">
                     <a href="/user/data/download" download className={btnLight + " flex items-center justify-center gap-3 w-full text-center"}>
                         <Download size={14} /> Export Archive (.JSON)
@@ -451,7 +451,7 @@ export function PaymentMethods() {
             <div className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {savedCards.length > 0 ? savedCards.map(card => (
-                        <div key={card.id} className="bg-gradient-to-br from-[#0F172A] to-[#1E293B] text-white p-6 relative overflow-hidden shadow-2xl">
+                        <div key={card.id} className="bg-gradient-to-br from-[#282c3f] to-[#282c3f] text-white p-6 relative overflow-hidden shadow-2xl">
                             {/* Subtle Metallic sheen */}
                             <div className="absolute top-0 right-0 w-[150%] h-full bg-gradient-to-bl from-white/10 to-transparent skew-x-12 translate-x-1/4 pointer-events-none"></div>
 
@@ -468,12 +468,12 @@ export function PaymentMethods() {
                             </div>
                         </div>
                     )) : (
-                        <div className="border border-slate-200 flex items-center justify-center p-8 text-[#94A3B8] bg-slate-50/50">
+                        <div className="border border-slate-200 flex items-center justify-center p-8 text-[#ff3f6c] bg-slate-50/50">
                             <span className="text-[10px] font-black uppercase tracking-[0.2em]">Vault is empty</span>
                         </div>
                     )}
 
-                    <button className="border border-slate-200 border-dashed flex flex-col items-center justify-center p-8 text-slate-400 hover:text-[#1E293B] hover:border-[#1E293B] hover:bg-slate-50 transition-all group">
+                    <button className="border border-slate-200 border-dashed flex flex-col items-center justify-center p-8 text-slate-400 hover:text-[#282c3f] hover:border-[#282c3f] hover:bg-slate-50 transition-all group">
                         <div className="size-10 bg-white shadow-sm border border-slate-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                             <Plus size={16} strokeWidth={2} />
                         </div>
@@ -492,13 +492,13 @@ export function Coupons() {
             <h3 className={sectionHeader}>Studio Privileges</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 {/* Minimalist Monochrome Coupon */}
-                <div className="flex items-stretch bg-white border border-slate-200 overflow-hidden shadow-sm group hover:border-[#1E293B] transition-colors">
-                    <div className="bg-[#1E293B] text-white p-6 flex flex-col justify-center items-center border-r border-dashed border-white/20">
+                <div className="flex items-stretch bg-white border border-slate-200 overflow-hidden shadow-sm group hover:border-[#282c3f] transition-colors">
+                    <div className="bg-[#282c3f] text-white p-6 flex flex-col justify-center items-center border-r border-dashed border-white/20">
                         <span className="text-3xl font-black tracking-tighter">20%</span>
                         <span className="text-[9px] font-black tracking-[0.4em] uppercase mt-1">OFF</span>
                     </div>
                     <div className="p-6 flex-1 flex flex-col justify-center">
-                        <h4 className="font-black text-[#1E293B] text-lg uppercase tracking-widest mb-1">STUDIO26</h4>
+                        <h4 className="font-black text-[#282c3f] text-lg uppercase tracking-widest mb-1">STUDIO26</h4>
                         <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-3">On orders above ₹1999.</p>
                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Exp: 31 Dec</p>
                     </div>
@@ -514,8 +514,8 @@ export function ReturnsRefunds() {
             <h3 className={sectionHeader}>Returns & Exchanges</h3>
             <div className="text-center py-24 bg-white border border-slate-100">
                 <RefreshCcw size={32} className="mx-auto text-slate-300 mb-6" strokeWidth={1} />
-                <h4 className="text-sm font-black text-[#1E293B] uppercase tracking-[0.3em] mb-3">No Active Returns</h4>
-                <p className="text-[#94A3B8] font-bold text-xs uppercase tracking-widest">Your return archive is currently empty.</p>
+                <h4 className="text-sm font-black text-[#282c3f] uppercase tracking-[0.3em] mb-3">No Active Returns</h4>
+                <p className="text-[#ff3f6c] font-bold text-xs uppercase tracking-widest">Your return archive is currently empty.</p>
             </div>
         </div>
     );
@@ -525,10 +525,10 @@ export function ReturnsRefunds() {
 function InputField({ label, type = "text", value, onChange, error, placeholder, readOnly, className, required }) {
     return (
         <div className="space-y-2 relative">
-            <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em]">{label} {required && '*'}</label>
+            <label className="text-[10px] font-black text-[#ff3f6c] uppercase tracking-[0.2em]">{label} {required && '*'}</label>
             <input
                 type={type} value={value} onChange={onChange} readOnly={readOnly} placeholder={placeholder} required={required}
-                className={`w-full bg-white border ${error ? 'border-red-500' : 'border-slate-200'} rounded-none px-4 py-3.5 focus:border-black focus:ring-1 focus:ring-black outline-none font-bold text-[#1E293B] transition-all placeholder:text-slate-300 ${className}`}
+                className={`w-full bg-white border ${error ? 'border-red-500' : 'border-slate-200'} rounded-none px-4 py-3.5 focus:border-black focus:ring-1 focus:ring-black outline-none font-bold text-[#282c3f] transition-all placeholder:text-slate-300 ${className}`}
             />
             {error && <p className="text-[9px] font-black text-red-500 uppercase tracking-widest absolute -bottom-5">{error}</p>}
         </div>
@@ -538,8 +538,8 @@ function InputField({ label, type = "text", value, onChange, error, placeholder,
 function SelectField({ label, value, onChange, options, required }) {
     return (
         <div className="space-y-2">
-            <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em]">{label} {required && '*'}</label>
-            <select value={value} onChange={onChange} required={required} className="w-full bg-white border border-slate-200 rounded-none px-4 py-3.5 focus:border-black focus:ring-1 focus:ring-black outline-none font-bold text-[#1E293B] transition-all appearance-none cursor-pointer">
+            <label className="text-[10px] font-black text-[#ff3f6c] uppercase tracking-[0.2em]">{label} {required && '*'}</label>
+            <select value={value} onChange={onChange} required={required} className="w-full bg-white border border-slate-200 rounded-none px-4 py-3.5 focus:border-black focus:ring-1 focus:ring-black outline-none font-bold text-[#282c3f] transition-all appearance-none cursor-pointer">
                 <option value="" disabled className="text-slate-400">Select an option...</option>
                 {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
             </select>

@@ -44,13 +44,13 @@ export default function StaffManagement({ tabData, roles, activeTab, stats, filt
                 {/* 🚀 HEADER & STATS */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                     <div>
-                        <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                            <ShieldCheck className="text-[#E94E3C]" size={32} /> Security & Access
+                        <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                            <ShieldCheck className="text-[#ff3f6c]" size={32} /> Security & Access
                         </h1>
                         <p className="text-gray-500 font-bold text-sm mt-1">Manage team roles, system permissions, and view audit logs.</p>
                     </div>
                     {activeTab === 'staff' && (
-                        <button onClick={() => setIsAddModalOpen(true)} className="bg-[#1A1A2E] text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-all flex items-center gap-2 shadow-lg shadow-black/10">
+                        <button onClick={() => setIsAddModalOpen(true)} className="bg-[#282c3f] text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[#ff3f6c] transition-all flex items-center gap-2 shadow-lg shadow-black/10">
                             <Plus size={18} /> Add Team Member
                         </button>
                     )}
@@ -64,10 +64,10 @@ export default function StaffManagement({ tabData, roles, activeTab, stats, filt
 
                 {/* 🚀 TAB NAVIGATION */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 mb-6 flex gap-2">
-                    <button onClick={() => switchTab('staff')} className={`flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'staff' ? 'bg-[#1A1A2E] text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>
+                    <button onClick={() => switchTab('staff')} className={`flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'staff' ? 'bg-[#282c3f] text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>
                         <Users size={16} /> Staff Directory
                     </button>
-                    <button onClick={() => switchTab('logs')} className={`flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'logs' ? 'bg-[#1A1A2E] text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>
+                    <button onClick={() => switchTab('logs')} className={`flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'logs' ? 'bg-[#282c3f] text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>
                         <Activity size={16} /> Security Audit Logs
                     </button>
                 </div>
@@ -75,7 +75,7 @@ export default function StaffManagement({ tabData, roles, activeTab, stats, filt
                 {/* 🚀 FILTERS BAR */}
                 <div className="relative mb-6">
                     <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input type="text" placeholder={`Search ${activeTab === 'staff' ? 'Staff Directory' : 'Activity Logs'}...`} value={search} onChange={e => setSearch(e.target.value)} onKeyPress={handleSearch} className="w-full bg-white shadow-sm border border-gray-100 rounded-2xl pl-12 pr-4 py-4 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none" />
+                    <input type="text" placeholder={`Search ${activeTab === 'staff' ? 'Staff Directory' : 'Activity Logs'}...`} value={search} onChange={e => setSearch(e.target.value)} onKeyPress={handleSearch} className="w-full bg-white shadow-sm border border-gray-100 rounded-2xl pl-12 pr-4 py-4 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none" />
                 </div>
 
                 {/* 🚀 DYNAMIC CONTENT TABLE */}
@@ -98,11 +98,11 @@ export default function StaffManagement({ tabData, roles, activeTab, stats, filt
                                         <tr key={member.id} className={`hover:bg-gray-50/80 transition-colors ${member.status === 'blocked' ? 'opacity-60' : ''}`}>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="size-10 bg-gray-100 rounded-xl flex items-center justify-center font-black text-[#1A1A2E] text-xs">
+                                                    <div className="size-10 bg-gray-100 rounded-xl flex items-center justify-center font-black text-[#282c3f] text-xs">
                                                         {member.name.substring(0, 2).toUpperCase()}
                                                     </div>
                                                     <div>
-                                                        <p className="font-black text-[#1A1A2E] text-sm">{member.name}</p>
+                                                        <p className="font-black text-[#282c3f] text-sm">{member.name}</p>
                                                         <p className="text-[10px] font-bold text-gray-400 mt-1">{member.email}</p>
                                                     </div>
                                                 </div>
@@ -146,11 +146,11 @@ export default function StaffManagement({ tabData, roles, activeTab, stats, filt
                                     {tabData?.data?.map((log) => (
                                         <tr key={log.id} className="hover:bg-gray-50/80 transition-colors">
                                             <td className="px-6 py-4">
-                                                <p className="font-black text-[#1A1A2E] text-sm flex items-center gap-1.5"><Clock size={14} className="text-gray-400" /> {new Date(log.created_at).toLocaleTimeString()}</p>
+                                                <p className="font-black text-[#282c3f] text-sm flex items-center gap-1.5"><Clock size={14} className="text-gray-400" /> {new Date(log.created_at).toLocaleTimeString()}</p>
                                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{new Date(log.created_at).toLocaleDateString()}</p>
                                             </td>
                                             <td className="px-6 py-4"><span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 px-2 py-1 rounded">{log.module}</span></td>
-                                            <td className="px-6 py-4 font-bold text-[#1A1A2E] text-sm">{log.staff_name}</td>
+                                            <td className="px-6 py-4 font-bold text-[#282c3f] text-sm">{log.staff_name}</td>
                                             <td className="px-6 py-4 text-xs font-bold text-gray-600">{log.action}</td>
                                         </tr>
                                     ))}
@@ -166,9 +166,9 @@ export default function StaffManagement({ tabData, roles, activeTab, stats, filt
             {/* 🚀 MODAL: ADD STAFF */}
             <AnimatePresence>
                 {isAddModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A2E]/60 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#282c3f]/60 backdrop-blur-sm">
                         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
-                            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-[#1A1A2E]">
+                            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-[#282c3f]">
                                 <h3 className="font-black text-white uppercase tracking-wider flex items-center gap-2"><ShieldCheck size={18} /> Onboard Team Member</h3>
                                 <button onClick={() => setIsAddModalOpen(false)} className="text-white/50 hover:text-white transition-colors"><X size={20} /></button>
                             </div>
@@ -179,14 +179,14 @@ export default function StaffManagement({ tabData, roles, activeTab, stats, filt
 
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Assign System Role *</label>
-                                    <select required value={data.role_id} onChange={e => setData('role_id', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none cursor-pointer">
+                                    <select required value={data.role_id} onChange={e => setData('role_id', e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none cursor-pointer">
                                         <option value="">-- Choose Role --</option>
                                         {roles.map(role => <option key={role.id} value={role.id}>{role.name}</option>)}
                                     </select>
                                     {errors.role_id && <p className="text-[10px] text-red-500 font-bold ml-1">{errors.role_id}</p>}
                                 </div>
 
-                                <button disabled={processing} type="submit" className="w-full bg-[#E94E3C] text-white py-3.5 rounded-xl font-black uppercase tracking-widest hover:bg-[#c0392b] transition-colors mt-4 shadow-xl shadow-[#E94E3C]/20 disabled:opacity-50 flex items-center justify-center gap-2">
+                                <button disabled={processing} type="submit" className="w-full bg-[#ff3f6c] text-white py-3.5 rounded-xl font-black uppercase tracking-widest hover:bg-[#c0392b] transition-colors mt-4 shadow-xl shadow-[#ff3f6c]/20 disabled:opacity-50 flex items-center justify-center gap-2">
                                     {processing ? 'Creating User...' : 'Create Account'} <Key size={16} />
                                 </button>
                             </form>
@@ -205,7 +205,7 @@ function StatCard({ title, value, icon: Icon, color }) {
         <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
             <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">{title}</p>
-                <h4 className="text-3xl font-black text-[#1A1A2E]">{value}</h4>
+                <h4 className="text-3xl font-black text-[#282c3f]">{value}</h4>
             </div>
             <div className={`size-14 rounded-2xl flex items-center justify-center bg-gray-50 ${color}`}><Icon size={24} strokeWidth={2.5} /></div>
         </div>
@@ -216,7 +216,7 @@ function InputField({ label, error, ...props }) {
     return (
         <div className="space-y-1.5">
             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{label}</label>
-            <input className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none transition-all" required {...props} />
+            <input className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none transition-all" required {...props} />
             {error && <p className="text-[10px] text-red-500 font-bold ml-1">{error}</p>}
         </div>
     );
@@ -224,6 +224,6 @@ function InputField({ label, error, ...props }) {
 
 function EmptyState({ icon: Icon, text }) {
     return (
-        <tr><td colSpan="4" className="px-6 py-16 text-center"><Icon size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} /><p className="text-[#1A1A2E] font-black text-lg">{text}</p></td></tr>
+        <tr><td colSpan="4" className="px-6 py-16 text-center"><Icon size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} /><p className="text-[#282c3f] font-black text-lg">{text}</p></td></tr>
     );
 }

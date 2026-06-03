@@ -238,8 +238,15 @@ class ProductController extends Controller
             ->unique()
             ->values();
 
+        $formattedSizes = $availableSizes->map(fn ($size) => [
+            'id' => $size,
+            'name' => $size,
+            'code' => $size,
+        ]);
+
         $productData = $product->toArray();
-        $productData['available_sizes'] = $availableSizes->map(fn ($size) => ['id' => $size, 'code' => $size]);
+        $productData['available_sizes'] = $formattedSizes;
+        $productData['sizes'] = $formattedSizes;
         $productData['available_colors'] = $availableColors->map(fn ($color) => ['id' => $color, 'name' => $color]);
         $productData['image_path'] = $this->normalizeStoragePath($product->images->firstWhere('is_primary', true)->image_path ?? $product->image_path);
         $productData['price'] = $product->base_price;
@@ -259,6 +266,8 @@ class ProductController extends Controller
 
         $reviewCount = $product->reviews->count();
         $avgRating = $reviewCount > 0 ? round($product->reviews->avg('rating'), 1) : 0;
+        $productData['reviews_count'] = $reviewCount;
+        $productData['rating'] = $avgRating;
         $ratingBreakdown = collect([5, 4, 3, 2, 1])->mapWithKeys(function ($rating) use ($product) {
             return [$rating => $product->reviews->where('rating', $rating)->count()];
         });

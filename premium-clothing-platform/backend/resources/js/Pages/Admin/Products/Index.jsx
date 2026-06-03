@@ -24,11 +24,11 @@ export default function ProductIndex({ products, categories, filters }) {
                 {/* 🚀 HEADER */}
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
                     <div>
-                        <h1 className="text-4xl font-black text-[#1A1A2E] tracking-tighter uppercase">Master Catalog</h1>
+                        <h1 className="text-4xl font-black text-[#282c3f] tracking-tighter uppercase">Master Catalog</h1>
                         <p className="text-gray-500 font-bold mt-1">Manage your sportswear range, pricing and variants.</p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Link href="/franchise-superadmin/products/create" className="bg-[#1A1A2E] text-white px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-all shadow-xl shadow-black/10 flex items-center gap-2">
+                        <Link href="/franchise-superadmin/products/create" className="bg-[#282c3f] text-white px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[#ff3f6c] transition-all shadow-xl shadow-black/10 flex items-center gap-2">
                             <Plus size={18} /> Add New Product
                         </Link>
                     </div>
@@ -42,10 +42,10 @@ export default function ProductIndex({ products, categories, filters }) {
                             type="text" placeholder="Search by name, SKU or fabric..."
                             value={search} onChange={e => setSearch(e.target.value)}
                             onKeyPress={e => e.key === 'Enter' && router.get('/franchise-superadmin/products', { search }, { preserveState: true })}
-                            className="w-full bg-white border-2 border-gray-100 rounded-2xl pl-12 pr-4 py-4 font-bold text-[#1A1A2E] focus:border-[#E94E3C] outline-none transition-all shadow-sm"
+                            className="w-full bg-white border-2 border-gray-100 rounded-2xl pl-12 pr-4 py-4 font-bold text-[#282c3f] focus:border-[#ff3f6c] outline-none transition-all shadow-sm"
                         />
                     </div>
-                    <select className="bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 font-bold text-gray-500 focus:border-[#E94E3C] outline-none shadow-sm cursor-pointer">
+                    <select className="bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 font-bold text-gray-500 focus:border-[#ff3f6c] outline-none shadow-sm cursor-pointer">
                         <option value="">All Categories</option>
                         {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
                     </select>
@@ -63,7 +63,7 @@ export default function ProductIndex({ products, categories, filters }) {
                             {/* Badges */}
                             <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
                                 {product.is_featured && <span className="bg-yellow-400 text-white p-2 rounded-xl shadow-lg"><Star size={14} fill="currentColor" /></span>}
-                                {product.is_best_seller && <span className="bg-[#E94E3C] text-white p-2 rounded-xl shadow-lg"><TrendingUp size={14} /></span>}
+                                {product.is_best_seller && <span className="bg-[#ff3f6c] text-white p-2 rounded-xl shadow-lg"><TrendingUp size={14} /></span>}
                             </div>
 
                             {/* 🚀 FIXED Image Container */}
@@ -76,13 +76,13 @@ export default function ProductIndex({ products, categories, filters }) {
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                                     <div className="flex gap-2 w-full">
-                                        <Link href={`/franchise-superadmin/products/${product.id}/edit`} className="flex-1 bg-white text-[#1A1A2E] py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest text-center hover:bg-[#E94E3C] hover:text-white transition-colors">Edit</Link>
+                                        <Link href={`/franchise-superadmin/products/${product.id}/edit`} className="flex-1 bg-white text-[#282c3f] py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest text-center hover:bg-[#ff3f6c] hover:text-white transition-colors">Edit</Link>
                                         <button
                                             type="button"
                                             onClick={() => setPreviewProduct(product)}
                                             title="View product details"
                                             aria-label={`View ${product.name}`}
-                                            className="bg-white/20 backdrop-blur-md text-white p-2.5 rounded-xl hover:bg-white hover:text-[#1A1A2E] transition-all"
+                                            className="bg-white/20 backdrop-blur-md text-white p-2.5 rounded-xl hover:bg-white hover:text-[#282c3f] transition-all"
                                         >
                                             <Eye size={18} />
                                         </button>
@@ -93,10 +93,10 @@ export default function ProductIndex({ products, categories, filters }) {
                             {/* Content Area */}
                             <div className="p-5 flex flex-col flex-1">
                                 <div className="flex justify-between items-start mb-2">
-                                    <p className="text-[10px] font-black text-[#E94E3C] uppercase tracking-[0.2em]">{product.category?.name}</p>
+                                    <p className="text-[10px] font-black text-[#ff3f6c] uppercase tracking-[0.2em]">{product.category?.name}</p>
                                     <p className="text-[10px] font-bold text-gray-400">SKU: {product.sku}</p>
                                 </div>
-                                <h3 className="font-black text-[#1A1A2E] text-lg leading-tight mb-4 group-hover:text-[#E94E3C] transition-colors">{product.name}</h3>
+                                <h3 className="font-black text-[#282c3f] text-lg leading-tight mb-4 group-hover:text-[#ff3f6c] transition-colors">{product.name}</h3>
 
                                 {/* Pricing Row - Wrapped in mt-auto taaki hamesha neeche rahe */}
                                 <div className="mt-auto">
@@ -104,7 +104,7 @@ export default function ProductIndex({ products, categories, filters }) {
                                         <div>
                                             <p className="text-[9px] font-black text-gray-400 uppercase mb-1 tracking-widest">Selling Price</p>
                                             {/* Number() lagaya hai taaki string pe toLocaleString crash na kare */}
-                                            <p className="text-xl font-black text-[#1A1A2E]">₹{(Number(product.selling_price) || 0).toLocaleString()}</p>
+                                            <p className="text-xl font-black text-[#282c3f]">₹{(Number(product.selling_price) || 0).toLocaleString()}</p>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-[9px] font-black text-gray-400 uppercase mb-1 tracking-widest">MRP</p>
@@ -116,18 +116,18 @@ export default function ProductIndex({ products, categories, filters }) {
                                     <div className="flex items-center justify-between px-1">
                                         <div className="flex items-center gap-2">
                                             <div className={`size-2 rounded-full ${product.total_stock > 10 ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                                            <span className="text-[10px] font-black text-[#1A1A2E] uppercase">{product.total_stock || 0} In Stock</span>
+                                            <span className="text-[10px] font-black text-[#282c3f] uppercase">{product.total_stock || 0} In Stock</span>
                                         </div>
                                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{product.variants?.length || 0} Variants</span>
                                     </div>
                                     <div className="mt-4 grid grid-cols-2 gap-2">
-                                        <Link href={`/franchise-superadmin/products/${product.id}/edit`} className="bg-[#1A1A2E] px-3 py-3 text-center text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-[#E94E3C]">
+                                        <Link href={`/franchise-superadmin/products/${product.id}/edit`} className="bg-[#282c3f] px-3 py-3 text-center text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-[#ff3f6c]">
                                             Edit Stock
                                         </Link>
                                         <button
                                             type="button"
                                             onClick={() => toggleStatus(product.id)}
-                                            className="border border-slate-200 px-3 py-3 text-[10px] font-black uppercase tracking-widest text-[#1A1A2E] transition-colors hover:border-[#1A1A2E]"
+                                            className="border border-slate-200 px-3 py-3 text-[10px] font-black uppercase tracking-widest text-[#282c3f] transition-colors hover:border-[#282c3f]"
                                         >
                                             {product.status === 'active' ? 'Hide' : 'Show'}
                                         </button>
@@ -143,19 +143,19 @@ export default function ProductIndex({ products, categories, filters }) {
                     {products.links.map((link, i) => (
                         <Link
                             key={i} href={link.url || '#'} dangerouslySetInnerHTML={{ __html: link.label }}
-                            className={`mx-1 px-4 py-2 rounded-xl font-black text-xs transition-all ${link.active ? 'bg-[#1A1A2E] text-white' : 'bg-white text-gray-400 hover:bg-gray-100'}`}
+                            className={`mx-1 px-4 py-2 rounded-xl font-black text-xs transition-all ${link.active ? 'bg-[#282c3f] text-white' : 'bg-white text-gray-400 hover:bg-gray-100'}`}
                         />
                     ))}
                 </div>
             </div>
 
             {previewProduct && (
-                <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#0F172A]/80 p-4 backdrop-blur-md" onClick={() => setPreviewProduct(null)}>
+                <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#282c3f]/80 p-4 backdrop-blur-md" onClick={() => setPreviewProduct(null)}>
                     <div className="w-full max-w-3xl overflow-hidden bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
                             <div>
                                 <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">Product Preview</p>
-                                <h2 className="text-xl font-black uppercase tracking-tight text-[#1E293B]">{previewProduct.name}</h2>
+                                <h2 className="text-xl font-black uppercase tracking-tight text-[#282c3f]">{previewProduct.name}</h2>
                             </div>
                             <button type="button" onClick={() => setPreviewProduct(null)} className="grid size-10 place-items-center bg-slate-50 text-slate-500 hover:bg-slate-100">
                                 <X size={18} />
@@ -174,8 +174,8 @@ export default function ProductIndex({ products, categories, filters }) {
 
                             <div className="p-8">
                                 <div className="mb-6">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-[#94A3B8]">{previewProduct.category?.name || 'Uncategorized'}</p>
-                                    <h3 className="mt-3 text-3xl font-black leading-tight text-[#1E293B]">{previewProduct.name}</h3>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-[#ff3f6c]">{previewProduct.category?.name || 'Uncategorized'}</p>
+                                    <h3 className="mt-3 text-3xl font-black leading-tight text-[#282c3f]">{previewProduct.name}</h3>
                                     <p className="mt-2 text-xs font-bold uppercase tracking-widest text-slate-400">SKU: {previewProduct.sku}</p>
                                 </div>
 
@@ -187,7 +187,7 @@ export default function ProductIndex({ products, categories, filters }) {
                                 </div>
 
                                 <div className="flex gap-3">
-                                    <Link href={`/franchise-superadmin/products/${previewProduct.id}/edit`} className="flex-1 bg-black px-5 py-4 text-center text-[10px] font-black uppercase tracking-[0.3em] text-white hover:bg-[#1E293B]">
+                                    <Link href={`/franchise-superadmin/products/${previewProduct.id}/edit`} className="flex-1 bg-black px-5 py-4 text-center text-[10px] font-black uppercase tracking-[0.3em] text-white hover:bg-[#282c3f]">
                                         Edit Product
                                     </Link>
                                     <button
@@ -196,7 +196,7 @@ export default function ProductIndex({ products, categories, filters }) {
                                             toggleStatus(previewProduct.id);
                                             setPreviewProduct(null);
                                         }}
-                                        className="px-5 py-4 border border-slate-200 text-[10px] font-black uppercase tracking-[0.2em] text-[#1E293B] hover:border-black"
+                                        className="px-5 py-4 border border-slate-200 text-[10px] font-black uppercase tracking-[0.2em] text-[#282c3f] hover:border-black"
                                     >
                                         {previewProduct.status === 'active' ? 'Hide' : 'Show'}
                                     </button>
@@ -214,7 +214,7 @@ function InfoCard({ label, value }) {
     return (
         <div className="bg-slate-50 p-4">
             <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{label}</p>
-            <p className="mt-1 text-lg font-black text-[#1E293B]">{value}</p>
+            <p className="mt-1 text-lg font-black text-[#282c3f]">{value}</p>
         </div>
     );
 }

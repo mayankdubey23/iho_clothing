@@ -5,9 +5,10 @@ import { motion } from 'framer-motion';
 import {
     ArrowRight,
     BadgePercent,
+    CheckCircle2,
+    Copy,
     Heart,
     PackageCheck,
-    Search,
     ShieldCheck,
     ShoppingBag,
     Sparkles,
@@ -27,13 +28,14 @@ const fallbackCms = {
     home_hero_subtitle: 'Fresh sportswear, streetwear, and daily essentials with a clean Myntra-inspired shopping experience.',
     home_hero_cta_text: 'Shop Now',
     home_hero_cta_link: '/shop',
-    home_hero_secondary_text: 'View Offers',
-    home_hero_secondary_link: '/offers',
+    home_hero_secondary_text: 'Shop Deals',
+    home_hero_secondary_link: '/shop?discount=40',
     home_sale_title: '50-80% OFF',
     home_sale_subtitle: 'On latest active storefront picks',
     home_coupon_text: 'Use code IHOSTYLE for extra savings at checkout',
     home_hidden_sections: '',
     home_section_order: 'hero,promo,categories,best,new,gym,offers,reviews,trust,franchise',
+    home_product_section_count: '4',
     home_category_offers_json: '',
     home_categories_title: 'Shop By Category',
     home_categories_subtitle: 'Browse curated edits for every training, travel, and weekend plan.',
@@ -114,6 +116,24 @@ function parseJsonList(raw, fallback) {
     }
 }
 
+function fillProductSection(primary, fallback, count = 4) {
+    const selected = [];
+    const seen = new Set();
+
+    [...asList(primary), ...asList(fallback)].forEach((product) => {
+        if (!product || seen.has(product.id) || selected.length >= count) return;
+        seen.add(product.id);
+        selected.push(product);
+    });
+
+    return selected;
+}
+
+function settingNumber(value, fallback) {
+    const parsed = Number.parseInt(value, 10);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
 function StorefrontImage({ src, alt, className = '', children }) {
     if (!src) {
         return (
@@ -149,109 +169,49 @@ function SectionHeader({ eyebrow, title, subtitle, action, dark = false }) {
 }
 
 function Hero({ cms, categories, products, banners = [] }) {
-    const [searchQuery, setSearchQuery] = useState('');
     const heroBanner = banners.find((banner) => banner.placement_type === 'main_hero_slider') || banners[0];
     const heroMedia = heroBanner?.desktop_image || mediaUrl(cms.home_hero_media) || products.find((product) => product.image)?.image;
-    const categoryLinks = categories.slice(0, 6);
-    const normalizedSearch = searchQuery.trim().toLowerCase();
-    const searchSuggestions = normalizedSearch
-        ? products
-            .filter((product) => `${product.name || ''} ${product.category_name || product.category || ''}`.toLowerCase().includes(normalizedSearch))
-            .slice(0, 5)
-        : [];
-
-    const submitSearch = (event) => {
-        event.preventDefault();
-        const query = searchQuery.trim();
-        if (!query) return;
-
-        router.get('/shop', { search: query });
-    };
 
     return (
-        <section className="bg-[#f5f5f6]">
-            <div className="border-y border-slate-100 bg-[#ff3f6c] px-4 py-2 text-center text-[10px] font-black uppercase tracking-[0.24em] text-white sm:text-xs">
+        <section className="bg-[#f5f5f6] lg:flex lg:h-[calc(100dvh-5rem)] lg:flex-col lg:overflow-hidden">
+            <div className="shrink-0 border-y border-slate-100 bg-[#ff3f6c] px-4 py-1.5 text-center text-[10px] font-black uppercase tracking-[0.24em] text-white sm:text-xs">
                 {cms.home_top_strip}
             </div>
 
-            <div className="mx-auto max-w-[1500px] px-4 pb-8 pt-5 sm:px-6 lg:px-10">
-                <div className="mb-5 grid gap-3 lg:grid-cols-[1fr_520px_1fr]">
-                    <form onSubmit={submitSearch} className="relative flex items-center gap-2 bg-white px-4 py-3 shadow-sm sm:px-5 sm:py-4">
-                        <Search size={18} className="shrink-0 text-slate-300" />
-                        <input
-                            type="search"
-                            value={searchQuery}
-                            onChange={(event) => setSearchQuery(event.target.value)}
-                            placeholder="Search for tees, joggers, shoes and more"
-                            className="min-w-0 flex-1 border-none bg-transparent p-0 text-xs font-black uppercase tracking-[0.16em] text-[#282c3f] outline-none placeholder:text-slate-400 focus:ring-0 sm:tracking-widest"
-                        />
-                        <button type="submit" className="shrink-0 text-[10px] font-black uppercase tracking-widest text-[#ff3f6c]">
-                            Go
-                        </button>
-                        {searchSuggestions.length > 0 && (
-                            <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-40 border border-slate-100 bg-white p-2 shadow-2xl">
-                                {searchSuggestions.map((product) => (
-                                    <Link
-                                        key={product.id}
-                                        href={product.slug ? `/product/${product.slug}` : `/shop?search=${encodeURIComponent(product.name || searchQuery)}`}
-                                        className="grid grid-cols-[48px_1fr] items-center gap-3 p-2 transition hover:bg-[#fff0f4]"
-                                    >
-                                        <StorefrontImage src={product.image} alt={product.name} className="aspect-square bg-slate-100" />
-                                        <div className="min-w-0">
-                                            <p className="truncate text-xs font-black uppercase text-[#282c3f]">{product.name}</p>
-                                            <p className="mt-1 truncate text-[10px] font-bold uppercase tracking-widest text-slate-400">{product.category_name || product.category || 'IHO Studio'}</p>
-                                        </div>
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
-                    </form>
-                    <div className="flex flex-wrap items-center justify-center gap-2 bg-white px-4 py-3 shadow-sm">
-                        {categoryLinks.map((category) => (
-                            <Link key={category.slug} href={`/shop?category=${category.slug}`} className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-[#282c3f] hover:text-[#ff3f6c]">
-                                {category.name}
-                            </Link>
-                        ))}
-                    </div>
-                    <div className="hidden items-center justify-end gap-3 bg-white px-5 py-4 text-[10px] font-black uppercase tracking-widest text-[#282c3f] shadow-sm lg:flex">
-                        <Truck size={16} className="text-[#14b8a6]" />
-                        Express Dispatch
-                    </div>
-                </div>
-
+            <div className="mx-auto flex w-full max-w-[1500px] flex-1 flex-col px-4 py-4 sm:px-6 lg:min-h-0 lg:px-10">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.55 }}
-                    className="grid overflow-hidden bg-white shadow-sm lg:grid-cols-[1fr_0.92fr]"
+                    className="grid flex-1 overflow-hidden bg-white shadow-sm lg:min-h-0 lg:grid-cols-[1fr_0.92fr]"
                 >
-                    <div className="flex min-h-[430px] flex-col justify-center bg-gradient-to-br from-[#fff0f4] via-white to-[#fff6df] p-6 sm:p-10 lg:p-14">
-                        <div className="mb-5 inline-flex w-fit items-center gap-2 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-[#ff3f6c] shadow-sm">
+                    <div className="flex min-h-[340px] flex-col justify-center bg-gradient-to-br from-[#fff0f4] via-white to-[#fff6df] p-6 sm:min-h-[390px] sm:p-8 lg:h-full lg:min-h-0 lg:p-10">
+                        <div className="mb-4 inline-flex w-fit items-center gap-2 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-[#ff3f6c] shadow-sm">
                             <Zap size={14} />
                             {cms.home_hero_badge}
                         </div>
-                        <h1 className="max-w-3xl text-5xl font-black uppercase leading-[0.95] tracking-tight text-[#282c3f] sm:text-7xl lg:text-8xl">
+                        <h1 className="max-w-3xl text-[clamp(2.75rem,6vw,5.6rem)] font-black uppercase leading-[0.92] tracking-tight text-[#282c3f]">
                             {cms.home_hero_title}
                         </h1>
-                        <p className="mt-5 max-w-xl text-sm font-semibold leading-7 text-slate-600 sm:text-base">
+                        <p className="mt-3 max-w-xl text-sm font-semibold leading-6 text-slate-600 sm:text-base">
                             {cms.home_hero_subtitle}
                         </p>
-                        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                             <Link href={cms.home_hero_cta_link || '/shop'} className="inline-flex min-h-12 items-center justify-center gap-2 bg-[#ff3f6c] px-7 text-xs font-black uppercase tracking-widest text-white transition hover:bg-[#282c3f]">
                                 {cms.home_hero_cta_text}
                                 <ArrowRight size={16} />
                             </Link>
-                            <Link href={(cms.home_hero_secondary_link || '/offers') === '/shop?offers=1' ? '/offers' : (cms.home_hero_secondary_link || '/offers')} className="inline-flex min-h-12 items-center justify-center border border-[#282c3f]/15 bg-white px-7 text-xs font-black uppercase tracking-widest text-[#282c3f] transition hover:border-[#ff3f6c] hover:text-[#ff3f6c]">
+                            <Link href={(cms.home_hero_secondary_link || '/shop?discount=40').startsWith('/offers') ? '/shop?discount=40' : (cms.home_hero_secondary_link || '/shop?discount=40')} className="inline-flex min-h-12 items-center justify-center border border-[#282c3f]/15 bg-white px-7 text-xs font-black uppercase tracking-widest text-[#282c3f] transition hover:border-[#ff3f6c] hover:text-[#ff3f6c]">
                                 {cms.home_hero_secondary_text}
                             </Link>
                         </div>
                     </div>
 
                     {heroBanner ? (
-                        <Link href={heroBanner.target_url || '/shop'} className="group relative min-h-[360px] overflow-hidden bg-slate-100 lg:min-h-[560px]">
+                        <Link href={heroBanner.target_url || '/shop'} className="group relative min-h-[340px] overflow-hidden bg-slate-100 sm:min-h-[390px] lg:h-full lg:min-h-0">
                             <picture>
                                 <source media="(max-width: 767px)" srcSet={heroBanner.mobile_image || heroBanner.desktop_image} />
-                                <img src={heroMedia} alt={heroBanner.title || cms.home_hero_title} className="h-full min-h-[360px] w-full object-cover transition duration-700 group-hover:scale-105 lg:min-h-[560px]" />
+                                <img src={heroMedia} alt={heroBanner.title || cms.home_hero_title} className="h-full min-h-[340px] w-full object-cover transition duration-700 group-hover:scale-105 sm:min-h-[390px] lg:min-h-0" />
                             </picture>
                             <div className="absolute inset-x-5 bottom-5 bg-white/92 p-5 shadow-xl backdrop-blur">
                                 <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#ff3f6c]">{cms.home_sale_title}</p>
@@ -259,7 +219,7 @@ function Hero({ cms, categories, products, banners = [] }) {
                             </div>
                         </Link>
                     ) : (
-                        <StorefrontImage src={heroMedia} alt={cms.home_hero_media_alt || cms.home_hero_title} className="group min-h-[360px] lg:min-h-[560px]">
+                        <StorefrontImage src={heroMedia} alt={cms.home_hero_media_alt || cms.home_hero_title} className="group min-h-[340px] sm:min-h-[390px] lg:h-full lg:min-h-0">
                             <div className="absolute inset-x-5 bottom-5 bg-white/92 p-5 shadow-xl backdrop-blur">
                                 <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#ff3f6c]">{cms.home_sale_title}</p>
                                 <p className="mt-1 text-xl font-black uppercase text-[#282c3f]">{cms.home_sale_subtitle}</p>
@@ -513,7 +473,9 @@ function ProductCard({ product, onAddedToBag }) {
     );
 }
 
-function ProductRail({ eyebrow, title, subtitle, products, href = '/shop', soft = false, onAddedToBag }) {
+function ProductRail({ eyebrow, title, subtitle, products, href = '/shop', soft = false, productCount = 4, onAddedToBag }) {
+    const visibleProducts = products.slice(0, productCount);
+
     return (
         <motion.section {...sectionMotion} className={soft ? 'bg-[#f5f5f6]' : 'bg-white'}>
             <div className="mx-auto max-w-[1500px] px-4 py-10 sm:px-6 lg:px-10">
@@ -523,9 +485,9 @@ function ProductRail({ eyebrow, title, subtitle, products, href = '/shop', soft 
                     subtitle={subtitle}
                     action={<Link href={href} className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.24em] text-[#ff3f6c]">View All <ArrowRight size={14} /></Link>}
                 />
-                {products.length ? (
-                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
-                        {products.map((product) => <ProductCard key={product.id} product={product} onAddedToBag={onAddedToBag} />)}
+                {visibleProducts.length ? (
+                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                        {visibleProducts.map((product) => <ProductCard key={product.id} product={product} onAddedToBag={onAddedToBag} />)}
                     </div>
                 ) : (
                     <EmptySection message="No active products are assigned to this section yet." />
@@ -536,33 +498,86 @@ function ProductRail({ eyebrow, title, subtitle, products, href = '/shop', soft 
 }
 
 function Offers({ offers, cms }) {
+    const [copiedCode, setCopiedCode] = useState(null);
+    const activeOffers = Array.isArray(offers) ? offers : [];
+    const featureOffer = activeOffers.find((offer) => offer.display_type === 'hero_banner') || activeOffers[0] || null;
+    const sideOffers = activeOffers.filter((offer) => offer !== featureOffer).slice(0, 3);
+    const featureCode = featureOffer?.offer_code || featureOffer?.code;
+    const featureImage = mediaUrl(featureOffer?.bg_image || featureOffer?.image || featureOffer?.image_path) || mediaUrl(cms.home_offers_media);
+    const shopHref = featureOffer?.target_url || featureOffer?.href || '/shop?discount=40';
+
+    const copyCode = (code) => {
+        if (!code) return;
+        navigator.clipboard?.writeText(code);
+        setCopiedCode(code);
+        window.setTimeout(() => setCopiedCode(null), 1800);
+    };
+
     return (
-        <motion.section {...sectionMotion} className="bg-[#282c3f] text-white">
+        <motion.section {...sectionMotion} className="bg-white">
             <div className="mx-auto max-w-[1500px] px-4 py-10 sm:px-6 lg:px-10">
                 <SectionHeader
-                    eyebrow="Coupons"
+                    eyebrow="Store Offer"
                     title={cms.home_offers_title}
                     subtitle={cms.home_offers_subtitle}
-                    dark
-                    action={<Link href="/offers" className="text-[10px] font-black uppercase tracking-[0.24em] text-white/70 hover:text-white">Shop Offers</Link>}
+                    action={<Link href="/shop?discount=40" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.24em] text-[#ff3f6c]">Shop Deals <ArrowRight size={14} /></Link>}
                 />
-                <div className="mb-5 border border-white/10 bg-white/10 p-5 text-center text-xs font-black uppercase tracking-[0.22em] text-white">
-                    {cms.home_coupon_text}
-                </div>
-                {offers.length ? (
-                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                        {offers.map((offer) => (
-                            <div key={offer.id || offer.code || offer.title} className="bg-white p-5 text-[#282c3f]">
-                                <BadgePercent className="mb-6 text-[#ff3f6c]" size={24} />
-                                <h3 className="min-h-14 text-lg font-black uppercase leading-tight">{offer.title}</h3>
-                                <p className="mt-4 inline-flex border border-dashed border-[#ff3f6c] px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#ff3f6c]">
-                                    {offer.code || 'SHOP NOW'}
-                                </p>
+                {featureOffer ? (
+                    <div className="grid overflow-hidden bg-[#282c3f] text-white shadow-sm lg:grid-cols-[1.35fr_0.85fr]">
+                        <Link href={shopHref} className="group relative flex min-h-[360px] flex-col justify-end overflow-hidden p-6 sm:p-10 lg:min-h-[460px]">
+                            {featureImage ? (
+                                <img src={featureImage} alt={featureOffer.title || cms.home_offers_title} className="absolute inset-0 h-full w-full object-cover opacity-55 transition duration-700 group-hover:scale-105" />
+                            ) : (
+                                <div className="absolute inset-0 bg-gradient-to-br from-[#ff3f6c] via-[#ff905a] to-[#282c3f]" />
+                            )}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+                            <div className="relative max-w-3xl">
+                                <span className="inline-flex items-center gap-2 bg-white px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.26em] text-[#282c3f]">
+                                    <BadgePercent size={13} /> Limited Time
+                                </span>
+                                <h2 className="mt-4 text-4xl font-black uppercase italic leading-none tracking-tight sm:text-6xl">
+                                    {featureOffer.title}
+                                </h2>
+                                {(featureOffer.subtitle || cms.home_coupon_text) && (
+                                    <p className="mt-4 max-w-xl text-sm font-bold uppercase leading-7 tracking-widest text-white/75">
+                                        {featureOffer.subtitle || cms.home_coupon_text}
+                                    </p>
+                                )}
+                                <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+                                    <span className="inline-flex min-h-12 items-center justify-center bg-[#ff3f6c] px-7 text-xs font-black uppercase tracking-widest text-white transition group-hover:bg-white group-hover:text-[#282c3f]">
+                                        Shop Offer <ArrowRight className="ml-2" size={16} />
+                                    </span>
+                                    {featureCode && (
+                                        <button type="button" onClick={(event) => { event.preventDefault(); copyCode(featureCode); }} className="inline-flex min-h-12 items-center justify-center gap-3 border border-white/30 bg-black/25 px-5 text-xs font-black uppercase tracking-widest text-white backdrop-blur transition hover:border-white hover:bg-white hover:text-[#282c3f]">
+                                            {featureCode}
+                                            {copiedCode === featureCode ? <CheckCircle2 size={15} /> : <Copy size={15} />}
+                                        </button>
+                                    )}
+                                </div>
                             </div>
-                        ))}
+                        </Link>
+
+                        <div className="grid gap-px bg-white/10 p-px">
+                            {(sideOffers.length ? sideOffers : activeOffers.slice(0, 3)).map((offer) => {
+                                const code = offer.offer_code || offer.code;
+                                return (
+                                    <div key={offer.id || code || offer.title} className="flex flex-col justify-center bg-[#282c3f] p-6">
+                                        <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[#ff905a]">Extra Deal</p>
+                                        <h3 className="mt-2 text-xl font-black uppercase leading-tight">{offer.title}</h3>
+                                        {offer.subtitle && <p className="mt-2 text-xs font-semibold uppercase leading-6 tracking-widest text-white/60">{offer.subtitle}</p>}
+                                        {code && (
+                                            <button type="button" onClick={() => copyCode(code)} className="mt-5 inline-flex w-fit items-center gap-3 border border-dashed border-white/30 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white transition hover:border-[#ff3f6c] hover:text-[#ff905a]">
+                                                {code}
+                                                {copiedCode === code ? <CheckCircle2 size={14} /> : <Copy size={14} />}
+                                            </button>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 ) : (
-                    <EmptySection dark message="No active offers are published right now." />
+                    <EmptySection message="No active offers are published right now." />
                 )}
             </div>
         </motion.section>
@@ -708,12 +723,15 @@ export default function Storefront({
         .filter(Boolean)
         .reduce((map, id, index) => ({ ...map, [id]: index }), {});
 
+    const homeProductCount = settingNumber(content.home_product_section_count, 4);
+
     const rails = useMemo(() => [
         {
             eyebrow: 'Limited Time',
             title: content.home_best_sellers_title,
             subtitle: content.home_best_sellers_subtitle,
-            products: bestSellersList.length ? bestSellersList : allProductsList.slice(0, 12),
+            products: fillProductSection(bestSellersList, allProductsList, homeProductCount),
+            productCount: homeProductCount,
             href: '/shop?sort=popular',
             soft: true,
         },
@@ -721,18 +739,20 @@ export default function Storefront({
             eyebrow: 'Fresh Finds',
             title: content.home_new_arrivals_title,
             subtitle: content.home_new_arrivals_subtitle,
-            products: newArrivalsList,
+            products: fillProductSection(newArrivalsList, allProductsList, homeProductCount),
+            productCount: homeProductCount,
             href: '/shop?sort=newest',
         },
         {
             eyebrow: 'Workout Ready',
             title: content.home_gym_title,
             subtitle: content.home_gym_subtitle,
-            products: gymProductsList,
+            products: fillProductSection(gymProductsList, allProductsList, homeProductCount),
+            productCount: homeProductCount,
             href: '/shop?category=gym-wear',
             soft: true,
         },
-    ], [allProductsList, bestSellersList, content, gymProductsList, newArrivalsList]);
+    ], [allProductsList, bestSellersList, content.home_best_sellers_subtitle, content.home_best_sellers_title, content.home_gym_subtitle, content.home_gym_title, content.home_new_arrivals_subtitle, content.home_new_arrivals_title, gymProductsList, homeProductCount, newArrivalsList]);
 
     const sections = [
         { id: 'hero', node: <Hero cms={content} categories={categoryList} products={allProductsList} banners={bannerList} /> },

@@ -51,8 +51,8 @@ export default function Profile({ user, profile, bank, pendingRequest }) {
                 {/* 🚀 HEADER */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
                     <div>
-                        <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                            <Store className="text-[#E94E3C]" size={32} /> Business Profile
+                        <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                            <Store className="text-[#ff3f6c]" size={32} /> Business Profile
                         </h1>
                         <p className="text-gray-500 font-bold text-sm mt-1">Manage your franchise identity, legal details, and bank information.</p>
                     </div>
@@ -76,8 +76,8 @@ export default function Profile({ user, profile, bank, pendingRequest }) {
                     {/* 🚀 PART 1: GENERAL INFORMATION (INSTANT) */}
                     <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden h-max">
                         <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                            <h3 className="font-black text-[#1A1A2E] uppercase tracking-widest text-sm flex items-center gap-2">
-                                <User size={18} className="text-[#E94E3C]" /> General Details
+                            <h3 className="font-black text-[#282c3f] uppercase tracking-widest text-sm flex items-center gap-2">
+                                <User size={18} className="text-[#ff3f6c]" /> General Details
                             </h3>
                             <span className="bg-green-100 text-green-700 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded">Instant Update</span>
                         </div>
@@ -94,7 +94,7 @@ export default function Profile({ user, profile, bank, pendingRequest }) {
                                 </div>
                                 <div className="flex-1">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 block">Brand Logo</label>
-                                    <input type="file" onChange={e => generalForm.setData('logo', e.target.files[0])} accept="image/*" className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:uppercase file:bg-gray-100 file:text-[#1A1A2E] hover:file:bg-gray-200 cursor-pointer" />
+                                    <input type="file" onChange={e => generalForm.setData('logo', e.target.files[0])} accept="image/*" className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:uppercase file:bg-gray-100 file:text-[#282c3f] hover:file:bg-gray-200 cursor-pointer" />
                                 </div>
                             </div>
 
@@ -110,7 +110,7 @@ export default function Profile({ user, profile, bank, pendingRequest }) {
                                 <InputField label="WhatsApp Number" icon={Phone} form={generalForm} field="whatsapp_number" maxLength="10" />
                             </div>
 
-                            <button disabled={generalForm.processing} type="submit" className="w-full bg-[#1A1A2E] text-white py-3.5 rounded-xl font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-colors mt-4 flex items-center justify-center gap-2">
+                            <button disabled={generalForm.processing} type="submit" className="w-full bg-[#282c3f] text-white py-3.5 rounded-xl font-black uppercase tracking-widest hover:bg-[#ff3f6c] transition-colors mt-4 flex items-center justify-center gap-2">
                                 {generalForm.processing ? 'Saving...' : 'Save General Details'} <Save size={16} />
                             </button>
                         </form>
@@ -122,14 +122,14 @@ export default function Profile({ user, profile, bank, pendingRequest }) {
                             <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 flex items-center justify-center">
                                 <div className="bg-white p-6 rounded-2xl shadow-xl text-center border border-gray-100 max-w-sm">
                                     <ShieldCheck size={40} className="text-orange-500 mx-auto mb-3" />
-                                    <h4 className="font-black text-[#1A1A2E] uppercase">Form Locked</h4>
+                                    <h4 className="font-black text-[#282c3f] uppercase">Form Locked</h4>
                                     <p className="text-xs font-bold text-gray-500 mt-2">You cannot make new changes while a previous request is still pending approval.</p>
                                 </div>
                             </div>
                         )}
 
                         <div className="p-6 border-b border-gray-100 bg-indigo-50/30 flex justify-between items-center">
-                            <h3 className="font-black text-[#1A1A2E] uppercase tracking-widest text-sm flex items-center gap-2">
+                            <h3 className="font-black text-[#282c3f] uppercase tracking-widest text-sm flex items-center gap-2">
                                 <ShieldCheck size={18} className="text-indigo-600" /> Legal & Financials
                             </h3>
                             <span className="bg-orange-100 text-orange-700 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded">Needs Admin Approval</span>
@@ -193,7 +193,7 @@ function InputField({ label, icon: Icon, form, field, type = "text", placeholder
                 onChange={e => form.setData(field, e.target.value)}
                 placeholder={placeholder}
                 maxLength={maxLength}
-                className={`w-full bg-gray-50 border ${form.errors[field] ? 'border-red-500' : 'border-gray-200'} rounded-xl px-4 py-2.5 font-bold text-[#1A1A2E] text-sm focus:ring-2 focus:ring-[#E94E3C] outline-none transition-all ${className}`}
+                className={`w-full bg-gray-50 border ${form.errors[field] ? 'border-red-500' : 'border-gray-200'} rounded-xl px-4 py-2.5 font-bold text-[#282c3f] text-sm focus:ring-2 focus:ring-[#ff3f6c] outline-none transition-all ${className}`}
             />
             {form.errors[field] && <p className="text-[9px] font-black text-red-500 uppercase tracking-widest mt-1">{form.errors[field]}</p>}
         </div>

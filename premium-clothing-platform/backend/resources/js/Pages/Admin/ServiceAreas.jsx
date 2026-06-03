@@ -39,12 +39,12 @@ export default function ServiceAreas({ areas, franchises, stats, filters }) {
                 {/* 🚀 HEADER & STATS */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                     <div>
-                        <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                            <Map className="text-[#E94E3C]" /> Routing & Coverage
+                        <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                            <Map className="text-[#ff3f6c]" /> Routing & Coverage
                         </h1>
                         <p className="text-gray-500 font-bold text-sm mt-1">Map pincodes to franchises for automatic order routing.</p>
                     </div>
-                    <button onClick={() => setIsAssignModalOpen(true)} className="bg-[#1A1A2E] text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-all flex items-center gap-2 shadow-lg shadow-black/10">
+                    <button onClick={() => setIsAssignModalOpen(true)} className="bg-[#282c3f] text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[#ff3f6c] transition-all flex items-center gap-2 shadow-lg shadow-black/10">
                         <Plus size={18} /> Assign New Zone
                     </button>
                 </div>
@@ -60,7 +60,7 @@ export default function ServiceAreas({ areas, franchises, stats, filters }) {
                 <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 mb-6 flex items-center gap-4">
                     <div className="flex-1 relative">
                         <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input type="text" placeholder="Search by Pincode, City or Franchise Name..." value={search} onChange={e => setSearch(e.target.value)} onKeyPress={e => e.key === 'Enter' && router.get('/franchise-superadmin/service-areas', { search })} className="w-full bg-gray-50 border-none rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none" />
+                        <input type="text" placeholder="Search by Pincode, City or Franchise Name..." value={search} onChange={e => setSearch(e.target.value)} onKeyPress={e => e.key === 'Enter' && router.get('/franchise-superadmin/service-areas', { search })} className="w-full bg-gray-50 border-none rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none" />
                     </div>
                 </div>
 
@@ -81,16 +81,16 @@ export default function ServiceAreas({ areas, franchises, stats, filters }) {
                                 {areas?.data?.length > 0 ? areas.data.map((area) => (
                                     <tr key={area.id} className="hover:bg-gray-50/80 transition-colors group">
                                         <td className="px-6 py-4">
-                                            <span className="bg-[#1A1A2E] text-white px-3 py-1.5 rounded-lg text-sm font-black tracking-widest shadow-md">
+                                            <span className="bg-[#282c3f] text-white px-3 py-1.5 rounded-lg text-sm font-black tracking-widest shadow-md">
                                                 {area.pincode}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <p className="font-black text-[#1A1A2E] text-sm flex items-center gap-1.5"><MapPin size={14} className="text-[#E94E3C]" /> {area.city}</p>
+                                            <p className="font-black text-[#282c3f] text-sm flex items-center gap-1.5"><MapPin size={14} className="text-[#ff3f6c]" /> {area.city}</p>
                                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 ml-5">{area.state}</p>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <p className="font-bold text-[#1A1A2E] text-sm flex items-center gap-1.5"><Store size={14} className="text-blue-500" /> {area.franchise_name}</p>
+                                            <p className="font-bold text-[#282c3f] text-sm flex items-center gap-1.5"><Store size={14} className="text-blue-500" /> {area.franchise_name}</p>
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`text-[10px] border px-3 py-1.5 rounded-md font-black tracking-wider uppercase inline-flex items-center gap-1 shadow-sm ${area.status === 'active' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
@@ -110,7 +110,7 @@ export default function ServiceAreas({ areas, franchises, stats, filters }) {
                                         </td>
                                     </tr>
                                 )) : (
-                                    <tr><td colSpan="5" className="px-6 py-16 text-center"><Map size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} /><p className="text-[#1A1A2E] font-black text-lg">No Service Areas Mapped</p></td></tr>
+                                    <tr><td colSpan="5" className="px-6 py-16 text-center"><Map size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} /><p className="text-[#282c3f] font-black text-lg">No Service Areas Mapped</p></td></tr>
                                 )}
                             </tbody>
                         </table>
@@ -122,9 +122,9 @@ export default function ServiceAreas({ areas, franchises, stats, filters }) {
             {/* 🚀 MODAL: ASSIGN NEW ZONE */}
             <AnimatePresence>
                 {isAssignModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A2E]/60 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#282c3f]/60 backdrop-blur-sm">
                         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
-                            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-[#1A1A2E]">
+                            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-[#282c3f]">
                                 <h3 className="font-black text-white uppercase tracking-wider flex items-center gap-2"><MapPin size={18} /> Assign Pincode Routing</h3>
                                 <button onClick={() => setIsAssignModalOpen(false)} className="text-white/50 hover:text-white transition-colors"><X size={20} /></button>
                             </div>
@@ -134,7 +134,7 @@ export default function ServiceAreas({ areas, franchises, stats, filters }) {
                                 <InputField label="City *" value={data.city} onChange={e => setData('city', e.target.value)} error={errors.city} placeholder="e.g. Mumbai" />
                                 <InputField label="Pincode (Zone ID) *" value={data.pincode} onChange={e => setData('pincode', e.target.value)} error={errors.pincode} placeholder="e.g. 400001" type="number" />
 
-                                <button disabled={processing} type="submit" className="w-full bg-[#E94E3C] text-white py-3.5 rounded-xl font-black uppercase tracking-widest hover:bg-[#c0392b] transition-colors mt-4 shadow-xl shadow-[#E94E3C]/20 disabled:opacity-50">
+                                <button disabled={processing} type="submit" className="w-full bg-[#ff3f6c] text-white py-3.5 rounded-xl font-black uppercase tracking-widest hover:bg-[#c0392b] transition-colors mt-4 shadow-xl shadow-[#ff3f6c]/20 disabled:opacity-50">
                                     {processing ? 'Mapping Route...' : 'Lock Service Area'}
                                 </button>
                             </form>
@@ -146,7 +146,7 @@ export default function ServiceAreas({ areas, franchises, stats, filters }) {
             {/* 🚀 MODAL: TRANSFER ZONE */}
             <AnimatePresence>
                 {transferModal.open && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A2E]/60 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#282c3f]/60 backdrop-blur-sm">
                         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
                             <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-indigo-600">
                                 <h3 className="font-black text-white uppercase tracking-wider flex items-center gap-2"><ArrowRightLeft size={18} /> Transfer Zone</h3>
@@ -180,7 +180,7 @@ function StatCard({ title, value, icon: Icon, color, alert }) {
         <div className={`bg-white p-5 rounded-3xl border ${alert ? 'border-orange-200 shadow-orange-500/10' : 'border-gray-100 shadow-black/5'} shadow-sm flex items-center justify-between`}>
             <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{title}</p>
-                <h4 className="text-2xl font-black text-[#1A1A2E]">{value?.toLocaleString() || 0}</h4>
+                <h4 className="text-2xl font-black text-[#282c3f]">{value?.toLocaleString() || 0}</h4>
             </div>
             <div className={`size-12 rounded-2xl flex items-center justify-center ${alert ? 'bg-orange-50' : 'bg-gray-50'} ${color}`}><Icon size={20} strokeWidth={2.5} /></div>
         </div>
@@ -192,12 +192,12 @@ function InputField({ label, isSelect, options, error, ...props }) {
         <div className="space-y-1.5">
             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{label}</label>
             {isSelect ? (
-                <select required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none cursor-pointer" {...props}>
+                <select required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none cursor-pointer" {...props}>
                     <option value="">-- Choose Option --</option>
                     {options?.map(opt => <option key={opt.id} value={opt.id}>{opt.name} ({opt.city})</option>)}
                 </select>
             ) : (
-                <input required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none" {...props} />
+                <input required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none" {...props} />
             )}
             {error && <p className="text-[10px] text-red-500 font-bold ml-1">{error}</p>}
         </div>

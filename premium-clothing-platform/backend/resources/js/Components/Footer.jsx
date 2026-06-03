@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { ArrowRight, CreditCard, Headphones, RotateCcw, ShieldCheck, Truck } from 'lucide-react';
+import { ArrowRight, CreditCard } from 'lucide-react';
 import { FaInstagram, FaTwitter, FaFacebookF, FaYoutube } from 'react-icons/fa';
 
 const defaultLinkGroups = [
@@ -27,13 +27,6 @@ const defaultLinkGroups = [
     ] },
 ];
 
-const defaultTrustBadges = [
-    { icon: 'truck', title: 'Fast Shipping', desc: 'Quick dispatch network' },
-    { icon: 'shield', title: 'Secure Payments', desc: 'UPI, cards and wallets' },
-    { icon: 'returns', title: 'Easy Returns', desc: 'Simple exchange support' },
-    { icon: 'support', title: 'Customer Support', desc: 'Help for every order' },
-];
-
 const defaultSocialLinks = [
     { icon: 'instagram', label: 'Instagram', href: '#' },
     { icon: 'twitter', label: 'Twitter', href: '#' },
@@ -49,13 +42,6 @@ const defaultBottomLinks = [
     { label: 'Terms', href: '/terms' },
 ];
 
-const badgeIconMap = {
-    truck: Truck,
-    shield: ShieldCheck,
-    returns: RotateCcw,
-    support: Headphones,
-};
-
 const socialIconMap = {
     instagram: FaInstagram,
     twitter: FaTwitter,
@@ -70,50 +56,45 @@ export default function Footer() {
     const brandName = site.site_brand_name || 'IHO STUDIO';
     const aboutText = site.footer_about_text || 'IHO Studio brings activewear, streetwear, and daily essentials into one clean fashion storefront with fresh drops, secure checkout, and quick dispatch.';
     const linkGroups = parseJsonList(site.footer_link_groups_json, defaultLinkGroups);
-    const trustBadges = parseJsonList(site.footer_trust_badges_json, defaultTrustBadges);
     const socialLinks = parseJsonList(site.footer_social_links_json, defaultSocialLinks);
     const paymentMethods = parseJsonList(site.footer_payment_methods_json, ['VISA', 'MASTER', 'UPI', 'COD']);
-    const bottomLinks = parseJsonList(site.footer_bottom_links_json, defaultBottomLinks);
+    const bottomLinks = parseJsonList(site.footer_bottom_links_json, defaultBottomLinks).slice(0, 5);
     const copyright = site.footer_copyright || `Copyright ${new Date().getFullYear()} ${brandName}. ALL RIGHTS RESERVED.`;
+    const adText = site.footer_ad_text || '';
+    const adCta = site.footer_ad_cta || 'Shop Deals';
+    const adHref = site.footer_ad_href || '/shop?discount=40';
 
     return (
-        <footer className="relative overflow-hidden bg-[#282c3f] pb-10 pt-20 text-white">
-            <div className="pointer-events-none absolute right-0 top-0 h-[500px] w-[500px] -translate-y-1/2 translate-x-1/2 rounded-full bg-slate-800/20 blur-[120px]" />
+        <footer className="bg-[#282c3f] text-white">
+            {adText && (
+                <Link href={adHref} className="block border-y border-white/10 bg-[#ff3f6c] px-4 py-3 text-white transition hover:bg-[#282c3f]">
+                    <div className="mx-auto flex max-w-7xl flex-col justify-between gap-2 sm:flex-row sm:items-center">
+                        <span className="text-[11px] font-black uppercase tracking-[0.22em]">{adText}</span>
+                        <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em]">
+                            {adCta} <ArrowRight size={14} />
+                        </span>
+                    </div>
+                </Link>
+            )}
 
-            <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
-                <div className="mb-20 grid grid-cols-1 gap-16 lg:grid-cols-12">
-                    <div className="space-y-8 lg:col-span-5">
+            <div className="mx-auto max-w-7xl px-6 py-6 lg:px-8">
+                <div className="grid gap-6 lg:grid-cols-[1.2fr_2fr_0.9fr] lg:items-start">
+                    <div>
                         <Link href="/" className="group flex items-center gap-3">
-                            <div className="grid size-10 place-items-center overflow-hidden bg-white text-xs font-black tracking-widest text-[#0F172A]">
+                            <div className="grid size-9 place-items-center overflow-hidden bg-white text-[10px] font-black tracking-widest text-[#282c3f]">
                                 {logoUrl ? <img src={logoUrl} alt={brandName} className="h-full w-full object-contain p-1" /> : logoMark}
                             </div>
-                            <span className="text-2xl font-black uppercase italic tracking-tighter">{brandName}</span>
+                            <span className="text-xl font-black uppercase italic tracking-tighter">{brandName}</span>
                         </Link>
-                        <p className="max-w-sm text-sm font-medium leading-relaxed text-[#c9ccd8]">{aboutText}</p>
-
-                        <div className="pt-4">
-                            <h3 className="mb-6 text-[10px] font-black uppercase tracking-[0.3em] text-white">
-                                {site.footer_newsletter_title || 'Get Style Updates'}
-                            </h3>
-                            <div className="group flex max-w-md items-center border-b border-slate-700 pb-3 transition-all focus-within:border-white">
-                                <input
-                                    type="email"
-                                    placeholder={site.footer_newsletter_placeholder || 'Enter your email for early access'}
-                                    className="w-full border-none bg-transparent px-0 text-xs font-bold uppercase tracking-widest outline-none placeholder:text-slate-600 focus:ring-0"
-                                />
-                                <button className="ml-4 text-slate-500 transition-colors hover:text-white" type="button">
-                                    <ArrowRight size={20} strokeWidth={2.5} />
-                                </button>
-                            </div>
-                        </div>
+                        <p className="mt-3 max-w-sm text-xs font-semibold leading-5 text-slate-400">{aboutText}</p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-12 sm:grid-cols-3 lg:col-span-7">
+                    <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
                         {linkGroups.map((group, index) => (
                             <div key={`${group.title}-${index}`} className={index === 2 ? 'col-span-2 sm:col-span-1' : ''}>
-                                <h4 className="mb-8 text-[10px] font-black uppercase tracking-[0.3em] text-[#94A3B8]">{group.title}</h4>
-                                <ul className="flex flex-col gap-4 text-[11px] font-bold uppercase tracking-widest text-slate-400">
-                                    {(group.links || []).map((link) => (
+                                <h4 className="mb-3 text-[10px] font-black uppercase tracking-[0.24em] text-[#ff905a]">{group.title}</h4>
+                                <ul className="flex flex-col gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                                    {(group.links || []).slice(0, 4).map((link) => (
                                         <li key={`${group.title}-${link.href}-${link.label}`}>
                                             <Link href={link.href || '/'} className={`transition-colors hover:text-white ${link.highlight ? 'italic text-white' : ''}`}>
                                                 {link.label}
@@ -124,46 +105,23 @@ export default function Footer() {
                             </div>
                         ))}
                     </div>
-                </div>
 
-                <div className="mb-12 grid grid-cols-2 gap-8 border-y border-slate-800/50 py-12 md:grid-cols-4">
-                    {trustBadges.map((badge, index) => (
-                        <FooterBadge
-                            key={`${badge.title}-${index}`}
-                            icon={badgeIconMap[badge.icon] || Truck}
-                            title={badge.title}
-                            desc={badge.desc}
-                        />
-                    ))}
-                </div>
-
-                <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
-                    <div className="flex flex-col items-center gap-4 md:items-start">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600">{copyright}</p>
-                        <div className="flex flex-wrap justify-center gap-6 text-slate-500">
-                            {bottomLinks.map((link) => (
-                                <Link key={`${link.href}-${link.label}`} href={link.href || '/'} className="text-[9px] font-bold uppercase tracking-widest transition-colors hover:text-white">
-                                    {link.label}
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col items-center gap-6 md:items-end">
-                        <div className="flex gap-8">
-                            {socialLinks.map((social) => {
+                    <div className="flex flex-col gap-4 lg:items-end">
+                        <div className="flex gap-5">
+                            {socialLinks.slice(0, 4).map((social) => {
                                 const Icon = socialIconMap[social.icon] || FaInstagram;
 
                                 return (
-                                    <a key={`${social.icon}-${social.href}`} href={social.href || '#'} className="text-slate-400 transition-all hover:-translate-y-1 hover:text-white" aria-label={social.label || social.icon}>
-                                        <Icon size={18} />
+                                    <a key={`${social.icon}-${social.href}`} href={social.href || '#'} className="text-slate-400 transition hover:text-white" aria-label={social.label || social.icon}>
+                                        <Icon size={16} />
                                     </a>
                                 );
                             })}
                         </div>
-                        <div className="flex flex-wrap justify-center gap-2 md:justify-end">
-                            {paymentMethods.map((method) => (
-                                <span key={method} className="inline-flex items-center gap-1 border border-white/10 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-slate-400">
+
+                        <div className="flex flex-wrap gap-2 lg:justify-end">
+                            {paymentMethods.slice(0, 4).map((method) => (
+                                <span key={method} className="inline-flex items-center gap-1 border border-white/10 px-2.5 py-1 text-[8px] font-black uppercase tracking-widest text-slate-400">
                                     <CreditCard size={12} />
                                     {method}
                                 </span>
@@ -171,22 +129,19 @@ export default function Footer() {
                         </div>
                     </div>
                 </div>
+
+                <div className="mt-5 flex flex-col justify-between gap-3 border-t border-white/10 pt-4 text-slate-500 sm:flex-row sm:items-center">
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em]">{copyright}</p>
+                    <div className="flex flex-wrap gap-4">
+                        {bottomLinks.map((link) => (
+                            <Link key={`${link.href}-${link.label}`} href={link.href || '/'} className="text-[8px] font-bold uppercase tracking-widest transition-colors hover:text-white">
+                                {link.label}
+                            </Link>
+                        ))}
+                    </div>
+                </div>
             </div>
         </footer>
-    );
-}
-
-function FooterBadge({ icon: Icon, title, desc }) {
-    return (
-        <div className="group flex items-center gap-4">
-            <div className="flex size-10 items-center justify-center rounded-full border border-slate-800 text-slate-500 transition-all duration-500 group-hover:border-white group-hover:text-white">
-                <Icon size={18} strokeWidth={1.5} />
-            </div>
-            <div>
-                <h5 className="text-[10px] font-black uppercase tracking-widest text-white">{title}</h5>
-                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500">{desc}</p>
-            </div>
-        </div>
     );
 }
 

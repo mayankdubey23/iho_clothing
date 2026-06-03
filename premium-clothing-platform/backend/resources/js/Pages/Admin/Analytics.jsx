@@ -57,17 +57,17 @@ export default function Analytics({ stats, chartData, tableData, franchises, fil
                 {/* 🚀 HEADER & EXPORT */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                     <div>
-                        <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                            <BarChart3 className="text-[#E94E3C]" /> Business Intelligence
+                        <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                            <BarChart3 className="text-[#ff3f6c]" /> Business Intelligence
                         </h1>
                         <p className="text-gray-500 font-bold text-sm mt-1">Comprehensive reports for sales, products, and franchises.</p>
                     </div>
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                        <select value={exportFormat} onChange={(e) => setExportFormat(e.target.value)} className="bg-white border-2 border-gray-200 text-[#1A1A2E] px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-[#E94E3C] outline-none">
+                        <select value={exportFormat} onChange={(e) => setExportFormat(e.target.value)} className="bg-white border-2 border-gray-200 text-[#282c3f] px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-[#ff3f6c] outline-none">
                             <option value="csv">CSV</option>
                             <option value="pdf">PDF</option>
                         </select>
-                        <button onClick={exportReport} className="bg-white border-2 border-gray-200 text-[#1A1A2E] px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:border-[#1A1A2E] hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
+                        <button onClick={exportReport} className="bg-white border-2 border-gray-200 text-[#282c3f] px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:border-[#282c3f] hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
                             <Download size={16} /> Export Report
                         </button>
                     </div>
@@ -78,7 +78,7 @@ export default function Analytics({ stats, chartData, tableData, franchises, fil
                     {/* Report Type Selector */}
                     <div className="space-y-1">
                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Report Dimension</label>
-                        <select value={reportType} onChange={(e) => { setReportType(e.target.value); applyFilters('report_type', e.target.value); }} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none cursor-pointer">
+                        <select value={reportType} onChange={(e) => { setReportType(e.target.value); applyFilters('report_type', e.target.value); }} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none cursor-pointer">
                             <option value="sales">Overall Sales Report</option>
                             <option value="products">Product Performance</option>
                             <option value="franchises">Franchise Performance</option>
@@ -89,7 +89,7 @@ export default function Analytics({ stats, chartData, tableData, franchises, fil
                     {/* Date Range Selector */}
                     <div className="space-y-1">
                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Time Period</label>
-                        <select value={dateRange} onChange={(e) => { setDateRange(e.target.value); applyFilters('date_range', e.target.value); }} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none cursor-pointer">
+                        <select value={dateRange} onChange={(e) => { setDateRange(e.target.value); applyFilters('date_range', e.target.value); }} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none cursor-pointer">
                             <option value="today">Today</option>
                             <option value="yesterday">Yesterday</option>
                             <option value="last_7_days">Last 7 Days</option>
@@ -102,7 +102,7 @@ export default function Analytics({ stats, chartData, tableData, franchises, fil
                     {/* Franchise Filter */}
                     <div className="space-y-1">
                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Filter by Franchise</label>
-                        <select value={franchiseId} onChange={(e) => { setFranchiseId(e.target.value); applyFilters('franchise_id', e.target.value); }} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none cursor-pointer">
+                        <select value={franchiseId} onChange={(e) => { setFranchiseId(e.target.value); applyFilters('franchise_id', e.target.value); }} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none cursor-pointer">
                             <option value="all">Entire Network</option>
                             {franchises.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
                         </select>
@@ -127,26 +127,26 @@ export default function Analytics({ stats, chartData, tableData, franchises, fil
 
                 {/* 🚀 REVENUE TREND CHART */}
                 <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 mb-8">
-                    <h2 className="text-sm font-black uppercase tracking-widest text-[#1A1A2E] mb-6 flex items-center gap-2">
-                        <TrendingUp size={16} className="text-[#E94E3C]" /> Revenue Trend Analysis
+                    <h2 className="text-sm font-black uppercase tracking-widest text-[#282c3f] mb-6 flex items-center gap-2">
+                        <TrendingUp size={16} className="text-[#ff3f6c]" /> Revenue Trend Analysis
                     </h2>
                     <div className="h-80 w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={formattedChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                                 <defs>
                                     <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#E94E3C" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#E94E3C" stopOpacity={0} />
+                                        <stop offset="5%" stopColor="#ff3f6c" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#ff3f6c" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis dataKey="displayDate" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 700 }} dy={10} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 700 }} tickFormatter={(value) => `₹${value / 1000}k`} />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#fff0f4" />
+                                <XAxis dataKey="displayDate" axisLine={false} tickLine={false} tick={{ fill: '#ff3f6c', fontSize: 12, fontWeight: 700 }} dy={10} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#ff3f6c', fontSize: 12, fontWeight: 700 }} tickFormatter={(value) => `₹${value / 1000}k`} />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: '#1A1A2E', borderRadius: '12px', border: 'none', color: '#fff', fontWeight: 'bold' }}
+                                    contentStyle={{ backgroundColor: '#282c3f', borderRadius: '12px', border: 'none', color: '#fff', fontWeight: 'bold' }}
                                     formatter={(value) => [`₹${value.toLocaleString()}`, 'Revenue']}
                                 />
-                                <Area type="monotone" dataKey="revenue" stroke="#E94E3C" strokeWidth={4} fillOpacity={1} fill="url(#colorRevenue)" />
+                                <Area type="monotone" dataKey="revenue" stroke="#ff3f6c" strokeWidth={4} fillOpacity={1} fill="url(#colorRevenue)" />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
@@ -155,7 +155,7 @@ export default function Analytics({ stats, chartData, tableData, franchises, fil
                 {/* 🚀 DYNAMIC DATA TABLE (Changes based on Report Type) */}
                 <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
-                        <h3 className="font-black text-[#1A1A2E] uppercase tracking-wider">Detailed Data Breakdown</h3>
+                        <h3 className="font-black text-[#282c3f] uppercase tracking-wider">Detailed Data Breakdown</h3>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
@@ -192,29 +192,29 @@ export default function Analytics({ stats, chartData, tableData, franchises, fil
                                         {reportType === 'products' ? (
                                             <>
                                                 <td className="px-6 py-4">
-                                                    <p className="font-black text-[#1A1A2E] text-sm">{row.name}</p>
+                                                    <p className="font-black text-[#282c3f] text-sm">{row.name}</p>
                                                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{row.sku}</p>
                                                 </td>
                                                 <td className="px-6 py-4 text-center font-black text-blue-600">{row.sold_qty} Units</td>
-                                                <td className="px-6 py-4 text-right font-black text-[#1A1A2E]">₹{Number(row.total_revenue).toLocaleString()}</td>
+                                                <td className="px-6 py-4 text-right font-black text-[#282c3f]">₹{Number(row.total_revenue).toLocaleString()}</td>
                                             </>
                                         ) : reportType === 'franchises' ? (
                                             <>
-                                                <td className="px-6 py-4 font-black text-[#1A1A2E] text-sm flex items-center gap-2"><Store size={14} className="text-[#E94E3C]" /> {row.franchise_name}</td>
+                                                <td className="px-6 py-4 font-black text-[#282c3f] text-sm flex items-center gap-2"><Store size={14} className="text-[#ff3f6c]" /> {row.franchise_name}</td>
                                                 <td className="px-6 py-4 text-center font-bold text-gray-600">{row.total_orders} Orders</td>
-                                                <td className="px-6 py-4 text-right font-black text-[#1A1A2E]">₹{Number(row.revenue).toLocaleString()}</td>
+                                                <td className="px-6 py-4 text-right font-black text-[#282c3f]">₹{Number(row.revenue).toLocaleString()}</td>
                                             </>
                                         ) : (
                                             <>
                                                 <td className="px-6 py-4">
-                                                    <p className="font-black text-[#1A1A2E] text-sm">ORD-{row.id}</p>
+                                                    <p className="font-black text-[#282c3f] text-sm">ORD-{row.id}</p>
                                                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{new Date(row.created_at).toLocaleDateString()}</p>
                                                 </td>
                                                 <td className="px-6 py-4 text-xs font-bold text-gray-600 flex items-center gap-1.5">
                                                     {row.fulfillment ? <><Store size={12} className="text-blue-500" /> {row.fulfillment}</> : <><Package size={12} className="text-gray-400" /> Master Stock</>}
                                                 </td>
-                                                <td className="px-6 py-4"><span className="text-[10px] bg-gray-100 text-[#1A1A2E] font-black px-2 py-1 rounded uppercase tracking-widest">{row.status}</span></td>
-                                                <td className="px-6 py-4 text-right font-black text-[#1A1A2E]">₹{Number(row.total_amount).toLocaleString()}</td>
+                                                <td className="px-6 py-4"><span className="text-[10px] bg-gray-100 text-[#282c3f] font-black px-2 py-1 rounded uppercase tracking-widest">{row.status}</span></td>
+                                                <td className="px-6 py-4 text-right font-black text-[#282c3f]">₹{Number(row.total_amount).toLocaleString()}</td>
                                             </>
                                         )}
                                     </tr>
@@ -235,7 +235,7 @@ function StatCard({ title, value, icon: Icon, color, alert }) {
         <div className={`bg-white p-5 rounded-3xl border ${alert ? 'border-red-200 shadow-red-500/10' : 'border-gray-100 shadow-black/5'} shadow-sm flex items-center justify-between`}>
             <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{title}</p>
-                <h4 className="text-2xl font-black text-[#1A1A2E]">{value}</h4>
+                <h4 className="text-2xl font-black text-[#282c3f]">{value}</h4>
             </div>
             <div className={`size-12 rounded-2xl flex items-center justify-center ${alert ? 'bg-red-50' : 'bg-gray-50'} ${color}`}><Icon size={22} strokeWidth={2.5} /></div>
         </div>

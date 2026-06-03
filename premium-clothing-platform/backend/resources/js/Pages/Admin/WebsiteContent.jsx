@@ -35,6 +35,9 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
         footer_newsletter_title: '',
         footer_newsletter_placeholder: '',
         footer_copyright: '',
+        footer_ad_text: '',
+        footer_ad_cta: '',
+        footer_ad_href: '',
         footer_link_groups_json: '',
         footer_trust_badges_json: '',
         footer_social_links_json: '',
@@ -58,6 +61,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
         home_coupon_text: '',
         home_hidden_sections: '',
         home_section_order: '',
+        home_product_section_count: '',
         home_category_offers_json: '',
         home_promo_tiles_json: '',
         home_categories_title: '',
@@ -509,12 +513,12 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
             <div className="max-w-[1600px] mx-auto pb-20 pt-6 px-4 sm:px-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                     <div>
-                        <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                            <LayoutTemplate className="text-[#E94E3C]" /> Storefront CMS
+                        <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                            <LayoutTemplate className="text-[#ff3f6c]" /> Storefront CMS
                         </h1>
                         <p className="text-gray-500 font-bold text-sm mt-1">Manage what your customers see on the live website.</p>
                     </div>
-                    <button onClick={handleAddClick} className="bg-[#1A1A2E] text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-all flex items-center gap-2 shadow-lg shadow-black/10">
+                    <button onClick={handleAddClick} className="bg-[#282c3f] text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[#ff3f6c] transition-all flex items-center gap-2 shadow-lg shadow-black/10">
                         <Plus size={18} /> {['shop_page', 'gym_wear', 'settings'].includes(activeTab) ? 'Edit Content' : activeTab === 'featured_categories' ? 'Add Featured Category' : `Add New ${activeTab === 'faqs' ? 'FAQ' : activeTab.slice(0, -1)}`}
                     </button>
                 </div>
@@ -531,10 +535,10 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                             const Icon = tab.icon;
                             const isActive = activeTab === tab.id;
                             return (
-                                <button key={tab.id} onClick={() => switchTab(tab.id)} className={`relative flex items-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${isActive ? 'text-[#1A1A2E] bg-gray-50' : 'text-gray-400 hover:bg-gray-50'}`}>
-                                    <Icon size={16} className={isActive ? 'text-[#E94E3C]' : ''} />
+                                <button key={tab.id} onClick={() => switchTab(tab.id)} className={`relative flex items-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${isActive ? 'text-[#282c3f] bg-gray-50' : 'text-gray-400 hover:bg-gray-50'}`}>
+                                    <Icon size={16} className={isActive ? 'text-[#ff3f6c]' : ''} />
                                     {tab.label}
-                                    {isActive && <motion.div layoutId="activeCmsTab" className="absolute bottom-0 left-4 right-4 h-0.5 bg-[#E94E3C] rounded-t-full" />}
+                                    {isActive && <motion.div layoutId="activeCmsTab" className="absolute bottom-0 left-4 right-4 h-0.5 bg-[#ff3f6c] rounded-t-full" />}
                                 </button>
                             );
                         })}
@@ -560,7 +564,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                             </span>
                                         )}
                                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                                            <button type="button" onClick={() => toggleBanner(banner)} className="bg-white text-[#1A1A2E] p-3 rounded-full hover:bg-[#E94E3C] hover:text-white transition-colors" title={banner.is_active ? 'Hide banner' : 'Show banner'}>
+                                            <button type="button" onClick={() => toggleBanner(banner)} className="bg-white text-[#282c3f] p-3 rounded-full hover:bg-[#ff3f6c] hover:text-white transition-colors" title={banner.is_active ? 'Hide banner' : 'Show banner'}>
                                                 {banner.is_active ? <EyeOff size={18} /> : <Eye size={18} />}
                                             </button>
                                             <button type="button" onClick={() => deleteBanner(banner)} className="bg-white text-red-500 p-3 rounded-full hover:bg-red-500 hover:text-white transition-colors" title="Delete banner">
@@ -569,7 +573,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                         </div>
                                     </div>
                                     <div className="p-4 bg-white">
-                                        <h3 className="font-black text-[#1A1A2E] text-sm uppercase">{banner.title}</h3>
+                                        <h3 className="font-black text-[#282c3f] text-sm uppercase">{banner.title}</h3>
                                         <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">{String(banner.placement_type || '').replace(/_/g, ' ')}</p>
                                         <p className={`mt-2 text-[9px] font-black uppercase tracking-widest ${banner.is_active ? 'text-green-500' : 'text-red-500'}`}>
                                             {banner.is_active ? 'Live on storefront' : 'Hidden'}
@@ -585,10 +589,10 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                         <div className="space-y-6">
                             <div className="flex flex-col justify-between gap-4 rounded-2xl border border-slate-100 bg-slate-50 p-5 md:flex-row md:items-center">
                                 <div>
-                                    <h2 className="text-lg font-black uppercase tracking-wider text-[#1A1A2E]">Static Pages</h2>
+                                    <h2 className="text-lg font-black uppercase tracking-wider text-[#282c3f]">Static Pages</h2>
                                     <p className="mt-1 text-xs font-bold uppercase tracking-widest text-slate-500">Create, edit, publish, draft, and SEO-manage customer information pages.</p>
                                 </div>
-                                <button type="button" onClick={openCreatePage} className="inline-flex items-center justify-center gap-2 bg-[#1A1A2E] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-[#E94E3C]">
+                                <button type="button" onClick={openCreatePage} className="inline-flex items-center justify-center gap-2 bg-[#282c3f] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-[#ff3f6c]">
                                     <Plus size={16} /> New Page
                                 </button>
                             </div>
@@ -604,14 +608,14 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                                     </span>
                                                     <span className="bg-slate-50 px-2 py-1 font-mono text-[9px] font-black uppercase tracking-widest text-slate-500">/{page.slug}</span>
                                                 </div>
-                                                <h3 className="truncate text-xl font-black uppercase tracking-tight text-[#1A1A2E]">{page.title}</h3>
+                                                <h3 className="truncate text-xl font-black uppercase tracking-tight text-[#282c3f]">{page.title}</h3>
                                                 <p className="mt-2 line-clamp-2 text-sm font-semibold leading-6 text-slate-500">{stripHtml(page.content || 'No content yet.')}</p>
                                             </div>
                                             <div className="flex shrink-0 gap-2">
-                                                <button type="button" onClick={() => openEditPage(page)} className="bg-slate-100 p-2 text-slate-600 hover:bg-[#1A1A2E] hover:text-white" title="Edit page">
+                                                <button type="button" onClick={() => openEditPage(page)} className="bg-slate-100 p-2 text-slate-600 hover:bg-[#282c3f] hover:text-white" title="Edit page">
                                                     <Edit3 size={16} />
                                                 </button>
-                                                <button type="button" onClick={() => toggleStatus(page.id, 'pages')} className="bg-slate-100 p-2 text-slate-600 hover:bg-[#1A1A2E] hover:text-white" title="Publish or draft">
+                                                <button type="button" onClick={() => toggleStatus(page.id, 'pages')} className="bg-slate-100 p-2 text-slate-600 hover:bg-[#282c3f] hover:text-white" title="Publish or draft">
                                                     {page.status === 'published' ? <EyeOff size={16} /> : <Eye size={16} />}
                                                 </button>
                                                 <button type="button" onClick={() => deletePage(page)} className="bg-red-50 p-2 text-red-500 hover:bg-red-500 hover:text-white" title="Delete page">
@@ -622,7 +626,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
 
                                         <div className="mt-5 grid grid-cols-1 gap-3 border-t border-slate-100 pt-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 md:grid-cols-2">
                                             <span>SEO: {page.meta_title ? 'Configured' : 'Missing title'}</span>
-                                            <a href={`/page/${page.slug}`} target="_blank" rel="noreferrer" className="text-[#E94E3C] hover:text-[#1A1A2E] md:text-right">
+                                            <a href={`/page/${page.slug}`} target="_blank" rel="noreferrer" className="text-[#ff3f6c] hover:text-[#282c3f] md:text-right">
                                                 Preview /page/{page.slug}
                                             </a>
                                         </div>
@@ -638,7 +642,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                         <form id="settings-settings" onSubmit={handleSettingsSubmit} className="max-w-4xl space-y-8">
                             <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
                                 <div className="border-b border-gray-100 pb-6">
-                                    <h2 className="mb-1 text-lg font-black uppercase tracking-wider text-[#1A1A2E]">Global Brand & Layout</h2>
+                                    <h2 className="mb-1 text-lg font-black uppercase tracking-wider text-[#282c3f]">Global Brand & Layout</h2>
                                     <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Controls the logo, navbar, footer, social links, payment labels, and reusable storefront text.</p>
                                 </div>
 
@@ -673,7 +677,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                             type="file"
                                             accept="image/*"
                                             onChange={(e) => setSettingsData('site_logo', e.target.files[0])}
-                                            className="w-full cursor-pointer rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-bold text-[#1A1A2E]"
+                                            className="w-full cursor-pointer rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-bold text-[#282c3f]"
                                         />
                                         {tabData?.site_logo && (
                                             <div className="grid h-16 w-28 shrink-0 place-items-center overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
@@ -714,7 +718,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                         value={settingsData.footer_about_text}
                                         onChange={(e) => setSettingsData('footer_about_text', e.target.value)}
                                         rows="3"
-                                        className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-bold text-[#1A1A2E] outline-none transition-all focus:ring-2 focus:ring-[#E94E3C]"
+                                        className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-bold text-[#282c3f] outline-none transition-all focus:ring-2 focus:ring-[#ff3f6c]"
                                         placeholder="Short brand description shown in the footer."
                                     />
                                     {settingsErrors.footer_about_text && <p className="ml-1 text-[10px] font-bold text-red-500">{settingsErrors.footer_about_text}</p>}
@@ -745,7 +749,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
 
                             <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
                                 <div className="border-b border-gray-100 pb-6">
-                                    <h2 className="text-lg font-black text-[#1A1A2E] uppercase tracking-wider mb-1">Homepage Storefront Content</h2>
+                                    <h2 className="text-lg font-black text-[#282c3f] uppercase tracking-wider mb-1">Homepage Storefront Content</h2>
                                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Controls the premium landing page hero, rails, trust blocks, reviews, offers, and franchise CTA.</p>
                                 </div>
 
@@ -826,6 +830,16 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                         error={settingsErrors.home_section_order}
                                         placeholder="hero,promo,categories,best,new,gym,offers,reviews,trust,franchise"
                                     />
+                                    <InputField
+                                        label="Products Per Homepage Section"
+                                        type="number"
+                                        min="1"
+                                        max="8"
+                                        value={settingsData.home_product_section_count}
+                                        onChange={(e) => setSettingsData('home_product_section_count', e.target.value)}
+                                        error={settingsErrors.home_product_section_count}
+                                        placeholder="4"
+                                    />
                                 </div>
                                 <p className="mt-2 text-[9px] font-bold uppercase tracking-widest text-gray-400">
                                     Section IDs: hero, promo, categories, best, new, gym, offers, reviews, trust, franchise.
@@ -837,7 +851,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                         value={settingsData.home_hero_subtitle}
                                         onChange={(e) => setSettingsData('home_hero_subtitle', e.target.value)}
                                         rows="3"
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none transition-all resize-none"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none transition-all resize-none"
                                         placeholder="Premium training, running, and daily performance essentials."
                                     />
                                     {settingsErrors.home_hero_subtitle && <p className="text-[10px] text-red-500 font-bold ml-1">{settingsErrors.home_hero_subtitle}</p>}
@@ -881,7 +895,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                             type="file"
                                             accept="image/*,video/mp4,video/webm"
                                             onChange={(e) => setSettingsData('home_hero_media', e.target.files[0])}
-                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-bold text-[#1A1A2E] cursor-pointer"
+                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-bold text-[#282c3f] cursor-pointer"
                                         />
                                         {tabData?.home_hero_media && (
                                             <div className="h-16 w-28 bg-gray-100 rounded-lg overflow-hidden shrink-0 border border-gray-200">
@@ -923,13 +937,40 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                     ))}
                                 </div>
 
+                                <div className="mt-8 rounded-2xl border border-gray-100 bg-white p-5">
+                                    <h3 className="mb-5 text-xs font-black uppercase tracking-[0.25em] text-[#282c3f]">Footer Ad Strip</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <InputField
+                                            label="Footer Ad Text"
+                                            value={settingsData.footer_ad_text}
+                                            onChange={(e) => setSettingsData('footer_ad_text', e.target.value)}
+                                            error={settingsErrors.footer_ad_text}
+                                            placeholder="Leave empty to hide footer ad"
+                                        />
+                                        <InputField
+                                            label="Footer Ad Button"
+                                            value={settingsData.footer_ad_cta}
+                                            onChange={(e) => setSettingsData('footer_ad_cta', e.target.value)}
+                                            error={settingsErrors.footer_ad_cta}
+                                            placeholder="Shop Deals"
+                                        />
+                                        <InputField
+                                            label="Footer Ad Link"
+                                            value={settingsData.footer_ad_href}
+                                            onChange={(e) => setSettingsData('footer_ad_href', e.target.value)}
+                                            error={settingsErrors.footer_ad_href}
+                                            placeholder="/shop?discount=40"
+                                        />
+                                    </div>
+                                </div>
+
                                 <div className="mt-5 space-y-1.5">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Franchise CTA Subtitle</label>
                                     <textarea
                                         value={settingsData.home_franchise_subtitle}
                                         onChange={(e) => setSettingsData('home_franchise_subtitle', e.target.value)}
                                         rows="3"
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none transition-all resize-none"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none transition-all resize-none"
                                     />
                                     {settingsErrors.home_franchise_subtitle && <p className="text-[10px] text-red-500 font-bold ml-1">{settingsErrors.home_franchise_subtitle}</p>}
                                 </div>
@@ -952,7 +993,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                         value={settingsData.home_category_offers_json}
                                         onChange={(e) => setSettingsData('home_category_offers_json', e.target.value)}
                                         rows="4"
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-mono text-xs font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none transition-all resize-none"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-mono text-xs font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none transition-all resize-none"
                                         placeholder='[{"title":"Mens Activewear","discount":"Studio Picks","href":"/shop?category=men-sportswear"}]'
                                     />
                                     <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest ml-1">Optional. Items match category cards by position.</p>
@@ -961,7 +1002,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                             </div>
 
                             <div className="border-b border-gray-100 pb-6">
-                                <h2 className="text-lg font-black text-[#1A1A2E] uppercase tracking-wider mb-1">Shop Page Configuration</h2>
+                                <h2 className="text-lg font-black text-[#282c3f] uppercase tracking-wider mb-1">Shop Page Configuration</h2>
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Control the main collection page visuals.</p>
                             </div>
 
@@ -988,7 +1029,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                     value={settingsData.shop_hero_subtitle}
                                     onChange={(e) => setSettingsData('shop_hero_subtitle', e.target.value)}
                                     rows="3"
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none transition-all resize-none"
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none transition-all resize-none"
                                     placeholder="e.g. Engineered for peak performance."
                                 />
                                 {settingsErrors.shop_hero_subtitle && <p className="text-[10px] text-red-500 font-bold ml-1">{settingsErrors.shop_hero_subtitle}</p>}
@@ -1009,7 +1050,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                         type="file"
                                         accept="image/*"
                                         onChange={(e) => setSettingsData('shop_hero_bg_image', e.target.files[0])}
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-bold text-[#1A1A2E] cursor-pointer"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-bold text-[#282c3f] cursor-pointer"
                                     />
                                     {tabData?.shop_hero_bg_image && (
                                         <div className="h-16 w-28 bg-gray-100 rounded-lg overflow-hidden shrink-0 border border-gray-200">
@@ -1022,7 +1063,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                             </div>
 
                             <div className="pt-6 border-t border-gray-100 flex justify-end">
-                                <button disabled={settingsProcessing} type="submit" className="bg-[#1A1A2E] text-white px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-colors flex items-center gap-2 disabled:opacity-50">
+                                <button disabled={settingsProcessing} type="submit" className="bg-[#282c3f] text-white px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#ff3f6c] transition-colors flex items-center gap-2 disabled:opacity-50">
                                     <Save size={16} /> {settingsProcessing ? 'Saving...' : 'Save All Settings'}
                                 </button>
                             </div>
@@ -1034,10 +1075,10 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                             <div className="rounded-2xl border border-slate-100 bg-slate-50 p-6">
                                 <div className="mb-6 flex items-start justify-between gap-4">
                                     <div>
-                                        <h3 className="text-xl font-black uppercase tracking-tight text-[#1A1A2E]">Gym Wear Content</h3>
+                                        <h3 className="text-xl font-black uppercase tracking-tight text-[#282c3f]">Gym Wear Content</h3>
                                         <p className="mt-1 text-xs font-bold text-slate-500">Controls the Gym Wear collection banner and customer-facing description on the Shop page.</p>
                                     </div>
-                                    <Dumbbell className="text-[#E94E3C]" size={28} />
+                                    <Dumbbell className="text-[#ff3f6c]" size={28} />
                                 </div>
 
                                 <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -1063,7 +1104,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                         value={gymWearForm.data.gym_wear_subtitle}
                                         onChange={(e) => gymWearForm.setData('gym_wear_subtitle', e.target.value)}
                                         rows="2"
-                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] outline-none resize-none"
+                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] outline-none resize-none"
                                         placeholder="Training layers built for strength, sweat, and daily movement."
                                     />
                                     {gymWearForm.errors.gym_wear_subtitle && <p className="text-[10px] text-red-500 font-bold ml-1">{gymWearForm.errors.gym_wear_subtitle}</p>}
@@ -1075,7 +1116,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                         value={gymWearForm.data.gym_wear_description}
                                         onChange={(e) => gymWearForm.setData('gym_wear_description', e.target.value)}
                                         rows="4"
-                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] outline-none resize-none"
+                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] outline-none resize-none"
                                         placeholder="Describe the gym wear collection, fabric, fit, training use, and customer benefits."
                                     />
                                     {gymWearForm.errors.gym_wear_description && <p className="text-[10px] text-red-500 font-bold ml-1">{gymWearForm.errors.gym_wear_description}</p>}
@@ -1098,7 +1139,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                             type="file"
                                             accept="image/*"
                                             onChange={(e) => gymWearForm.setData('gym_wear_header_image', e.target.files[0])}
-                                            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm font-bold text-[#1A1A2E]"
+                                            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm font-bold text-[#282c3f]"
                                         />
                                         {tabData?.gym_wear_header_image && (
                                             <div className="h-16 w-28 bg-gray-100 rounded-lg overflow-hidden shrink-0 border border-gray-200">
@@ -1111,13 +1152,13 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                 </div>
 
                                 <div className="mt-7 flex flex-wrap justify-between gap-3 border-t border-slate-200 pt-6">
-                                    <a href="/franchise-superadmin/products?subcategory=gym-wear" className="border border-slate-200 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-[#1A1A2E] hover:border-[#1A1A2E]">
+                                    <a href="/franchise-superadmin/products?subcategory=gym-wear" className="border border-slate-200 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-[#282c3f] hover:border-[#282c3f]">
                                         Edit Gym Products
                                     </a>
                                     <button
                                         disabled={gymWearForm.processing}
                                         type="submit"
-                                        className="bg-[#1A1A2E] px-8 py-4 text-[10px] font-black uppercase tracking-[0.25em] text-white transition-colors hover:bg-[#E94E3C] disabled:opacity-60"
+                                        className="bg-[#282c3f] px-8 py-4 text-[10px] font-black uppercase tracking-[0.25em] text-white transition-colors hover:bg-[#ff3f6c] disabled:opacity-60"
                                     >
                                         {gymWearForm.processing ? 'Saving...' : 'Save Gym Wear Content'}
                                     </button>
@@ -1131,10 +1172,10 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                             <div className="rounded-2xl border border-slate-100 bg-slate-50 p-6">
                                 <div className="mb-6 flex items-start justify-between gap-4">
                                     <div>
-                                        <h3 className="text-xl font-black uppercase tracking-tight text-[#1A1A2E]">Shop Page Content</h3>
+                                        <h3 className="text-xl font-black uppercase tracking-tight text-[#282c3f]">Shop Page Content</h3>
                                         <p className="mt-1 text-xs font-bold text-slate-500">These fields control the hero and promo text on the public Shop page.</p>
                                     </div>
-                                    <ShoppingBag className="text-[#E94E3C]" size={28} />
+                                    <ShoppingBag className="text-[#ff3f6c]" size={28} />
                                 </div>
 
                                 <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -1160,7 +1201,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                         value={shopForm.data.shop_hero_subtitle}
                                         onChange={(e) => shopForm.setData('shop_hero_subtitle', e.target.value)}
                                         rows="3"
-                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] outline-none resize-none"
+                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] outline-none resize-none"
                                         placeholder="Engineered for peak performance."
                                     />
                                     {shopForm.errors.shop_hero_subtitle && <p className="text-[10px] text-red-500 font-bold ml-1">{shopForm.errors.shop_hero_subtitle}</p>}
@@ -1182,7 +1223,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                         type="file"
                                         accept="image/*"
                                         onChange={(e) => shopForm.setData('shop_hero_bg_image', e.target.files[0])}
-                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm font-bold text-[#1A1A2E]"
+                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm font-bold text-[#282c3f]"
                                     />
                                     {tabData?.shop_hero_bg_image && (
                                         <p className="text-[10px] font-bold text-gray-400 ml-1">Current image: {tabData.shop_hero_bg_image}</p>
@@ -1193,7 +1234,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                 <button
                                     disabled={shopForm.processing}
                                     type="submit"
-                                    className="mt-7 bg-[#1A1A2E] px-8 py-4 text-[10px] font-black uppercase tracking-[0.25em] text-white transition-colors hover:bg-[#E94E3C] disabled:opacity-60"
+                                    className="mt-7 bg-[#282c3f] px-8 py-4 text-[10px] font-black uppercase tracking-[0.25em] text-white transition-colors hover:bg-[#ff3f6c] disabled:opacity-60"
                                 >
                                     {shopForm.processing ? 'Saving...' : 'Save Shop Page'}
                                 </button>
@@ -1205,10 +1246,10 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                         <div className="space-y-6">
                             <div className="flex flex-col gap-2 border-b border-gray-100 pb-5 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
-                                    <h2 className="text-lg font-black uppercase tracking-wider text-[#1A1A2E]">Homepage Featured Categories</h2>
+                                    <h2 className="text-lg font-black uppercase tracking-wider text-[#282c3f]">Homepage Featured Categories</h2>
                                     <p className="text-xs font-bold text-gray-400">Controls the public “The Collections” section. Cards appear by sort order.</p>
                                 </div>
-                                <button onClick={openCreateFeaturedCategory} className="flex items-center justify-center gap-2 bg-[#1A1A2E] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-[#E94E3C]">
+                                <button onClick={openCreateFeaturedCategory} className="flex items-center justify-center gap-2 bg-[#282c3f] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-[#ff3f6c]">
                                     <Plus size={16} /> Add Card
                                 </button>
                             </div>
@@ -1229,7 +1270,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                                     {category.name || 'No Image Uploaded'}
                                                 </div>
                                             )}
-                                            <div className="absolute left-4 top-4 bg-white/95 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-[#1A1A2E]">
+                                            <div className="absolute left-4 top-4 bg-white/95 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-[#282c3f]">
                                                 Order {category.sort_order}
                                             </div>
                                         </div>
@@ -1237,7 +1278,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                         <div className="p-5">
                                             <div className="mb-5 flex items-start justify-between gap-4">
                                                 <div>
-                                                    <h3 className="text-lg font-black uppercase tracking-tight text-[#1A1A2E]">{category.name}</h3>
+                                                    <h3 className="text-lg font-black uppercase tracking-tight text-[#282c3f]">{category.name}</h3>
                                                     <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">/{category.slug}</p>
                                                 </div>
                                                 <span className={`shrink-0 px-2 py-1 text-[9px] font-black uppercase tracking-widest ${category.is_active ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'}`}>
@@ -1246,10 +1287,10 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                             </div>
 
                                             <div className="flex items-center justify-end gap-2 border-t border-gray-100 pt-4">
-                                                <button onClick={() => openEditFeaturedCategory(category)} className="bg-gray-100 p-2 text-gray-600 hover:bg-[#1A1A2E] hover:text-white" title="Edit featured category">
+                                                <button onClick={() => openEditFeaturedCategory(category)} className="bg-gray-100 p-2 text-gray-600 hover:bg-[#282c3f] hover:text-white" title="Edit featured category">
                                                     <Edit3 size={16} />
                                                 </button>
-                                                <button onClick={() => toggleFeaturedCategory(category)} className="bg-gray-100 p-2 text-gray-600 hover:bg-[#1A1A2E] hover:text-white" title="Show or hide featured category">
+                                                <button onClick={() => toggleFeaturedCategory(category)} className="bg-gray-100 p-2 text-gray-600 hover:bg-[#282c3f] hover:text-white" title="Show or hide featured category">
                                                     {category.is_active ? <EyeOff size={16} /> : <Eye size={16} />}
                                                 </button>
                                                 <button onClick={() => deleteFeaturedCategory(category)} className="bg-red-50 p-2 text-red-500 hover:bg-red-500 hover:text-white" title="Delete featured category">
@@ -1268,17 +1309,17 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                     {activeTab === 'testimonials' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                             {tabData.map((review) => (
-                                <div key={review.id} className={`bg-white border border-gray-100 p-6 rounded-2xl shadow-sm flex flex-col justify-between transition-colors ${review.status === 'inactive' ? 'opacity-60 bg-gray-50' : 'hover:border-[#1A1A2E]/20'}`}>
+                                <div key={review.id} className={`bg-white border border-gray-100 p-6 rounded-2xl shadow-sm flex flex-col justify-between transition-colors ${review.status === 'inactive' ? 'opacity-60 bg-gray-50' : 'hover:border-[#282c3f]/20'}`}>
                                     <div className="mb-4 flex justify-between items-start gap-4 border-b border-gray-100 pb-4">
                                         <div>
                                             <div className="flex flex-wrap items-center gap-2">
-                                                <h4 className="font-black text-[#1A1A2E] uppercase">{review.customer_name}</h4>
+                                                <h4 className="font-black text-[#282c3f] uppercase">{review.customer_name}</h4>
                                                 {review.is_dummy && (
                                                     <span className="text-[9px] font-black uppercase tracking-widest rounded bg-amber-50 px-2 py-1 text-amber-600">Dummy</span>
                                                 )}
                                             </div>
                                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
-                                                Product: <span className="text-[#E94E3C]">{review.product_purchased || 'N/A'}</span>
+                                                Product: <span className="text-[#ff3f6c]">{review.product_purchased || 'N/A'}</span>
                                             </p>
                                         </div>
                                         {review.image_path && (
@@ -1302,10 +1343,10 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                             {review.status}
                                         </span>
                                         <div className="flex gap-2">
-                                            <button onClick={() => openEditTestimonial(review)} className="bg-gray-100 text-gray-600 p-2 rounded-lg hover:bg-[#1A1A2E] hover:text-white transition-colors" title="Edit review">
+                                            <button onClick={() => openEditTestimonial(review)} className="bg-gray-100 text-gray-600 p-2 rounded-lg hover:bg-[#282c3f] hover:text-white transition-colors" title="Edit review">
                                                 <Edit3 size={16} />
                                             </button>
-                                            <button onClick={() => toggleStatus(review.id, 'testimonials')} className="bg-gray-100 text-gray-600 p-2 rounded-lg hover:bg-[#1A1A2E] hover:text-white transition-colors" title="Show or hide review">
+                                            <button onClick={() => toggleStatus(review.id, 'testimonials')} className="bg-gray-100 text-gray-600 p-2 rounded-lg hover:bg-[#282c3f] hover:text-white transition-colors" title="Show or hide review">
                                                 {review.status === 'active' ? <EyeOff size={16} /> : <Eye size={16} />}
                                             </button>
                                             <button onClick={() => deleteTestimonial(review)} className="bg-red-50 text-red-500 p-2 rounded-lg hover:bg-red-500 hover:text-white transition-colors" title="Delete review">
@@ -1333,12 +1374,12 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
 
             <AnimatePresence>
                 {isBannerModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1A1A2E]/60 p-4 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#282c3f]/60 p-4 backdrop-blur-sm">
                         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-3xl overflow-hidden bg-white shadow-2xl">
                             <div className="flex items-center justify-between border-b border-gray-100 bg-white p-6">
                                 <div>
-                                    <h3 className="flex items-center gap-2 font-black uppercase tracking-wider text-[#1A1A2E]">
-                                        <ImageIcon size={18} className="text-[#E94E3C]" /> Add Storefront Banner
+                                    <h3 className="flex items-center gap-2 font-black uppercase tracking-wider text-[#282c3f]">
+                                        <ImageIcon size={18} className="text-[#ff3f6c]" /> Add Storefront Banner
                                     </h3>
                                     <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Upload desktop and mobile artwork for responsive website campaigns.</p>
                                 </div>
@@ -1358,7 +1399,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                 <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                                     <div className="space-y-1.5">
                                         <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">Placement *</label>
-                                        <select value={bannerForm.data.placement_type} onChange={(e) => bannerForm.setData('placement_type', e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-bold text-[#1A1A2E] outline-none focus:ring-2 focus:ring-[#E94E3C]">
+                                        <select value={bannerForm.data.placement_type} onChange={(e) => bannerForm.setData('placement_type', e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-bold text-[#282c3f] outline-none focus:ring-2 focus:ring-[#ff3f6c]">
                                             <option value="main_hero_slider">Main Hero Slider</option>
                                             <option value="mid_page_banner">Mid Page Banner</option>
                                             <option value="category_banner">Category Collection</option>
@@ -1393,10 +1434,10 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                 </div>
 
                                 <div className="flex flex-col-reverse justify-end gap-3 border-t border-gray-100 pt-5 sm:flex-row">
-                                    <button type="button" onClick={closeBannerModal} className="border border-slate-200 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:border-[#1A1A2E] hover:text-[#1A1A2E]">
+                                    <button type="button" onClick={closeBannerModal} className="border border-slate-200 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:border-[#282c3f] hover:text-[#282c3f]">
                                         Cancel
                                     </button>
-                                    <button disabled={bannerForm.processing} type="submit" className="inline-flex items-center justify-center gap-2 bg-[#1A1A2E] px-8 py-4 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-[#E94E3C] disabled:opacity-50">
+                                    <button disabled={bannerForm.processing} type="submit" className="inline-flex items-center justify-center gap-2 bg-[#282c3f] px-8 py-4 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-[#ff3f6c] disabled:opacity-50">
                                         <Upload size={15} /> {bannerForm.processing ? 'Publishing...' : 'Publish Banner'}
                                     </button>
                                 </div>
@@ -1408,12 +1449,12 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
 
             <AnimatePresence>
                 {isPageModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1A1A2E]/60 p-4 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#282c3f]/60 p-4 backdrop-blur-sm">
                         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="max-h-[92vh] w-full max-w-5xl overflow-y-auto bg-white shadow-2xl">
                             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white p-6">
                                 <div>
-                                    <h3 className="flex items-center gap-2 font-black uppercase tracking-wider text-[#1A1A2E]">
-                                        <FileText size={18} className="text-[#E94E3C]" /> {editingPage ? 'Edit Static Page' : 'Create Static Page'}
+                                    <h3 className="flex items-center gap-2 font-black uppercase tracking-wider text-[#282c3f]">
+                                        <FileText size={18} className="text-[#ff3f6c]" /> {editingPage ? 'Edit Static Page' : 'Create Static Page'}
                                     </h3>
                                     <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Published pages are available at /page/slug and supported fixed links.</p>
                                 </div>
@@ -1445,7 +1486,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                     />
                                     <div className="space-y-1.5">
                                         <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">Status</label>
-                                        <select value={pageForm.data.status} onChange={(e) => pageForm.setData('status', e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-bold text-[#1A1A2E] outline-none focus:ring-2 focus:ring-[#E94E3C]">
+                                        <select value={pageForm.data.status} onChange={(e) => pageForm.setData('status', e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-bold text-[#282c3f] outline-none focus:ring-2 focus:ring-[#ff3f6c]">
                                             <option value="published">Published</option>
                                             <option value="draft">Draft</option>
                                         </select>
@@ -1479,7 +1520,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                         value={pageForm.data.content}
                                         onChange={(e) => pageForm.setData('content', e.target.value)}
                                         rows="14"
-                                        className="w-full resize-y rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-mono text-sm font-bold leading-7 text-[#1A1A2E] outline-none transition-all focus:ring-2 focus:ring-[#E94E3C]"
+                                        className="w-full resize-y rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-mono text-sm font-bold leading-7 text-[#282c3f] outline-none transition-all focus:ring-2 focus:ring-[#ff3f6c]"
                                         placeholder="<h2>Policy Heading</h2><p>Write your page content here.</p>"
                                     />
                                     {pageForm.errors.content && <p className="ml-1 text-[10px] font-bold text-red-500">{pageForm.errors.content}</p>}
@@ -1487,17 +1528,17 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
 
                                 <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5">
                                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Live URL</p>
-                                    <p className="mt-2 font-mono text-sm font-black text-[#1A1A2E]">/page/{pageForm.data.slug || 'your-page-slug'}</p>
+                                    <p className="mt-2 font-mono text-sm font-black text-[#282c3f]">/page/{pageForm.data.slug || 'your-page-slug'}</p>
                                     {['shipping', 'returns', 'privacy-policy', 'terms', 'cancellation', 'support'].includes(pageForm.data.slug) && (
-                                        <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#E94E3C]">This slug also powers the matching main footer/static route.</p>
+                                        <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#ff3f6c]">This slug also powers the matching main footer/static route.</p>
                                     )}
                                 </div>
 
                                 <div className="flex flex-col-reverse justify-end gap-3 border-t border-gray-100 pt-5 sm:flex-row">
-                                    <button type="button" onClick={closePageModal} className="border border-slate-200 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:border-[#1A1A2E] hover:text-[#1A1A2E]">
+                                    <button type="button" onClick={closePageModal} className="border border-slate-200 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:border-[#282c3f] hover:text-[#282c3f]">
                                         Cancel
                                     </button>
-                                    <button disabled={pageForm.processing} type="submit" className="bg-[#1A1A2E] px-8 py-4 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-[#E94E3C] disabled:opacity-50">
+                                    <button disabled={pageForm.processing} type="submit" className="bg-[#282c3f] px-8 py-4 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-[#ff3f6c] disabled:opacity-50">
                                         {pageForm.processing ? 'Saving...' : editingPage ? 'Update Page' : 'Create Page'}
                                     </button>
                                 </div>
@@ -1509,11 +1550,11 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
 
             <AnimatePresence>
                 {isTestimonialModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A2E]/60 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#282c3f]/60 backdrop-blur-sm">
                         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden">
                             <div className="bg-white p-6 border-b border-gray-100 flex justify-between items-center">
-                                <h3 className="font-black text-[#1A1A2E] uppercase tracking-wider flex items-center gap-2">
-                                    <MessageSquare size={18} className="text-[#E94E3C]" /> {editingTestimonial ? 'Edit Customer Review' : 'Add Customer Review'}
+                                <h3 className="font-black text-[#282c3f] uppercase tracking-wider flex items-center gap-2">
+                                    <MessageSquare size={18} className="text-[#ff3f6c]" /> {editingTestimonial ? 'Edit Customer Review' : 'Add Customer Review'}
                                 </h3>
                                 <button type="button" onClick={closeTestimonialModal} className="text-gray-400 hover:text-red-500"><X size={20} /></button>
                             </div>
@@ -1523,7 +1564,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                     <InputField label="Customer Name *" value={data.customer_name} onChange={(e) => setData('customer_name', e.target.value)} error={errors.customer_name} required />
                                     <div className="space-y-1.5">
                                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Star Rating</label>
-                                        <select value={data.rating} onChange={(e) => setData('rating', parseInt(e.target.value, 10))} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] outline-none">
+                                        <select value={data.rating} onChange={(e) => setData('rating', parseInt(e.target.value, 10))} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] outline-none">
                                             {[5, 4, 3, 2, 1].map((num) => <option key={num} value={num}>{num} Stars</option>)}
                                         </select>
                                     </div>
@@ -1533,17 +1574,17 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
 
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Review Text *</label>
-                                    <textarea value={data.review_text} onChange={(e) => setData('review_text', e.target.value)} rows="3" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] outline-none resize-none" required placeholder="What did the customer say?"></textarea>
+                                    <textarea value={data.review_text} onChange={(e) => setData('review_text', e.target.value)} rows="3" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] outline-none resize-none" required placeholder="What did the customer say?"></textarea>
                                     {errors.review_text && <p className="text-[10px] text-red-500 font-bold ml-1">{errors.review_text}</p>}
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Customer Image (Optional)</label>
-                                    <input type="file" accept="image/*" onChange={(e) => setData('image', e.target.files[0])} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-bold text-[#1A1A2E]" />
+                                    <input type="file" accept="image/*" onChange={(e) => setData('image', e.target.files[0])} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-bold text-[#282c3f]" />
                                     {editingTestimonial?.image_path && <p className="text-[10px] font-bold text-gray-400 ml-1">Leave empty to keep current image.</p>}
                                 </div>
 
-                                <button disabled={processing} type="submit" className="w-full bg-[#1A1A2E] text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-colors mt-4">
+                                <button disabled={processing} type="submit" className="w-full bg-[#282c3f] text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-[#ff3f6c] transition-colors mt-4">
                                     {processing ? 'Saving...' : editingTestimonial ? 'Update Review' : 'Publish Review'}
                                 </button>
                             </form>
@@ -1554,11 +1595,11 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
 
             <AnimatePresence>
                 {isFeaturedCategoryModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1A1A2E]/60 p-4 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#282c3f]/60 p-4 backdrop-blur-sm">
                         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-2xl overflow-hidden bg-white shadow-2xl">
                             <div className="flex items-center justify-between border-b border-gray-100 bg-white p-6">
-                                <h3 className="flex items-center gap-2 font-black uppercase tracking-wider text-[#1A1A2E]">
-                                    <Tags size={18} className="text-[#E94E3C]" /> {editingFeaturedCategory ? 'Edit Featured Category' : 'Add Featured Category'}
+                                <h3 className="flex items-center gap-2 font-black uppercase tracking-wider text-[#282c3f]">
+                                    <Tags size={18} className="text-[#ff3f6c]" /> {editingFeaturedCategory ? 'Edit Featured Category' : 'Add Featured Category'}
                                 </h3>
                                 <button type="button" onClick={closeFeaturedCategoryModal} className="text-gray-400 hover:text-red-500"><X size={20} /></button>
                             </div>
@@ -1598,7 +1639,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                         type="file"
                                         accept="image/*"
                                         onChange={handleFeaturedCategoryImageChange}
-                                        className="w-full bg-gray-50 border border-gray-200 px-4 py-2 text-sm font-bold text-[#1A1A2E]"
+                                        className="w-full bg-gray-50 border border-gray-200 px-4 py-2 text-sm font-bold text-[#282c3f]"
                                     />
                                     {editingFeaturedCategory?.image_url && (
                                         <div className="mt-3 flex items-center gap-3">
@@ -1613,7 +1654,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                     )}
                                 </div>
 
-                                <button disabled={featuredCategoryForm.processing} type="submit" className="w-full bg-[#1A1A2E] py-4 font-black uppercase tracking-widest text-white transition-colors hover:bg-[#E94E3C] disabled:opacity-50">
+                                <button disabled={featuredCategoryForm.processing} type="submit" className="w-full bg-[#282c3f] py-4 font-black uppercase tracking-widest text-white transition-colors hover:bg-[#ff3f6c] disabled:opacity-50">
                                     {featuredCategoryForm.processing ? 'Saving...' : editingFeaturedCategory ? 'Update Category' : 'Create Category'}
                                 </button>
                             </form>
@@ -1630,7 +1671,7 @@ function StatCard({ title, value, icon: Icon, color }) {
         <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
             <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{title}</p>
-                <h4 className="text-2xl font-black text-[#1A1A2E]">{value}</h4>
+                <h4 className="text-2xl font-black text-[#282c3f]">{value}</h4>
             </div>
             <div className={`size-12 rounded-2xl flex items-center justify-center bg-gray-50 ${color}`}><Icon size={20} strokeWidth={2.5} /></div>
         </div>
@@ -1641,7 +1682,7 @@ function EmptyState({ icon: Icon, text }) {
     return (
         <div className="col-span-full py-16 text-center">
             <Icon size={48} className="mx-auto text-gray-300 mb-4" strokeWidth={1} />
-            <p className="text-[#1A1A2E] font-black text-lg">{text}</p>
+            <p className="text-[#282c3f] font-black text-lg">{text}</p>
         </div>
     );
 }
@@ -1663,7 +1704,7 @@ function BannerUploadField({ label, hint, file, error, onChange }) {
         <label className="relative block cursor-pointer overflow-hidden rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 p-5 text-center transition-colors hover:bg-gray-100">
             <input type="file" accept="image/*" onChange={(e) => onChange(e.target.files[0] || null)} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
             <ImageIcon size={24} className="mx-auto mb-3 text-gray-400" />
-            <p className="text-[10px] font-black uppercase tracking-widest text-[#1A1A2E]">{label}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#282c3f]">{label}</p>
             <p className="mt-1 text-[9px] font-bold uppercase tracking-widest text-gray-400">{file ? file.name : hint}</p>
             {error && <p className="mt-2 text-[10px] font-bold text-red-500">{error}</p>}
         </label>
@@ -1674,7 +1715,7 @@ function InputField({ label, error, ...props }) {
     return (
         <div className="space-y-1.5">
             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{label}</label>
-            <input className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none transition-all" {...props} />
+            <input className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none transition-all" {...props} />
             {error && <p className="text-[10px] text-red-500 font-bold ml-1">{error}</p>}
         </div>
     );
@@ -1686,7 +1727,7 @@ function JsonTextArea({ label, error, ...props }) {
             <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">{label}</label>
             <textarea
                 rows="4"
-                className="w-full resize-y rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-mono text-xs font-bold text-[#1A1A2E] outline-none transition-all focus:ring-2 focus:ring-[#E94E3C]"
+                className="w-full resize-y rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-mono text-xs font-bold text-[#282c3f] outline-none transition-all focus:ring-2 focus:ring-[#ff3f6c]"
                 {...props}
             />
             <p className="ml-1 text-[9px] font-bold uppercase tracking-widest text-gray-400">Optional advanced control. Leave empty to use the site default.</p>
@@ -1727,10 +1768,10 @@ function PromoTileEditor({ value, onChange, error }) {
         <div className="mt-6 rounded-2xl border border-gray-100 bg-gray-50 p-5">
             <div className="mb-4 flex items-center justify-between gap-4">
                 <div>
-                    <h3 className="text-sm font-black uppercase tracking-wider text-[#1A1A2E]">Homepage Promo Tiles</h3>
+                    <h3 className="text-sm font-black uppercase tracking-wider text-[#282c3f]">Homepage Promo Tiles</h3>
                     <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Editable cards below the hero.</p>
                 </div>
-                <button type="button" onClick={() => updateRows([...rows, { title: '', subtitle: '', href: '/shop', from: '#ff3f6c', to: '#ff905a' }])} className="bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#1A1A2E] shadow-sm hover:text-[#E94E3C]">
+                <button type="button" onClick={() => updateRows([...rows, { title: '', subtitle: '', href: '/shop', from: '#ff3f6c', to: '#ff905a' }])} className="bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#282c3f] shadow-sm hover:text-[#ff3f6c]">
                     Add Tile
                 </button>
             </div>
@@ -1747,7 +1788,7 @@ function PromoTileEditor({ value, onChange, error }) {
                                     updateRows(nextRows);
                                 }}
                                 placeholder={field}
-                                className="bg-gray-50 border border-gray-200 px-3 py-2 text-xs font-bold text-[#1A1A2E] outline-none focus:ring-2 focus:ring-[#E94E3C] md:col-span-1"
+                                className="bg-gray-50 border border-gray-200 px-3 py-2 text-xs font-bold text-[#282c3f] outline-none focus:ring-2 focus:ring-[#ff3f6c] md:col-span-1"
                             />
                         ))}
                         <button type="button" onClick={() => updateRows(rows.filter((_, itemIndex) => itemIndex !== index))} className="bg-red-50 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white">
@@ -1783,10 +1824,10 @@ function BenefitEditor({ value, onChange, error }) {
         <div className="mt-6 rounded-2xl border border-gray-100 bg-gray-50 p-5">
             <div className="mb-4 flex items-center justify-between gap-4">
                 <div>
-                    <h3 className="text-sm font-black uppercase tracking-wider text-[#1A1A2E]">Trust Benefit Cards</h3>
+                    <h3 className="text-sm font-black uppercase tracking-wider text-[#282c3f]">Trust Benefit Cards</h3>
                     <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Shown in the assurance section.</p>
                 </div>
-                <button type="button" onClick={() => updateRows([...rows, { title: '', body: '' }])} className="bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#1A1A2E] shadow-sm hover:text-[#E94E3C]">
+                <button type="button" onClick={() => updateRows([...rows, { title: '', body: '' }])} className="bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#282c3f] shadow-sm hover:text-[#ff3f6c]">
                     Add Card
                 </button>
             </div>
@@ -1798,13 +1839,13 @@ function BenefitEditor({ value, onChange, error }) {
                             value={row.title || ''}
                             onChange={(e) => updateRows(rows.map((item, itemIndex) => itemIndex === index ? { ...item, title: e.target.value } : item))}
                             placeholder="Title"
-                            className="bg-gray-50 border border-gray-200 px-3 py-2 text-xs font-bold text-[#1A1A2E] outline-none focus:ring-2 focus:ring-[#E94E3C]"
+                            className="bg-gray-50 border border-gray-200 px-3 py-2 text-xs font-bold text-[#282c3f] outline-none focus:ring-2 focus:ring-[#ff3f6c]"
                         />
                         <input
                             value={row.body || ''}
                             onChange={(e) => updateRows(rows.map((item, itemIndex) => itemIndex === index ? { ...item, body: e.target.value } : item))}
                             placeholder="Description"
-                            className="bg-gray-50 border border-gray-200 px-3 py-2 text-xs font-bold text-[#1A1A2E] outline-none focus:ring-2 focus:ring-[#E94E3C]"
+                            className="bg-gray-50 border border-gray-200 px-3 py-2 text-xs font-bold text-[#282c3f] outline-none focus:ring-2 focus:ring-[#ff3f6c]"
                         />
                         <button type="button" onClick={() => updateRows(rows.filter((_, itemIndex) => itemIndex !== index))} className="bg-red-50 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white">
                             Remove

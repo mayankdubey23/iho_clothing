@@ -46,8 +46,8 @@ export default function ServiceArea({ areas, requests }) {
                 {/* 🚀 HEADER */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
                     <div>
-                        <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                            <Map className="text-[#E94E3C]" size={32} /> Service Zones
+                        <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                            <Map className="text-[#ff3f6c]" size={32} /> Service Zones
                         </h1>
                         <p className="text-gray-500 font-bold text-sm mt-1">View your assigned delivery pincodes or request an expansion.</p>
                     </div>
@@ -63,8 +63,8 @@ export default function ServiceArea({ areas, requests }) {
 
                     {/* 🚀 LEFT: ASSIGNED AREAS */}
                     <div className="xl:col-span-2 space-y-6">
-                        <h3 className="font-black text-[#1A1A2E] uppercase tracking-widest text-sm flex items-center gap-2">
-                            <MapPin size={18} className="text-[#E94E3C]" /> Currently Active Zones
+                        <h3 className="font-black text-[#282c3f] uppercase tracking-widest text-sm flex items-center gap-2">
+                            <MapPin size={18} className="text-[#ff3f6c]" /> Currently Active Zones
                         </h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -78,12 +78,12 @@ export default function ServiceArea({ areas, requests }) {
                                         </div>
                                         <div className="text-right">
                                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pincode</p>
-                                            <h4 className="text-2xl font-black text-[#1A1A2E]">{area.pincode}</h4>
+                                            <h4 className="text-2xl font-black text-[#282c3f]">{area.pincode}</h4>
                                         </div>
                                     </div>
 
                                     <div className="space-y-1 mb-4">
-                                        <p className="font-bold text-[#1A1A2E] text-lg">{area.locality}</p>
+                                        <p className="font-bold text-[#282c3f] text-lg">{area.locality}</p>
                                         <p className="text-sm font-bold text-gray-500">{area.city}, {area.state}</p>
                                     </div>
 
@@ -95,7 +95,7 @@ export default function ServiceArea({ areas, requests }) {
                             )) : (
                                 <div className="col-span-2 bg-white rounded-3xl p-10 text-center border border-gray-100 shadow-sm">
                                     <AlertTriangle size={48} className="mx-auto text-orange-400 mb-4" strokeWidth={1.5} />
-                                    <h3 className="text-[#1A1A2E] font-black text-lg uppercase">No Active Zones Assigned</h3>
+                                    <h3 className="text-[#282c3f] font-black text-lg uppercase">No Active Zones Assigned</h3>
                                     <p className="text-gray-500 text-sm font-bold mt-1">Please raise an expansion request to start receiving orders.</p>
                                 </div>
                             )}
@@ -104,7 +104,7 @@ export default function ServiceArea({ areas, requests }) {
                         {/* REQUEST HISTORY TABLE */}
                         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mt-8">
                             <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                                <h3 className="font-black text-[#1A1A2E] uppercase tracking-widest text-xs flex items-center gap-2">
+                                <h3 className="font-black text-[#282c3f] uppercase tracking-widest text-xs flex items-center gap-2">
                                     <Clock size={16} className="text-gray-500" /> Expansion Request History
                                 </h3>
                             </div>
@@ -121,11 +121,11 @@ export default function ServiceArea({ areas, requests }) {
                                         {requests.map((req) => (
                                             <tr key={req.id} className="hover:bg-gray-50/80 transition-colors">
                                                 <td className="px-6 py-4">
-                                                    <p className="font-bold text-[#1A1A2E] text-sm">{req.request_type}</p>
+                                                    <p className="font-bold text-[#282c3f] text-sm">{req.request_type}</p>
                                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">{new Date(req.created_at).toLocaleDateString()}</p>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <p className="font-bold text-[#1A1A2E] text-sm">{req.requested_locality} - {req.requested_pincode}</p>
+                                                    <p className="font-bold text-[#282c3f] text-sm">{req.requested_locality} - {req.requested_pincode}</p>
                                                     <p className="text-[10px] font-bold text-gray-500">{req.requested_city}, {req.requested_state}</p>
                                                 </td>
                                                 <td className="px-6 py-4">
@@ -147,10 +147,10 @@ export default function ServiceArea({ areas, requests }) {
 
                     {/* 🚀 RIGHT: REQUEST NEW AREA FORM */}
                     <div className="xl:col-span-1">
-                        <div className="bg-[#1A1A2E] rounded-3xl shadow-xl overflow-hidden sticky top-28">
+                        <div className="bg-[#282c3f] rounded-3xl shadow-xl overflow-hidden sticky top-28">
                             <div className="p-6 border-b border-white/10 bg-white/5">
                                 <h3 className="font-black text-white uppercase tracking-widest flex items-center gap-2">
-                                    <PlusCircle size={18} className="text-[#E94E3C]" /> Request Area Expansion
+                                    <PlusCircle size={18} className="text-[#ff3f6c]" /> Request Area Expansion
                                 </h3>
                                 <p className="text-[10px] text-gray-400 mt-1 font-bold">Subject to Super Admin approval & feasibility check.</p>
                             </div>
@@ -158,7 +158,7 @@ export default function ServiceArea({ areas, requests }) {
                             <form onSubmit={submitRequest} className="p-6 space-y-4">
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Request Type *</label>
-                                    <select required value={data.request_type} onChange={e => setData('request_type', e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 font-bold text-white focus:ring-2 focus:ring-[#E94E3C] outline-none">
+                                    <select required value={data.request_type} onChange={e => setData('request_type', e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 font-bold text-white focus:ring-2 focus:ring-[#ff3f6c] outline-none">
                                         <option className="text-black" value="Pincode Expansion">Expand to nearby Pincode</option>
                                         <option className="text-black" value="Add New Area">Add completely New Area</option>
                                         <option className="text-black" value="Change Area">Relocate / Change Area</option>
@@ -168,30 +168,30 @@ export default function ServiceArea({ areas, requests }) {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
                                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">State *</label>
-                                        <input required type="text" value={data.requested_state} onChange={e => setData('requested_state', e.target.value)} placeholder="e.g. UP" className="w-full bg-white border-none rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none" />
+                                        <input required type="text" value={data.requested_state} onChange={e => setData('requested_state', e.target.value)} placeholder="e.g. UP" className="w-full bg-white border-none rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none" />
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">City *</label>
-                                        <input required type="text" value={data.requested_city} onChange={e => setData('requested_city', e.target.value)} placeholder="e.g. Noida" className="w-full bg-white border-none rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none" />
+                                        <input required type="text" value={data.requested_city} onChange={e => setData('requested_city', e.target.value)} placeholder="e.g. Noida" className="w-full bg-white border-none rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none" />
                                     </div>
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Locality / Area Name *</label>
-                                    <input required type="text" value={data.requested_locality} onChange={e => setData('requested_locality', e.target.value)} placeholder="e.g. Sector 62" className="w-full bg-white border-none rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none" />
+                                    <input required type="text" value={data.requested_locality} onChange={e => setData('requested_locality', e.target.value)} placeholder="e.g. Sector 62" className="w-full bg-white border-none rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none" />
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pincode *</label>
-                                    <input required type="text" maxLength="6" value={data.requested_pincode} onChange={e => setData('requested_pincode', e.target.value)} placeholder="e.g. 201309" className="w-full bg-white border-none rounded-xl px-4 py-3 font-black text-xl text-[#1A1A2E] tracking-widest focus:ring-2 focus:ring-[#E94E3C] outline-none" />
+                                    <input required type="text" maxLength="6" value={data.requested_pincode} onChange={e => setData('requested_pincode', e.target.value)} placeholder="e.g. 201309" className="w-full bg-white border-none rounded-xl px-4 py-3 font-black text-xl text-[#282c3f] tracking-widest focus:ring-2 focus:ring-[#ff3f6c] outline-none" />
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Business Reason *</label>
-                                    <textarea required rows="3" value={data.reason} onChange={e => setData('reason', e.target.value)} placeholder="Why do you want to expand here?" className="w-full bg-white border-none rounded-xl px-4 py-3 font-bold text-[#1A1A2E] text-sm focus:ring-2 focus:ring-[#E94E3C] outline-none resize-none"></textarea>
+                                    <textarea required rows="3" value={data.reason} onChange={e => setData('reason', e.target.value)} placeholder="Why do you want to expand here?" className="w-full bg-white border-none rounded-xl px-4 py-3 font-bold text-[#282c3f] text-sm focus:ring-2 focus:ring-[#ff3f6c] outline-none resize-none"></textarea>
                                 </div>
 
-                                <button disabled={processing} type="submit" className="w-full bg-[#E94E3C] text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-[#c0392b] transition-colors mt-2 shadow-xl shadow-[#E94E3C]/20 flex items-center justify-center gap-2">
+                                <button disabled={processing} type="submit" className="w-full bg-[#ff3f6c] text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-[#c0392b] transition-colors mt-2 shadow-xl shadow-[#ff3f6c]/20 flex items-center justify-center gap-2">
                                     {processing ? 'Submitting...' : 'Submit Request'} <Send size={18} />
                                 </button>
                             </form>

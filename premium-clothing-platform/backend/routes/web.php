@@ -103,7 +103,7 @@ Route::get('/page/{slug}', fn (string $slug) => $staticPage($slug, ['eyebrow' =>
 
 // Shop & Collections
 Route::get('/shop', [StorefrontController::class, 'shop'])->name('shop');
-Route::get('/offers', [StorefrontController::class, 'offers'])->name('offers');
+Route::redirect('/offers', '/')->name('offers');
 Route::get('/sports-wear', [StorefrontController::class, 'sportsWear'])->name('sports-wear');
 Route::redirect('/men', '/shop?gender=men')->name('men');
 Route::redirect('/women', '/shop?gender=women')->name('women');
@@ -255,7 +255,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/coupons', [AdminCouponController::class, 'store']);
         Route::post('/coupons/{id}/toggle-status', [AdminCouponController::class, 'toggleStatus']);
         Route::delete('/coupons/{id}', [AdminCouponController::class, 'destroy']);
+        Route::post('/offers', [AdminCouponController::class, 'storeOffer'])->name('superadmin.offers.store');
         Route::put('/offers/{id}', [AdminCouponController::class, 'updateOffer'])->name('superadmin.offers.update');
+        Route::delete('/offers/{id}', [AdminCouponController::class, 'destroyOffer'])->name('superadmin.offers.destroy');
         
         Route::get('/content', [AdminContentController::class, 'index'])->name('admin.content');
         Route::post('/content/settings', [AdminContentController::class, 'updateSettings']);

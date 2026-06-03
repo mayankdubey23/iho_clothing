@@ -24,8 +24,8 @@ export default function Analytics({ kpis, topProducts, orderStatuses, inventoryH
                 {/* 🚀 HEADER & GLOBAL FILTERS */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
                     <div>
-                        <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                            <BarChart3 className="text-[#E94E3C]" size={32} /> Reports & Analytics
+                        <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                            <BarChart3 className="text-[#ff3f6c]" size={32} /> Reports & Analytics
                         </h1>
                         <p className="text-gray-500 font-bold text-sm mt-1">Deep dive into your sales, inventory performance, and profit margins.</p>
                     </div>
@@ -35,7 +35,7 @@ export default function Analytics({ kpis, topProducts, orderStatuses, inventoryH
                         <select
                             value={filters.dateFilter}
                             onChange={updateDateFilter}
-                            className="bg-transparent border-none text-sm font-bold text-[#1A1A2E] focus:ring-0 outline-none cursor-pointer py-2 pr-8"
+                            className="bg-transparent border-none text-sm font-bold text-[#282c3f] focus:ring-0 outline-none cursor-pointer py-2 pr-8"
                         >
                             <option value="today">Today</option>
                             <option value="yesterday">Yesterday</option>
@@ -48,7 +48,7 @@ export default function Analytics({ kpis, topProducts, orderStatuses, inventoryH
 
                 {/* 🚀 TOP KPI CARDS */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <div className="bg-gradient-to-br from-[#1A1A2E] to-[#0F3460] text-white p-6 rounded-3xl shadow-lg relative overflow-hidden">
+                    <div className="bg-gradient-to-br from-[#282c3f] to-[#282c3f] text-white p-6 rounded-3xl shadow-lg relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
                         <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Total Revenue (B2C)</p>
                         <h4 className="text-3xl font-black text-white flex items-center gap-1">₹{Number(kpis.revenue).toLocaleString()}</h4>
@@ -66,8 +66,8 @@ export default function Analytics({ kpis, topProducts, orderStatuses, inventoryH
                         {/* Top Products Table */}
                         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                             <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                                <h3 className="font-black text-[#1A1A2E] uppercase tracking-widest text-xs flex items-center gap-2">
-                                    <TrendingUp size={16} className="text-[#E94E3C]" /> Top Selling Products
+                                <h3 className="font-black text-[#282c3f] uppercase tracking-widest text-xs flex items-center gap-2">
+                                    <TrendingUp size={16} className="text-[#ff3f6c]" /> Top Selling Products
                                 </h3>
                             </div>
                             <div className="overflow-x-auto">
@@ -83,7 +83,7 @@ export default function Analytics({ kpis, topProducts, orderStatuses, inventoryH
                                         {topProducts.length > 0 ? topProducts.map((product, idx) => (
                                             <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
                                                 <td className="px-6 py-4">
-                                                    <p className="font-bold text-[#1A1A2E] text-sm">{product.name}</p>
+                                                    <p className="font-bold text-[#282c3f] text-sm">{product.name}</p>
                                                     <p className="text-[10px] font-black text-gray-400 uppercase mt-0.5">SKU: {product.sku}</p>
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
@@ -103,7 +103,7 @@ export default function Analytics({ kpis, topProducts, orderStatuses, inventoryH
 
                         {/* Inventory Health Bar */}
                         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
-                            <h3 className="font-black text-[#1A1A2E] uppercase tracking-widest text-xs mb-6 flex items-center gap-2">
+                            <h3 className="font-black text-[#282c3f] uppercase tracking-widest text-xs mb-6 flex items-center gap-2">
                                 <PackageSearch size={16} className="text-blue-500" /> Current Inventory Health
                             </h3>
                             <div className="flex gap-4">
@@ -120,7 +120,7 @@ export default function Analytics({ kpis, topProducts, orderStatuses, inventoryH
 
                         {/* Order Status Distribution */}
                         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
-                            <h3 className="font-black text-[#1A1A2E] uppercase tracking-widest text-xs mb-6 flex items-center gap-2">
+                            <h3 className="font-black text-[#282c3f] uppercase tracking-widest text-xs mb-6 flex items-center gap-2">
                                 <ShoppingBag size={16} className="text-indigo-500" /> Order Status Breakdown
                             </h3>
                             <div className="space-y-4">
@@ -129,7 +129,7 @@ export default function Analytics({ kpis, topProducts, orderStatuses, inventoryH
                                     return (
                                         <div key={idx}>
                                             <div className="flex justify-between text-xs font-bold mb-1.5">
-                                                <span className="text-[#1A1A2E]">{status.status}</span>
+                                                <span className="text-[#282c3f]">{status.status}</span>
                                                 <span className="text-gray-500">{status.count} ({percentage}%)</span>
                                             </div>
                                             <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
@@ -145,13 +145,13 @@ export default function Analytics({ kpis, topProducts, orderStatuses, inventoryH
 
                         {/* Returns Activity */}
                         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
-                            <h3 className="font-black text-[#1A1A2E] uppercase tracking-widest text-xs mb-6 flex items-center gap-2">
+                            <h3 className="font-black text-[#282c3f] uppercase tracking-widest text-xs mb-6 flex items-center gap-2">
                                 <RotateCcw size={16} className="text-pink-500" /> Return Requests Activity
                             </h3>
                             <div className="space-y-3">
                                 {returnsData.length > 0 ? returnsData.map((ret, idx) => (
                                     <div key={idx} className="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
-                                        <span className="text-xs font-bold text-[#1A1A2E]">{ret.status}</span>
+                                        <span className="text-xs font-bold text-[#282c3f]">{ret.status}</span>
                                         <span className="text-sm font-black text-pink-600 bg-pink-50 px-2 py-0.5 rounded">{ret.count}</span>
                                     </div>
                                 )) : (
@@ -174,7 +174,7 @@ function MetricCard({ title, value, icon: Icon, color, alert }) {
         <div className={`bg-white p-6 rounded-3xl border ${alert ? 'border-red-200 shadow-red-500/10' : 'border-gray-100 shadow-black/5'} shadow-sm flex items-center justify-between`}>
             <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">{title}</p>
-                <h4 className="text-2xl font-black text-[#1A1A2E] truncate">{value}</h4>
+                <h4 className="text-2xl font-black text-[#282c3f] truncate">{value}</h4>
             </div>
             <div className={`size-14 rounded-2xl flex items-center justify-center ${alert ? 'bg-red-50 text-red-500' : 'bg-gray-50'} ${color}`}>
                 <Icon size={24} strokeWidth={2.5} />

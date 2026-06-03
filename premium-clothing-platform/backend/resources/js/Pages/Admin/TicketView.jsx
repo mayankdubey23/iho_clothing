@@ -45,10 +45,10 @@ export default function TicketView({ ticket, messages }) {
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-4">
                         <Link href="/franchise-superadmin/tickets" className="size-10 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-50 transition-all">
-                            <ArrowLeft size={18} className="text-[#1A1A2E]" />
+                            <ArrowLeft size={18} className="text-[#282c3f]" />
                         </Link>
                         <div>
-                            <h1 className="text-xl font-black text-[#1A1A2E] uppercase tracking-tighter">
+                            <h1 className="text-xl font-black text-[#282c3f] uppercase tracking-tighter">
                                 {ticket.ticket_number} : {ticket.subject}
                             </h1>
                             <p className="text-xs font-bold text-gray-400">Created on {new Date(ticket.created_at).toLocaleString()}</p>
@@ -82,10 +82,10 @@ export default function TicketView({ ticket, messages }) {
                                     animate={{ opacity: 1, x: 0 }}
                                     className={`flex ${msg.is_admin_reply ? 'justify-end' : 'justify-start'}`}
                                 >
-                                    <div className={`max-w-[85%] ${msg.is_admin_reply ? 'bg-[#1A1A2E] text-white' : 'bg-white text-gray-800'} rounded-3xl p-5 shadow-sm border ${!msg.is_admin_reply ? 'border-gray-200' : 'border-[#1A1A2E]'}`}>
+                                    <div className={`max-w-[85%] ${msg.is_admin_reply ? 'bg-[#282c3f] text-white' : 'bg-white text-gray-800'} rounded-3xl p-5 shadow-sm border ${!msg.is_admin_reply ? 'border-gray-200' : 'border-[#282c3f]'}`}>
                                         <div className="flex items-center justify-between mb-2 gap-4">
                                             <span className="text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
-                                                {msg.is_admin_reply ? <ShieldCheck size={12} className="text-[#E94E3C]" /> : <User size={12} />}
+                                                {msg.is_admin_reply ? <ShieldCheck size={12} className="text-[#ff3f6c]" /> : <User size={12} />}
                                                 {msg.sender_name}
                                             </span>
                                             <span className={`text-[9px] font-bold ${msg.is_admin_reply ? 'text-gray-400' : 'text-gray-400'}`}>
@@ -98,7 +98,7 @@ export default function TicketView({ ticket, messages }) {
                                         {msg.attachments?.length > 0 && (
                                             <div className="mt-4 pt-3 border-t border-white/10 flex flex-wrap gap-2">
                                                 {msg.attachments.map(file => (
-                                                    <a key={file.id} href={`/storage/${file.file_path}`} target="_blank" className={`flex items-center gap-2 p-2 rounded-lg text-[10px] font-bold ${msg.is_admin_reply ? 'bg-white/10 text-white' : 'bg-gray-100 text-[#1A1A2E]'}`}>
+                                                    <a key={file.id} href={`/storage/${file.file_path}`} target="_blank" className={`flex items-center gap-2 p-2 rounded-lg text-[10px] font-bold ${msg.is_admin_reply ? 'bg-white/10 text-white' : 'bg-gray-100 text-[#282c3f]'}`}>
                                                         <FileText size={14} /> {file.file_name} <Download size={12} />
                                                     </a>
                                                 ))}
@@ -117,7 +117,7 @@ export default function TicketView({ ticket, messages }) {
                                     value={data.message}
                                     onChange={e => setData('message', e.target.value)}
                                     placeholder="Type your response here..."
-                                    className="w-full border-none focus:ring-0 text-sm font-bold text-[#1A1A2E] placeholder-gray-300 resize-none p-4"
+                                    className="w-full border-none focus:ring-0 text-sm font-bold text-[#282c3f] placeholder-gray-300 resize-none p-4"
                                     required
                                 />
                                 <div className="flex items-center justify-between pt-4 border-t border-gray-50">
@@ -129,7 +129,7 @@ export default function TicketView({ ticket, messages }) {
                                         <select
                                             value={data.status}
                                             onChange={e => setData('status', e.target.value)}
-                                            className="bg-gray-50 border-none text-[10px] font-black uppercase tracking-widest text-[#1A1A2E] rounded-xl focus:ring-2 focus:ring-[#E94E3C]"
+                                            className="bg-gray-50 border-none text-[10px] font-black uppercase tracking-widest text-[#282c3f] rounded-xl focus:ring-2 focus:ring-[#ff3f6c]"
                                         >
                                             <option value="In Progress">Keep In Progress</option>
                                             <option value="Waiting for Customer">Waiting for Customer</option>
@@ -139,7 +139,7 @@ export default function TicketView({ ticket, messages }) {
                                     <button
                                         disabled={processing}
                                         type="submit"
-                                        className="bg-[#1A1A2E] text-white px-8 py-3.5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-[#E94E3C] transition-all flex items-center gap-2 shadow-lg shadow-black/10 disabled:opacity-50"
+                                        className="bg-[#282c3f] text-white px-8 py-3.5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-[#ff3f6c] transition-all flex items-center gap-2 shadow-lg shadow-black/10 disabled:opacity-50"
                                     >
                                         {processing ? 'Sending...' : 'Send Reply'} <Send size={16} />
                                     </button>
@@ -168,11 +168,11 @@ export default function TicketView({ ticket, messages }) {
                                 <User size={14} /> Requester Profile
                             </h3>
                             <div className="flex items-center gap-4 mb-6">
-                                <div className="size-14 bg-gradient-to-tr from-[#1A1A2E] to-gray-700 text-white rounded-2xl flex items-center justify-center font-black text-xl">
+                                <div className="size-14 bg-gradient-to-tr from-[#282c3f] to-gray-700 text-white rounded-2xl flex items-center justify-center font-black text-xl">
                                     {(ticket.creator_name || 'U')[0]}
                                 </div>
                                 <div>
-                                    <p className="font-black text-[#1A1A2E]">{ticket.creator_name}</p>
+                                    <p className="font-black text-[#282c3f]">{ticket.creator_name}</p>
                                     <p className={`text-[10px] font-black px-2 py-0.5 rounded-md inline-block uppercase mt-1 ${ticket.user_type === 'Customer' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
                                         {ticket.user_type}
                                     </p>
@@ -181,17 +181,17 @@ export default function TicketView({ ticket, messages }) {
                             <div className="space-y-4 pt-4 border-t border-gray-50">
                                 <div>
                                     <p className="text-[10px] font-black text-gray-400 uppercase">Email Address</p>
-                                    <p className="text-xs font-bold text-[#1A1A2E]">{ticket.email}</p>
+                                    <p className="text-xs font-bold text-[#282c3f]">{ticket.email}</p>
                                 </div>
                                 <div>
                                     <p className="text-[10px] font-black text-gray-400 uppercase">Phone Number</p>
-                                    <p className="text-xs font-bold text-[#1A1A2E]">{ticket.phone || 'N/A'}</p>
+                                    <p className="text-xs font-bold text-[#282c3f]">{ticket.phone || 'N/A'}</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Ticket Stats */}
-                        <div className="bg-[#1A1A2E] rounded-[2rem] p-6 text-white shadow-xl shadow-black/10">
+                        <div className="bg-[#282c3f] rounded-[2rem] p-6 text-white shadow-xl shadow-black/10">
                             <h3 className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-6">Internal Status</h3>
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center">

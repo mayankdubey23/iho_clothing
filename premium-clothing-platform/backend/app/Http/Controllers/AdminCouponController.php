@@ -41,11 +41,18 @@ class AdminCouponController extends Controller
 
         // 🚀 NEW: Fetch Storefront Visual Offers (Banners)
         $storeOffers = Schema::hasTable('store_offers')
-            ? DB::table('store_offers')->get()->map(function ($offer) {
+            ? DB::table('store_offers')
+                ->when(Schema::hasColumn('store_offers', 'sort_order'), fn ($query) => $query->orderBy('sort_order'))
+                ->latest()
+                ->get()
+                ->map(function ($offer) {
                 $offer->offer_code = $offer->offer_code ?? $offer->code ?? null;
                 $offer->code = $offer->code ?? $offer->offer_code ?? null;
                 $offer->subtitle = $offer->subtitle ?? '';
                 $offer->display_type = $offer->display_type ?? 'store_offer';
+                $offer->bg_image = $offer->bg_image ?? null;
+                $offer->target_url = $offer->target_url ?? '/shop';
+                $offer->sort_order = $offer->sort_order ?? 0;
                 return $offer;
             })
             : collect();
@@ -107,35 +114,77 @@ class AdminCouponController extends Controller
     // ====================================================================
     // 🚀 NEW: Method to Update the Visual Storefront Offers (Banners)
     // ====================================================================
+    public function storeOffer(Request $request)
+    {
+        abort_unless(Schema::hasTable('store_offers'), 404, 'Store offer banners table is not available.');
+
+        DB::table('store_offers')->insert($this->offerPayload($this->validateOffer($request), true));
+
+        return back()->with('success', 'Storefront offer banner created successfully!');
+    }
+
     public function updateOffer(Request $request, $id)
     {
-        $validated = $request->validate([
+        abort_unless(Schema::hasTable('store_offers'), 404, 'Store offer banners table is not available.');
+
+        DB::table('store_offers')->where('id', $id)->update($this->offerPayload($this->validateOffer($request)));
+
+        return back()->with('success', 'Storefront offer banner updated successfully!');
+    }
+
+    public function destroyOffer($id)
+    {
+        abort_unless(Schema::hasTable('store_offers'), 404, 'Store offer banners table is not available.');
+
+        DB::table('store_offers')->where('id', $id)->delete();
+
+        return back()->with('success', 'Storefront offer banner deleted.');
+    }
+
+    private function validateOffer(Request $request): array
+    {
+        return $request->validate([
             'title' => 'required|string|max:255',
             'subtitle' => 'nullable|string|max:255',
             'offer_code' => 'nullable|string|max:50',
+            'display_type' => 'nullable|string|max:50',
+            'bg_image' => 'nullable|string|max:1000',
+            'target_url' => 'nullable|string|max:255',
+            'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
         ]);
+    }
 
-        abort_unless(Schema::hasTable('store_offers'), 404, 'Store offer banners table is not available.');
-
-        $updates = [
+    private function offerPayload(array $validated, bool $creating = false): array
+    {
+        $payload = [
             'title' => $validated['title'],
             'is_active' => $validated['is_active'] ?? false,
             'updated_at' => now(),
         ];
 
-        if (Schema::hasColumn('store_offers', 'subtitle')) {
-            $updates['subtitle'] = $validated['subtitle'] ?? null;
+        if ($creating) {
+            $payload['created_at'] = now();
+        }
+
+        foreach ([
+            'subtitle' => $validated['subtitle'] ?? null,
+            'display_type' => $validated['display_type'] ?? 'store_offer',
+            'bg_image' => $validated['bg_image'] ?? null,
+            'target_url' => $validated['target_url'] ?? '/shop',
+            'sort_order' => $validated['sort_order'] ?? 0,
+        ] as $column => $value) {
+            if (Schema::hasColumn('store_offers', $column)) {
+                $payload[$column] = $value;
+            }
         }
 
         if (Schema::hasColumn('store_offers', 'offer_code')) {
-            $updates['offer_code'] = $validated['offer_code'] ?? null;
+            $payload['offer_code'] = $validated['offer_code'] ?? null;
         } elseif (Schema::hasColumn('store_offers', 'code')) {
-            $updates['code'] = $validated['offer_code'] ?? null;
+            $payload['code'] = $validated['offer_code'] ?? null;
         }
 
-        DB::table('store_offers')->where('id', $id)->update($updates);
-
-        return back()->with('success', 'Storefront offer banner updated successfully!');
+        return $payload;
     }
 }

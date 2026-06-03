@@ -110,8 +110,8 @@ export default function BuyStock({ requests, masterProducts = [] }) {
 
                 {/* 🚀 HEADER */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-black text-[#1A1A2E] uppercase tracking-tighter flex items-center gap-3">
-                        <PackagePlus className="text-[#E94E3C]" size={32} /> Buy Stock
+                    <h1 className="text-3xl font-black text-[#282c3f] uppercase tracking-tighter flex items-center gap-3">
+                        <PackagePlus className="text-[#ff3f6c]" size={32} /> Buy Stock
                     </h1>
                     <p className="text-gray-500 font-bold text-sm mt-1">Request fresh inventory from the Master Warehouse.</p>
                 </div>
@@ -121,7 +121,7 @@ export default function BuyStock({ requests, masterProducts = [] }) {
                     {/* 🚀 LEFT: CREATE NEW REQUEST FORM */}
                     <div className="lg:col-span-1 space-y-6">
                         <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-                            <h3 className="font-black text-[#1A1A2E] uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <h3 className="font-black text-[#282c3f] uppercase tracking-widest mb-4 flex items-center gap-2">
                                 <ShoppingCart size={18} /> Draft Request
                             </h3>
 
@@ -131,7 +131,7 @@ export default function BuyStock({ requests, masterProducts = [] }) {
                                     <select
                                         value={selectedProduct}
                                         onChange={e => setSelectedProduct(e.target.value)}
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none cursor-pointer"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none cursor-pointer"
                                     >
                                         <option value="">-- Choose from Catalog --</option>
                                         {masterProducts && masterProducts.map(p => (
@@ -147,7 +147,7 @@ export default function BuyStock({ requests, masterProducts = [] }) {
                                         min="1"
                                         value={quantity}
                                         onChange={e => setQuantity(e.target.value)}
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#1A1A2E] focus:ring-2 focus:ring-[#E94E3C] outline-none"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] focus:ring-2 focus:ring-[#ff3f6c] outline-none"
                                     />
                                 </div>
 
@@ -179,7 +179,7 @@ export default function BuyStock({ requests, masterProducts = [] }) {
                                         {cart.map((item, idx) => (
                                             <div key={idx} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100 group hover:border-gray-300 transition-colors">
                                                 <div>
-                                                    <p className="font-bold text-[#1A1A2E] text-xs">{item.name}</p>
+                                                    <p className="font-bold text-[#282c3f] text-xs">{item.name}</p>
                                                     <p className="text-[10px] font-black text-gray-500 uppercase mt-0.5">Qty: {item.quantity}</p>
                                                 </div>
                                                 <button onClick={() => removeFromCart(idx)} className="text-gray-300 hover:text-red-500 transition-colors p-2">
@@ -195,7 +195,7 @@ export default function BuyStock({ requests, masterProducts = [] }) {
                                     <button
                                         disabled={processing}
                                         onClick={submitRequest}
-                                        className="w-full bg-[#1A1A2E] text-white py-3.5 rounded-xl font-black uppercase tracking-widest hover:bg-[#E94E3C] transition-colors shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 active:scale-95"
+                                        className="w-full bg-[#282c3f] text-white py-3.5 rounded-xl font-black uppercase tracking-widest hover:bg-[#ff3f6c] transition-colors shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 active:scale-95"
                                     >
                                         <Send size={16} /> {processing ? 'Sending Request...' : 'Submit Request'}
                                     </button>
@@ -208,7 +208,7 @@ export default function BuyStock({ requests, masterProducts = [] }) {
                     <div className="lg:col-span-2">
                         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden h-full flex flex-col">
                             <div className="p-6 border-b border-gray-100 bg-gray-50/50">
-                                <h3 className="font-black text-[#1A1A2E] uppercase tracking-widest flex items-center gap-2">
+                                <h3 className="font-black text-[#282c3f] uppercase tracking-widest flex items-center gap-2">
                                     <Clock size={18} /> Request History
                                 </h3>
                             </div>
@@ -226,7 +226,7 @@ export default function BuyStock({ requests, masterProducts = [] }) {
                                         {requests?.data?.map((req) => (
                                             <tr key={req.id} className="hover:bg-gray-50/80 transition-colors">
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <p className="font-black text-[#1A1A2E] text-sm">{req.request_number || `#REQ-${req.id}`}</p>
+                                                    <p className="font-black text-[#282c3f] text-sm">{req.request_number || `#REQ-${req.id}`}</p>
                                                     <p className="text-[10px] font-bold text-gray-400 uppercase mt-1">
                                                         {new Date(req.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                                                     </p>
@@ -258,7 +258,7 @@ export default function BuyStock({ requests, masterProducts = [] }) {
                                             <tr>
                                                 <td colSpan="3" className="px-6 py-24 text-center">
                                                     <Package size={48} className="mx-auto text-gray-200 mb-4" strokeWidth={1} />
-                                                    <p className="text-[#1A1A2E] font-black text-lg">No Requests Made</p>
+                                                    <p className="text-[#282c3f] font-black text-lg">No Requests Made</p>
                                                     <p className="text-gray-400 text-sm font-bold mt-1">Your stock request history will appear here.</p>
                                                 </td>
                                             </tr>
