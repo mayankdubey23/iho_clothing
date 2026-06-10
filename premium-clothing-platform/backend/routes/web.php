@@ -193,7 +193,7 @@ Route::middleware(['auth'])->group(function () {
     // ==========================================
     // 👑 2. SUPER ADMIN SECTOR 
     // ==========================================
-    Route::prefix('franchise-superadmin')->group(function () {
+    Route::middleware(['super_admin'])->prefix('franchise-superadmin')->group(function () {
         
         // Dashboards
         Route::get('/', [AdminDashboardController::class, 'index'])->name('admin.dashboard.base');
@@ -206,9 +206,11 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/banners/{banner}', [AdminBannerController::class, 'destroy'])->name('admin.banners.destroy');
 
         // Products & Categories
-        Route::get('/products', [AdminProductController::class, 'index'])->name('admin.products');
+        Route::get('/products', [AdminProductController::class, 'index'])->name('admin.products.index');
+        Route::get('/products/create', [AdminProductController::class, 'create'])->name('admin.products.create');
         Route::post('/products', [AdminProductController::class, 'store'])->name('admin.products.store');
-        Route::put('/products/{product}', [ProductController::class, 'update']);
+        Route::get('/products/{product}/edit', [AdminProductController::class, 'edit'])->name('admin.products.edit');
+        Route::put('/products/{product}', [AdminProductController::class, 'update'])->name('admin.products.update');
         Route::post('/products/{id}/toggle-status', [AdminProductController::class, 'toggleStatus']);
         
         // ✅ CORRECTED CATEGORY ROUTES
@@ -262,7 +264,27 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/content', [AdminContentController::class, 'index'])->name('admin.content');
         Route::post('/content/settings', [AdminContentController::class, 'updateSettings']);
         Route::post('/content/pages', [AdminContentController::class, 'storePage']);
+        Route::put('/content/pages/{id}', [AdminContentController::class, 'updatePage']);
+        Route::delete('/content/pages/{id}', [AdminContentController::class, 'destroyPage']);
         
+        // 🚀 TESTIMONIALS CRUD ROUTES
+        Route::post('/content/testimonials', [AdminContentController::class, 'storeTestimonial']);
+        Route::put('/content/testimonials/{id}', [AdminContentController::class, 'updateTestimonial']);
+        Route::delete('/content/testimonials/{id}', [AdminContentController::class, 'destroyTestimonial']);
+        
+        // 🚀 TOGGLE STATUS FOR CMS ITEMS
+        Route::post('/content/toggle-status', [AdminContentController::class, 'toggleStatus']);
+        
+        // 🚀 SHOP PAGE & GYM WEAR SETTINGS
+        Route::post('/content/shop-page', [AdminContentController::class, 'updateSettings']);
+        Route::post('/content/gym-wear', [AdminContentController::class, 'updateSettings']);
+        
+        // 🚀 FEATURED CATEGORIES ROUTES
+        Route::post('/content/featured-categories', [AdminContentController::class, 'storeFeaturedCategory']);
+        Route::put('/content/featured-categories/{id}', [AdminContentController::class, 'updateFeaturedCategory']);
+        Route::delete('/content/featured-categories/{id}', [AdminContentController::class, 'destroyFeaturedCategory']);
+        Route::post('/content/featured-categories/{id}/toggle', [AdminContentController::class, 'toggleFeaturedCategory']);
+
         // 🚀 SERVICE AREAS ROUTES
         Route::get('/service-areas', [AdminServiceAreaController::class, 'index'])->name('admin.service_areas');
         Route::post('/service-areas', [AdminServiceAreaController::class, 'store']);

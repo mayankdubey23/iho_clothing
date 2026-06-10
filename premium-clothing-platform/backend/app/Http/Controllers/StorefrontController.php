@@ -480,6 +480,9 @@ class StorefrontController extends Controller
                     'name' => $item->name,
                     'slug' => $item->slug,
                     'image' => $item->image_path ? asset('storage/' . ltrim($item->image_path, '/')) : null,
+                    'banner_image' => $item->banner_image_path ? asset('storage/' . ltrim($item->banner_image_path, '/')) : null,
+                    'accent_color' => $item->accent_color,
+                    'style_theme' => $item->style_theme,
                     'image_alt' => $item->name,
                     'sort_order' => $item->sort_order,
                 ])

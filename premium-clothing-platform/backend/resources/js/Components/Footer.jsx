@@ -1,103 +1,119 @@
 import React from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { ArrowRight, CreditCard } from 'lucide-react';
-import { FaInstagram, FaTwitter, FaFacebookF, FaYoutube } from 'react-icons/fa';
+import { ArrowRight, MapPin, Mail } from 'lucide-react';
 
-const defaultLinkGroups = [
-    { title: 'Shop', links: [
-        { label: 'All Products', href: '/shop' },
-        { label: 'Men', href: '/shop?gender=men' },
-        { label: 'Women', href: '/shop?gender=women' },
-        { label: 'Gym Wear', href: '/shop?category=gym-wear' },
-        { label: 'New Drops', href: '/shop?sort=newest', highlight: true },
-    ] },
-    { title: 'Support', links: [
-        { label: 'Order Tracking', href: '/account?tab=orders' },
-        { label: 'Shipping Policy', href: '/shipping' },
-        { label: 'Returns & Refunds', href: '/returns' },
-        { label: 'Help Center', href: '/support' },
-        { label: 'Contact Support', href: '/support' },
-    ] },
-    { title: 'Company', links: [
-        { label: 'Our Story', href: '/about' },
-        { label: 'Franchise Program', href: '/franchise-apply' },
-        { label: 'Privacy Policy', href: '/privacy-policy' },
-        { label: 'Terms & Conditions', href: '/terms' },
-        { label: 'Cancellation', href: '/cancellation' },
-    ] },
-];
+// --- CUSTOM SOCIAL ICONS ---
+const Facebook = ({ size = 18, className }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+    </svg>
+);
 
-const defaultSocialLinks = [
-    { icon: 'instagram', label: 'Instagram', href: '#' },
-    { icon: 'twitter', label: 'Twitter', href: '#' },
-    { icon: 'youtube', label: 'YouTube', href: '#' },
-    { icon: 'facebook', label: 'Facebook', href: '#' },
-];
+const Instagram = ({ size = 18, className }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+        <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    </svg>
+);
 
-const defaultBottomLinks = [
-    { label: 'About', href: '/about' },
-    { label: 'Shipping', href: '/shipping' },
-    { label: 'Returns', href: '/returns' },
-    { label: 'Privacy', href: '/privacy-policy' },
-    { label: 'Terms', href: '/terms' },
-];
+const Twitter = ({ size = 18, className }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+    </svg>
+);
 
-const socialIconMap = {
-    instagram: FaInstagram,
-    twitter: FaTwitter,
-    youtube: FaYoutube,
-    facebook: FaFacebookF,
-};
+const Youtube = ({ size = 18, className }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z" />
+        <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
+    </svg>
+);
 
 export default function Footer() {
     const { site = {} } = usePage().props;
-    const logoUrl = site.site_logo ? `/storage/${site.site_logo}` : null;
-    const logoMark = site.site_logo_mark || 'IHO';
     const brandName = site.site_brand_name || 'IHO STUDIO';
-    const aboutText = site.footer_about_text || 'IHO Studio brings activewear, streetwear, and daily essentials into one clean fashion storefront with fresh drops, secure checkout, and quick dispatch.';
-    const linkGroups = parseJsonList(site.footer_link_groups_json, defaultLinkGroups);
-    const socialLinks = parseJsonList(site.footer_social_links_json, defaultSocialLinks);
-    const paymentMethods = parseJsonList(site.footer_payment_methods_json, ['VISA', 'MASTER', 'UPI', 'COD']);
-    const bottomLinks = parseJsonList(site.footer_bottom_links_json, defaultBottomLinks).slice(0, 5);
-    const copyright = site.footer_copyright || `Copyright ${new Date().getFullYear()} ${brandName}. ALL RIGHTS RESERVED.`;
-    const adText = site.footer_ad_text || '';
-    const adCta = site.footer_ad_cta || 'Shop Deals';
-    const adHref = site.footer_ad_href || '/shop?discount=40';
+    const supportEmail = site.support_email || 'support@ihostudio.com';
+
+    const footerNav = [
+        {
+            title: 'Directory',
+            links: [
+                { name: 'Latest Drops', href: '/shop?sort=newest' },
+                { name: 'Men\'s Performance', href: '/shop?gender=men' },
+                { name: 'Women\'s Active', href: '/shop?gender=women' },
+                { name: 'Gym Wear Core', href: '/shop?category=gym-wear' },
+            ]
+        },
+        {
+            title: 'Support',
+            links: [
+                { name: 'Track Order', href: '/account?tab=orders' },
+                { name: 'Returns & Exchanges', href: '/returns' },
+                { name: 'Shipping Information', href: '/shipping' },
+                { name: 'Contact Concierge', href: '/support' },
+            ]
+        },
+        {
+            title: 'The Studio',
+            links: [
+                { name: 'Our Story', href: '/about' },
+                { name: 'Franchise Partner', href: '/franchise-enquiry' },
+                { name: 'Privacy Policy', href: '/privacy-policy' },
+                { name: 'Terms of Service', href: '/terms' },
+            ]
+        }
+    ];
 
     return (
-        <footer className="bg-[#282c3f] text-white">
-            {adText && (
-                <Link href={adHref} className="block border-y border-white/10 bg-[#ff3f6c] px-4 py-3 text-white transition hover:bg-[#282c3f]">
-                    <div className="mx-auto flex max-w-7xl flex-col justify-between gap-2 sm:flex-row sm:items-center">
-                        <span className="text-[11px] font-black uppercase tracking-[0.22em]">{adText}</span>
-                        <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em]">
-                            {adCta} <ArrowRight size={14} />
-                        </span>
-                    </div>
-                </Link>
-            )}
+        <footer className="bg-[#0a0a0a] text-white pt-16 pb-8 px-4 sm:px-8 lg:px-16 overflow-hidden relative border-t border-white/10">
+            {/* Subtle background glow */}
+            <div className="absolute top-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-[#ff3f6c] rounded-full blur-[150px] opacity-10 pointer-events-none" />
 
-            <div className="mx-auto max-w-7xl px-6 py-6 lg:px-8">
-                <div className="grid gap-6 lg:grid-cols-[1.2fr_2fr_0.9fr] lg:items-start">
-                    <div>
-                        <Link href="/" className="group flex items-center gap-3">
-                            <div className="grid size-9 place-items-center overflow-hidden bg-white text-[10px] font-black tracking-widest text-[#282c3f]">
-                                {logoUrl ? <img src={logoUrl} alt={brandName} className="h-full w-full object-contain p-1" /> : logoMark}
-                            </div>
-                            <span className="text-xl font-black uppercase italic tracking-tighter">{brandName}</span>
-                        </Link>
-                        <p className="mt-3 max-w-sm text-xs font-semibold leading-5 text-slate-400">{aboutText}</p>
+            <div className="max-w-screen-2xl mx-auto relative z-10">
+                
+                {/* 1. Top Section: Newsletter & Contact */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 mb-10 border-b border-white/10 pb-12">
+                    
+                    {/* Newsletter (Spans 5 columns) */}
+                    <div className="lg:col-span-5">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="h-[2px] w-6 bg-[#ff3f6c]" />
+                            <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-[#ff3f6c]">Join The Movement</span>
+                        </div>
+                        <h3 className="text-2xl md:text-3xl font-black uppercase italic tracking-tighter mb-4 leading-none">
+                            Unlock <br /> Exclusive Access
+                        </h3>
+                        <p className="text-[11px] md:text-xs font-semibold text-white/60 mb-6 max-w-sm leading-relaxed">
+                            Sign up to receive early access to new drops, limited editions, and VIP events.
+                        </p>
+                        
+                        <form className="relative group max-w-sm" onSubmit={(e) => e.preventDefault()}>
+                            <input 
+                                type="email" 
+                                placeholder="ENTER YOUR EMAIL" 
+                                className="w-full bg-white/5 border border-white/20 text-white px-5 py-3.5 text-[10px] md:text-xs font-black uppercase tracking-widest outline-none transition-all focus:border-[#ff3f6c] focus:bg-white/10 placeholder:text-white/30"
+                            />
+                            <button type="submit" className="absolute right-1.5 top-1.5 bottom-1.5 bg-white text-black px-4 flex items-center justify-center hover:bg-[#ff3f6c] hover:text-white transition-colors">
+                                <ArrowRight size={16} strokeWidth={2.5} />
+                            </button>
+                        </form>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
-                        {linkGroups.map((group, index) => (
-                            <div key={`${group.title}-${index}`} className={index === 2 ? 'col-span-2 sm:col-span-1' : ''}>
-                                <h4 className="mb-3 text-[10px] font-black uppercase tracking-[0.24em] text-[#ff905a]">{group.title}</h4>
-                                <ul className="flex flex-col gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                                    {(group.links || []).slice(0, 4).map((link) => (
-                                        <li key={`${group.title}-${link.href}-${link.label}`}>
-                                            <Link href={link.href || '/'} className={`transition-colors hover:text-white ${link.highlight ? 'italic text-white' : ''}`}>
-                                                {link.label}
+                    {/* Navigation Columns (Spans 7 columns) */}
+                    <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-8">
+                        {footerNav.map((section, idx) => (
+                            <div key={idx}>
+                                <h4 className="text-[11px] md:text-xs font-black uppercase tracking-[0.2em] text-white mb-6">{section.title}</h4>
+                                <ul className="space-y-3.5">
+                                    {section.links.map((link, linkIdx) => (
+                                        <li key={linkIdx}>
+                                            <Link 
+                                                href={link.href} 
+                                                className="group flex items-center font-semibold text-white/60 hover:text-white transition-colors"
+                                            >
+                                                <span className="h-[1px] w-0 bg-[#ff3f6c] transition-all duration-300 group-hover:w-3 group-hover:mr-2" />
+                                                <span className="uppercase tracking-widest text-[10px] md:text-[11px]">{link.name}</span>
                                             </Link>
                                         </li>
                                     ))}
@@ -105,53 +121,61 @@ export default function Footer() {
                             </div>
                         ))}
                     </div>
+                </div>
 
-                    <div className="flex flex-col gap-4 lg:items-end">
-                        <div className="flex gap-5">
-                            {socialLinks.slice(0, 4).map((social) => {
-                                const Icon = socialIconMap[social.icon] || FaInstagram;
-
-                                return (
-                                    <a key={`${social.icon}-${social.href}`} href={social.href || '#'} className="text-slate-400 transition hover:text-white" aria-label={social.label || social.icon}>
-                                        <Icon size={16} />
-                                    </a>
-                                );
-                            })}
+                {/* 2. Middle Section: Socials & Contact */}
+                <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+                    <div className="flex items-center gap-3">
+                        <a href="#" aria-label="Instagram" className="size-10 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-[#ff3f6c] hover:border-[#ff3f6c] transition-all duration-300">
+                            <Instagram />
+                        </a>
+                        <a href="#" aria-label="Twitter" className="size-10 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-[#ff3f6c] hover:border-[#ff3f6c] transition-all duration-300">
+                            <Twitter />
+                        </a>
+                        <a href="#" aria-label="YouTube" className="size-10 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-[#ff3f6c] hover:border-[#ff3f6c] transition-all duration-300">
+                            <Youtube />
+                        </a>
+                        <a href="#" aria-label="Facebook" className="size-10 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-[#ff3f6c] hover:border-[#ff3f6c] transition-all duration-300">
+                            <Facebook />
+                        </a>
+                    </div>
+                    
+                    <div className="flex flex-col md:flex-row gap-4 md:gap-8 text-center md:text-right">
+                        <div className="flex items-center gap-2 justify-center md:justify-end text-white/60">
+                            <Mail size={14} />
+                            <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest">{supportEmail}</span>
                         </div>
-
-                        <div className="flex flex-wrap gap-2 lg:justify-end">
-                            {paymentMethods.slice(0, 4).map((method) => (
-                                <span key={method} className="inline-flex items-center gap-1 border border-white/10 px-2.5 py-1 text-[8px] font-black uppercase tracking-widest text-slate-400">
-                                    <CreditCard size={12} />
-                                    {method}
-                                </span>
-                            ))}
+                        <div className="flex items-center gap-2 justify-center md:justify-end text-white/60">
+                            <MapPin size={14} />
+                            <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest">Global Shipping Available</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="mt-5 flex flex-col justify-between gap-3 border-t border-white/10 pt-4 text-slate-500 sm:flex-row sm:items-center">
-                    <p className="text-[9px] font-black uppercase tracking-[0.2em]">{copyright}</p>
-                    <div className="flex flex-wrap gap-4">
-                        {bottomLinks.map((link) => (
-                            <Link key={`${link.href}-${link.label}`} href={link.href || '/'} className="text-[8px] font-bold uppercase tracking-widest transition-colors hover:text-white">
-                                {link.label}
-                            </Link>
-                        ))}
+                {/* 3. Massive Brand Typography */}
+                <div className="w-full overflow-hidden flex justify-center items-center py-2 select-none pointer-events-none">
+                    <h2 
+                        className="text-[11vw] font-black uppercase italic leading-[0.8] tracking-tighter text-transparent w-full text-center"
+                        style={{ WebkitTextStroke: '1px rgba(255,255,255,0.1)' }}
+                    >
+                        {brandName}
+                    </h2>
+                </div>
+
+                {/* 4. Copyright & Legal */}
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-white/10 text-white/40">
+                    <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]">
+                        &copy; {new Date().getFullYear()} {brandName}. All Rights Reserved.
+                    </p>
+                    <div className="flex flex-wrap justify-center items-center gap-3 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]">
+                        <span>Secure Checkout</span>
+                        <div className="h-1 w-1 bg-white/20 rounded-full" />
+                        <span>Fast Delivery</span>
+                        <div className="h-1 w-1 bg-white/20 rounded-full" />
+                        <span>Premium Quality</span>
                     </div>
                 </div>
             </div>
         </footer>
     );
-}
-
-function parseJsonList(value, fallback = []) {
-    if (!value) return fallback;
-
-    try {
-        const decoded = typeof value === 'string' ? JSON.parse(value) : value;
-        return Array.isArray(decoded) && decoded.length ? decoded : fallback;
-    } catch {
-        return fallback;
-    }
 }

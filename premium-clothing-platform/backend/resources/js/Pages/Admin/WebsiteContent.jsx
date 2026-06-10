@@ -133,6 +133,9 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
         slug: '',
         sort_order: 0,
         image: null,
+        banner_image: null,
+        accent_color: '',
+        style_theme: 'default',
     });
 
     const {
@@ -354,10 +357,7 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
         e.preventDefault();
 
         if (editingTestimonial) {
-            router.post(`/franchise-superadmin/content/testimonials/${editingTestimonial.id}`, {
-                ...data,
-                _method: 'PUT',
-            }, {
+            router.put(`/franchise-superadmin/content/testimonials/${editingTestimonial.id}`, data, {
                 forceFormData: true,
                 preserveScroll: true,
                 onSuccess: closeTestimonialModal,
@@ -429,6 +429,9 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
             slug: '',
             sort_order: Number(tabData?.length || 0),
             image: null,
+            banner_image: null,
+            accent_color: '',
+            style_theme: 'default',
         });
         setIsFeaturedCategoryModalOpen(true);
     };
@@ -441,6 +444,9 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
             slug: category.slug || '',
             sort_order: Number(category.sort_order) || 0,
             image: null,
+            banner_image: null,
+            accent_color: category.accent_color || '',
+            style_theme: category.style_theme || 'default',
         });
         setIsFeaturedCategoryModalOpen(true);
     };
@@ -474,9 +480,8 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
         }
 
         if (editingFeaturedCategory) {
-            router.post(`/franchise-superadmin/content/featured-categories/${editingFeaturedCategory.id}`, {
+            router.put(`/franchise-superadmin/content/featured-categories/${editingFeaturedCategory.id}`, {
                 ...featuredCategoryForm.data,
-                _method: 'PUT',
             }, {
                 forceFormData: true,
                 preserveScroll: true,
@@ -1624,14 +1629,54 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                     />
                                 </div>
 
-                                <InputField
-                                    label="Sort Order"
-                                    type="number"
-                                    min="0"
-                                    value={featuredCategoryForm.data.sort_order}
-                                    onChange={(e) => featuredCategoryForm.setData('sort_order', e.target.value)}
-                                    error={featuredCategoryForm.errors.sort_order}
-                                />
+                                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                    <InputField
+                                        label="Sort Order"
+                                        type="number"
+                                        min="0"
+                                        value={featuredCategoryForm.data.sort_order}
+                                        onChange={(e) => featuredCategoryForm.setData('sort_order', e.target.value)}
+                                        error={featuredCategoryForm.errors.sort_order}
+                                    />
+                                    <div className="space-y-1.5">
+                                        <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">Style Theme</label>
+                                        <select
+                                            value={featuredCategoryForm.data.style_theme}
+                                            onChange={(e) => featuredCategoryForm.setData('style_theme', e.target.value)}
+                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] outline-none focus:ring-2 focus:ring-[#ff3f6c]"
+                                        >
+                                            <option value="default">Default (Dark)</option>
+                                            <option value="minimal">Minimal Light</option>
+                                            <option value="bold">Bold & Vibrant</option>
+                                            <option value="mono">Monochrome</option>
+                                            <option value="gradient">Gradient Mesh</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Accent Color (Hex)</label>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="color"
+                                                value={featuredCategoryForm.data.accent_color || '#ff3f6c'}
+                                                onChange={(e) => featuredCategoryForm.setData('accent_color', e.target.value)}
+                                                className="h-11 w-14 cursor-pointer border border-gray-200 rounded-xl bg-gray-50"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={featuredCategoryForm.data.accent_color}
+                                                onChange={(e) => featuredCategoryForm.setData('accent_color', e.target.value)}
+                                                placeholder="#ff3f6c"
+                                                className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-[#282c3f] outline-none focus:ring-2 focus:ring-[#ff3f6c]"
+                                            />
+                                        </div>
+                                        {featuredCategoryForm.errors.accent_color && (
+                                            <p className="text-[10px] font-bold text-red-500 ml-1">{featuredCategoryForm.errors.accent_color}</p>
+                                        )}
+                                    </div>
+                                </div>
 
                                 <div className="space-y-1.5">
                                     <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">Card Image</label>
@@ -1651,6 +1696,26 @@ export default function WebsiteContent({ tabData = [], activeTab, stats = {} }) 
                                         <p className="ml-1 text-[10px] font-bold text-red-500">
                                             {featuredCategoryImageError || featuredCategoryForm.errors.image}
                                         </p>
+                                    )}
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">Collection Banner Image (Optional - Wide)</label>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => featuredCategoryForm.setData('banner_image', e.target.files[0] || null)}
+                                        className="w-full bg-gray-50 border border-gray-200 px-4 py-2 text-sm font-bold text-[#282c3f]"
+                                    />
+                                    {editingFeaturedCategory?.banner_image_url && (
+                                        <div className="mt-3 flex items-center gap-3">
+                                            <img src={editingFeaturedCategory.banner_image_url} alt="Banner preview" className="h-16 w-36 object-cover" />
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Current banner. Leave empty to keep it.</p>
+                                        </div>
+                                    )}
+                                    <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400 ml-1">Appears as a unique background in each collection card.</p>
+                                    {featuredCategoryForm.errors.banner_image && (
+                                        <p className="ml-1 text-[10px] font-bold text-red-500">{featuredCategoryForm.errors.banner_image}</p>
                                     )}
                                 </div>
 

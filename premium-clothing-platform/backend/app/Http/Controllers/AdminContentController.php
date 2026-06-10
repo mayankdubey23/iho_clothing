@@ -66,6 +66,9 @@ class AdminContentController extends Controller
                     'slug'       => $item->slug,
                     'image_path' => $item->image_path,
                     'image_url'  => $item->image_path ? asset('storage/' . ltrim($item->image_path, '/')) : null,
+                    'banner_image_url' => $item->banner_image_path ? asset('storage/' . ltrim($item->banner_image_path, '/')) : null,
+                    'accent_color' => $item->accent_color,
+                    'style_theme' => $item->style_theme,
                     'sort_order' => $item->sort_order,
                     'is_active'  => $item->is_active,
                 ];
@@ -141,22 +144,32 @@ class AdminContentController extends Controller
     public function storeFeaturedCategory(Request $request)
     {
         $validated = $request->validate([
-            'name'       => 'required|string|max:255',
-            'slug'       => 'required|string|max:100',
-            'sort_order' => 'nullable|integer|min:0',
-            'image'      => 'nullable|image|max:4096',
+            'name'         => 'required|string|max:255',
+            'slug'         => 'required|string|max:100',
+            'sort_order'   => 'nullable|integer|min:0',
+            'image'        => 'nullable|image|max:4096',
+            'banner_image' => 'nullable|image|max:4096',
+            'accent_color' => 'nullable|string|max:7',
+            'style_theme'  => 'nullable|string|max:50',
         ]);
 
         $imagePath = $request->hasFile('image')
             ? $request->file('image')->store('featured_categories', 'public')
             : null;
 
+        $bannerPath = $request->hasFile('banner_image')
+            ? $request->file('banner_image')->store('featured_category_banners', 'public')
+            : null;
+
         FeaturedCategoryItem::create([
-            'name'       => $validated['name'],
-            'slug'       => $validated['slug'],
-            'sort_order' => $validated['sort_order'] ?? 0,
-            'image_path' => $imagePath,
-            'is_active'  => true,
+            'name'             => $validated['name'],
+            'slug'             => $validated['slug'],
+            'sort_order'       => $validated['sort_order'] ?? 0,
+            'image_path'       => $imagePath,
+            'banner_image_path'=> $bannerPath,
+            'accent_color'     => $validated['accent_color'] ?? null,
+            'style_theme'      => $validated['style_theme'] ?? 'default',
+            'is_active'        => true,
         ]);
 
         return back()->with('success', 'Featured category added successfully!');
@@ -167,25 +180,37 @@ class AdminContentController extends Controller
         $item = FeaturedCategoryItem::findOrFail($id);
 
         $validated = $request->validate([
-            'name'       => 'required|string|max:255',
-            'slug'       => 'required|string|max:100',
-            'sort_order' => 'nullable|integer|min:0',
-            'image'      => 'nullable|image|max:4096',
+            'name'         => 'required|string|max:255',
+            'slug'         => 'required|string|max:100',
+            'sort_order'   => 'nullable|integer|min:0',
+            'image'        => 'nullable|image|max:4096',
+            'banner_image' => 'nullable|image|max:4096',
+            'accent_color' => 'nullable|string|max:7',
+            'style_theme'  => 'nullable|string|max:50',
         ]);
 
         if ($request->hasFile('image')) {
-            // Delete old image if it exists
             if ($item->image_path) {
                 Storage::disk('public')->delete($item->image_path);
             }
             $validated['image_path'] = $request->file('image')->store('featured_categories', 'public');
         }
 
+        if ($request->hasFile('banner_image')) {
+            if ($item->banner_image_path) {
+                Storage::disk('public')->delete($item->banner_image_path);
+            }
+            $validated['banner_image_path'] = $request->file('banner_image')->store('featured_category_banners', 'public');
+        }
+
         $item->update([
-            'name'       => $validated['name'],
-            'slug'       => $validated['slug'],
-            'sort_order' => $validated['sort_order'] ?? $item->sort_order,
-            'image_path' => $validated['image_path'] ?? $item->image_path,
+            'name'             => $validated['name'],
+            'slug'             => $validated['slug'],
+            'sort_order'       => $validated['sort_order'] ?? $item->sort_order,
+            'image_path'       => $validated['image_path'] ?? $item->image_path,
+            'banner_image_path'=> $validated['banner_image_path'] ?? $item->banner_image_path,
+            'accent_color'     => $validated['accent_color'] ?? $item->accent_color,
+            'style_theme'      => $validated['style_theme'] ?? $item->style_theme,
         ]);
 
         return back()->with('success', 'Featured category updated successfully!');

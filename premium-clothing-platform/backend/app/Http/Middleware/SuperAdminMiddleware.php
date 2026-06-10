@@ -10,8 +10,8 @@ class SuperAdminMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        // Check if user is logged in AND their role is 'super_admin'
-        if (auth()->check() && auth()->user()->role === 'super_admin') {
+        // Check if user is logged in AND their role is 'super_admin' or 'admin'
+        if (auth()->check() && in_array(auth()->user()->role, ['super_admin', 'admin'])) {
             return $next($request);
         }
 

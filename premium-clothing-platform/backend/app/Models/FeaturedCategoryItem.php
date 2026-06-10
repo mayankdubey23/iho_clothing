@@ -10,6 +10,9 @@ class FeaturedCategoryItem extends Model
         'name',
         'slug',
         'image_path',
+        'banner_image_path',
+        'accent_color',
+        'style_theme',
         'sort_order',
         'is_active',
     ];

@@ -5,7 +5,6 @@ import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import { User, Package, MapPin, HeartHandshake, ShoppingBag, Tag, FileText, Phone, Shield } from 'lucide-react';
 
-// 🚀 Boutique Menu Style
 export const ACCOUNT_MENU = [
     { key: 'profile', label: 'My Profile', href: '/account', icon: User },
     { key: 'orders', label: 'My Orders', href: '/account', icon: Package },
@@ -22,7 +21,6 @@ export const money = new Intl.NumberFormat('en-IN', { style: 'currency', currenc
 export function imageFor(product) { return product?.images?.[0]?.image_path || ''; }
 export function stockFor(product) { return product?.skus?.reduce((t, s) => t + Number(s.inventory?.stock_quantity || 0), 0) || 0; }
 
-// 💎 Luxury Typography
 export function SectionHeading({ title, description }) {
     return (
         <div className="mb-10 text-center md:text-left">
@@ -38,7 +36,6 @@ export function EmptyState({ text }) {
     return <div className="p-16 text-center text-[#ff3f6c] font-bold uppercase tracking-widest text-xs border border-dashed border-gray-200 rounded-3xl">{text}</div>;
 }
 
-// 💎 Glassmorphic Stat Card
 export function Stat({ label, value }) {
     return (
         <div className="p-6 bg-white/40 backdrop-blur-[10px] border border-white/20 shadow-sm rounded-none hover:shadow-xl transition-all duration-500">
@@ -58,7 +55,6 @@ export function Field({ label, error, children }) {
     );
 }
 
-// 🚀 Main Layout Component
 export default function AppLayout({ children, admin = false, verticalNav = false }) {
     const navLinks = [
         { name: 'Storefront', href: '/' },
@@ -70,8 +66,6 @@ export default function AppLayout({ children, admin = false, verticalNav = false
 
     return (
         <div className="min-h-screen flex flex-col bg-white text-[#282c3f] selection:bg-[#282c3f] selection:text-white relative overflow-hidden">
-
-            {/* ❄️ Titanium Frost Orbs (Silver & Slate tones) */}
             {!admin && (
                 <>
                     <div className="absolute top-[-10%] left-[-5%] w-[40vw] h-[40vw] bg-[#fff0f4] rounded-full blur-[120px] opacity-60 pointer-events-none" />
@@ -82,7 +76,8 @@ export default function AppLayout({ children, admin = false, verticalNav = false
 
             {!admin && <Navbar navLinks={navLinks} vertical={verticalNav} />}
 
-            <main className={`flex-grow w-full relative z-10 ${verticalNav ? 'pt-16 lg:pt-0 lg:pl-20' : 'pt-16'}`}>
+            {/* 🚀 REMOVED pt-16 so the hero sits flush against the absolute top */}
+            <main className={`flex-grow w-full relative z-10 ${verticalNav ? 'lg:pl-20' : ''}`}>
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={typeof window !== 'undefined' ? window.location.pathname : 'page'}
@@ -100,7 +95,6 @@ export default function AppLayout({ children, admin = false, verticalNav = false
 
             <style dangerouslySetInnerHTML={{
                 __html: `
-                /* Minimalist Custom Scrollbar */
                 ::-webkit-scrollbar { width: 4px; }
                 ::-webkit-scrollbar-track { background: #f5f5f6; }
                 ::-webkit-scrollbar-thumb { background: #ff3f6c; }
